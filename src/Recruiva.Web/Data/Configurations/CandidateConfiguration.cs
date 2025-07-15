@@ -1,5 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Builders;
+﻿using Microsoft.EntityFrameworkCore.Metadata.Builders;
+
+using Recruiva.Web.ValueObjects;
 
 namespace Recruiva.Web.Data.Configurations;
 
@@ -8,7 +9,13 @@ public class CandidateConfiguration : IEntityTypeConfiguration<Candidate>
     public void Configure(EntityTypeBuilder<Candidate> builder)
     {
         builder.ToTable("Candidates");
-
+        builder.HasKey(a => a.Id);
+        builder.Property(a => a.Id)
+            .HasConversion(
+                id => id.ToString(),
+                value => Id.Create(Guid.Parse(value))
+            )
+            .HasColumnType("varchar(36)");
         builder.Property(c => c.Status)
             .HasConversion<string>()
             .HasMaxLength(50);

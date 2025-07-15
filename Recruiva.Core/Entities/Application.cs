@@ -9,12 +9,12 @@ public class Application : BaseEntity
     public virtual Candidate? Candidate { get; set; }
 
     [Required]
-    public string CandidateId { get; set; } = string.Empty;
+    public Id CandidateId { get; set; } = Id.Create();
 
     public virtual Job? Job { get; set; }
 
     [Required]
-    public string JobId { get; set; } = string.Empty;
+    public Id JobId { get; set; } = Id.Create();
 
     public string? Notes { get; set; }
 

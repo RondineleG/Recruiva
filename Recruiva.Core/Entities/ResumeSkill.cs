@@ -1,12 +1,12 @@
 ﻿namespace Recruiva.Web.Entities;
 
-public class ResumeSkill
+public class ResumeSkill : BaseEntity
 {
     public string Level { get; set; } = string.Empty;
 
     public virtual Resume? Resume { get; set; }
 
-    public string ResumeId { get; set; } = string.Empty;
+    public Id ResumeId { get; set; }
 
     public string Skill { get; set; } = string.Empty;
 

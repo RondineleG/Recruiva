@@ -1,6 +1,4 @@
-﻿using Recruiva.Web.Enums;
-
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace Recruiva.Web.Entities;
 
@@ -9,9 +7,9 @@ public class Job : BaseEntity
     public virtual Advertiser? Advertiser { get; set; }
 
     [Required]
-    public string AdvertiserId { get; set; } = string.Empty;
+    public Id AdvertiserId { get; set; }
 
-    public virtual ICollection<Application> Applications { get; set; } = new List<Application>();
+    public virtual ICollection<Application> Applications { get; set; } = [];
 
     public string? Benefits { get; set; }
 

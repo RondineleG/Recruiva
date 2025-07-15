@@ -1,7 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Builders;
+﻿using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-using Recruiva.Web.Entities;
+using Recruiva.Web.ValueObjects;
 
 namespace Recruiva.Web.Data.Configurations;
 
@@ -10,7 +9,13 @@ public class ApplicationStatusHistoryConfiguration : IEntityTypeConfiguration<Ap
     public void Configure(EntityTypeBuilder<ApplicationStatusHistory> builder)
     {
         builder.ToTable("ApplicationStatusHistory");
-
+        builder.HasKey(a => a.Id);
+        builder.Property(a => a.Id)
+            .HasConversion(
+                id => id.ToString(),
+                value => Id.Create(Guid.Parse(value))
+            )
+            .HasColumnType("varchar(36)");
         builder.HasKey(h => new { h.ApplicationId, h.Date });
 
         builder.Property(h => h.Responsible)

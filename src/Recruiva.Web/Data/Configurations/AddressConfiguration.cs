@@ -1,7 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Builders;
+﻿using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-using Recruiva.Web.Entities;
+using Recruiva.Web.ValueObjects;
 
 namespace Recruiva.Web.Data.Configurations;
 
@@ -10,6 +9,13 @@ public class AddressConfiguration : IEntityTypeConfiguration<Address>
     public void Configure(EntityTypeBuilder<Address> builder)
     {
         builder.ToTable("Addresses");
+        builder.HasKey(a => a.Id);
+        builder.Property(a => a.Id)
+            .HasConversion(
+                id => id.ToString(),
+                value => Id.Create(Guid.Parse(value))
+            )
+            .HasColumnType("varchar(36)");
 
         builder.Property(a => a.City).HasMaxLength(100);
         builder.Property(a => a.Complement).HasMaxLength(100);

@@ -1,7 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Builders;
+﻿using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-using Recruiva.Web.Entities;
+using Recruiva.Web.ValueObjects;
 
 namespace Recruiva.Web.Data.Configurations;
 
@@ -10,6 +9,22 @@ public class AdvertiserConfiguration : IEntityTypeConfiguration<Advertiser>
     public void Configure(EntityTypeBuilder<Advertiser> builder)
     {
         builder.ToTable("Advertisers");
+
+        builder.HasKey(a => a.Id);
+
+        builder.Property(a => a.Id)
+            .HasConversion(
+                id => id.Value,
+                value => Id.Create(value)
+            )
+            .HasColumnType("uniqueidentifier");
+
+        builder.Property(a => a.AddressId)
+            .HasConversion(
+                id => id.Value,
+                value => Id.Create(value)
+            )
+            .HasColumnType("uniqueidentifier");
 
         builder.Property(a => a.Status)
             .HasConversion<string>()

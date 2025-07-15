@@ -7,7 +7,7 @@ public class Resume : BaseEntity
     public virtual Candidate? Candidate { get; set; }
 
     [Required]
-    public string CandidateId { get; set; } = string.Empty;
+    public Id CandidateId { get; set; }
 
     public virtual ICollection<Education> EducationHistory { get; set; } = new List<Education>();
 

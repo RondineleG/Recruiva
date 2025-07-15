@@ -5,11 +5,7 @@ public sealed class Id : ValueObject
     private Id(Guid value)
     {
         Value = value;
-        _validationResult = new ValidationResult();
-        Validate();
     }
-
-    private readonly ValidationResult _validationResult;
 
     public Guid Value { get; }
 
@@ -18,41 +14,80 @@ public sealed class Id : ValueObject
         return new Id(Guid.NewGuid());
     }
 
-    public static implicit operator Guid(Id id)
+    public static Id Create(Guid guid)
     {
-        return id.Value;
+        return TryCreate(guid, out var id) ? id : throw new DomainException(IdResources.IdIsRequired);
     }
 
-    public static implicit operator Id(string value)
+    public static Id Create(string value)
     {
-        if (value.Contains('/'))
-        {
-            var parts = value.Split('/');
-
-            var idPart = parts[1].Split('-')[0];
-            if (Guid.TryParse(idPart, out var guid))
-            {
-                return new Id(guid);
-            }
-        }
-
-        return Guid.TryParse(value, out var normalGuid) ? new Id(normalGuid) : throw new DomainException(IdResources.InvalidIdFormat);
+        return TryCreate(value, out var id) ? id : throw new DomainException(IdResources.InvalidIdFormat);
     }
 
-    public static implicit operator string(Id id)
+    public static implicit operator Guid(Id id) => id.Value;
+
+    public static implicit operator Id(Guid guid) => Create(guid);
+
+    public static implicit operator string(Id id) => id.ToString();
+
+    public static bool operator !=(Id? left, Id? right)
     {
-        return id.ToString();
+        return !(left == right);
     }
 
-    public override string ToString()
+    public static bool operator ==(Id? left, Id? right)
     {
-        return Value.ToString("N");
+        return left?.Equals(right) ?? right is null;
     }
+
+    public static bool TryCreate(string value, out Id? id)
+    {
+        id = null;
+
+        if (string.IsNullOrWhiteSpace(value))
+            return false;
+
+        if (!Guid.TryParse(value, out var guid))
+            return false;
+
+        return TryCreate(guid, out id);
+    }
+
+    public static bool TryCreate(Guid guid, out Id? id)
+    {
+        id = null;
+
+        if (guid == Guid.Empty)
+            return false;
+
+        id = new Id(guid);
+        return true;
+    }
+
+    public bool Equals(Id? other)
+    {
+        return other is not null && Value.Equals(other.Value);
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is Id other && Equals(other);
+    }
+
+    public override int GetHashCode()
+    {
+        return Value.GetHashCode();
+    }
+
+    public override string ToString() => Value.ToString("D");
+
+    public string ToString(string format) => Value.ToString(format);
 
     public override ValidationResult Validate()
     {
-        _validationResult.AddErrorIf(() => Value == Guid.Empty, IdResources.IdIsRequired, nameof(Id));
-        return _validationResult;
+        var validationResult = new ValidationResult();
+        validationResult.AddErrorIf(() => Value == Guid.Empty, IdResources.IdIsRequired, nameof(Id));
+        return validationResult;
     }
 
     protected override IEnumerable<object> GetEqualityComponents()

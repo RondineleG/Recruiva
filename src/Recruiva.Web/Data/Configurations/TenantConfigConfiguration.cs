@@ -1,7 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Builders;
+﻿using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-using Recruiva.Web.Entities;
+using Recruiva.Web.ValueObjects;
 
 namespace Recruiva.Web.Data.Configurations;
 
@@ -10,7 +9,13 @@ public class TenantConfigConfiguration : IEntityTypeConfiguration<TenantConfig>
     public void Configure(EntityTypeBuilder<TenantConfig> builder)
     {
         builder.ToTable("TenantConfigs");
-
+        builder.HasKey(a => a.Id);
+        builder.Property(a => a.Id)
+            .HasConversion(
+                id => id.ToString(),
+                value => Id.Create(Guid.Parse(value))
+            )
+            .HasColumnType("varchar(36)");
         builder.Property(t => t.DisplayName)
             .IsRequired()
             .HasMaxLength(200);

@@ -8,8 +8,7 @@ public abstract class BaseEntity : IAggregateRoot
 {
     protected BaseEntity()
     {
-        _entityId = ValueObjects.Id.Create();
-        Id = $"{GetCollectionName()}/{_entityId}";
+        Id = Id.Create();
         CreatedAt = DateTime.UtcNow;
         ValidateInitialState();
     }
@@ -17,13 +16,10 @@ public abstract class BaseEntity : IAggregateRoot
     protected BaseEntity(Id id, DateTime createdAt, DateTime? updatedAt = null)
     {
         ValidateConstructorParameters(id, createdAt, updatedAt);
-        _entityId = id;
-        Id = $"{GetCollectionName()}/{id}";
+        Id = id;
         CreatedAt = createdAt;
         UpdatedAt = updatedAt;
     }
-
-    private readonly Id _entityId;
 
     public DateTime CreatedAt { get; protected set; } = DateTime.UtcNow;
 
@@ -33,7 +29,8 @@ public abstract class BaseEntity : IAggregateRoot
 
     public string DeletedBy { get; set; } = string.Empty;
 
-    public string Id { get; set; }
+    [Key]
+    public Id Id { get; set; }
 
     public bool IsDeleted { get; set; }
 

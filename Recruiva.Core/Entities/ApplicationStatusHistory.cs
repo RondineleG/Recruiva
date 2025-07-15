@@ -1,10 +1,10 @@
 ﻿namespace Recruiva.Web.Entities;
 
-public class ApplicationStatusHistory
+public class ApplicationStatusHistory : BaseEntity
 {
     public Application Application { get; set; } = default!;
 
-    public string ApplicationId { get; set; } = string.Empty;
+    public Id ApplicationId { get; set; }
 
     public DateTime Date { get; set; } = DateTime.UtcNow;
 

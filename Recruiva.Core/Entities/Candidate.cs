@@ -6,9 +6,9 @@ public class Candidate : BaseEntity
 {
     public Address Address { get; set; }
 
-    public string AddressId { get; set; }
+    public Id AddressId { get; set; }
 
-    public virtual ICollection<Application> Applications { get; set; } = new List<Application>();
+    public virtual ICollection<Application> Applications { get; set; } = [];
 
     public DateTime DateOfBirth { get; set; }
 
@@ -26,7 +26,7 @@ public class Candidate : BaseEntity
 
     public string? Phone { get; set; }
 
-    public virtual ICollection<Resume> Resumes { get; set; } = new List<Resume>();
+    public virtual ICollection<Resume> Resumes { get; set; } = [];
 
     public EAccountStatus Status { get; set; } = EAccountStatus.Incomplete;
 }

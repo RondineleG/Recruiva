@@ -8,7 +8,7 @@ public class Advertiser : BaseEntity
 
     public Address? Address { get; set; }
 
-    public string AddressId { get; set; }
+    public Id AddressId { get; set; }
 
     public string? CompanyDescription { get; set; }
 
