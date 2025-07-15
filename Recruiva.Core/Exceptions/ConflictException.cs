@@ -1,0 +1,4 @@
+namespace Recruiva.Web.Exceptions;
+
+public class ConflictException(string message, string errorCode = "CONFLICT_ERROR") : CustomException(message, errorCode)
+{ }
