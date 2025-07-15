@@ -14,7 +14,7 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="9.0.0" />
-    <ProjectReference Include="..\..\Recruiva.Core\Recruiva.Core.csproj" />
+    <ProjectReference Include="..\Recruiva.Core\Recruiva.Core.csproj" />
     <ProjectReference Include="..\Recruiva.Web.Client\Recruiva.Web.Client.csproj" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="8.0.17" />
     <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="9.0.7" />

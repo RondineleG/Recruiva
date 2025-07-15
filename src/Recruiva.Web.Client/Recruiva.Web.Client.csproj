@@ -18,8 +18,4 @@
     <Folder Include="Pages\" />
   </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\..\Recruiva.Core\Recruiva.Core.csproj" />
-  </ItemGroup>
-
 </Project>

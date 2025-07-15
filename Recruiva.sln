@@ -7,7 +7,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Recruiva.Web", "src\Recruiv
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Recruiva.Web.Client", "src\Recruiva.Web.Client\Recruiva.Web.Client.csproj", "{B171FACB-FDF1-B882-A24F-AF4E934576AA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Recruiva.Core", "Recruiva.Core\Recruiva.Core.csproj", "{D6A5CB6E-8345-4695-BDE2-C403A629C680}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Recruiva.Core", "src\Recruiva.Core\Recruiva.Core.csproj", "{B9C860E9-ADB2-29E1-5A8C-D375A9E4FE37}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -23,10 +23,10 @@ Global
 		{B171FACB-FDF1-B882-A24F-AF4E934576AA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B171FACB-FDF1-B882-A24F-AF4E934576AA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B171FACB-FDF1-B882-A24F-AF4E934576AA}.Release|Any CPU.Build.0 = Release|Any CPU
-		{D6A5CB6E-8345-4695-BDE2-C403A629C680}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{D6A5CB6E-8345-4695-BDE2-C403A629C680}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{D6A5CB6E-8345-4695-BDE2-C403A629C680}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{D6A5CB6E-8345-4695-BDE2-C403A629C680}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B9C860E9-ADB2-29E1-5A8C-D375A9E4FE37}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B9C860E9-ADB2-29E1-5A8C-D375A9E4FE37}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B9C860E9-ADB2-29E1-5A8C-D375A9E4FE37}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B9C860E9-ADB2-29E1-5A8C-D375A9E4FE37}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
