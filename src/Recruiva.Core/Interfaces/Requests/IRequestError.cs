@@ -1,4 +1,6 @@
-namespace Recruiva.Web.Interfaces.Requests;
+using Recruiva.Core.Requests;
+
+namespace Recruiva.Core.Interfaces.Requests;
 
 public interface IRequestError : IRequestResult
 {

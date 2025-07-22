@@ -1,4 +1,8 @@
-namespace Recruiva.Web.Interfaces.Repositories.Base;
+using Recruiva.Core.Entities.Base;
+using Recruiva.Core.Requests;
+using Recruiva.Core.ValueObjects;
+
+namespace Recruiva.Core.Interfaces.Repositories.Base;
 
 public interface IBaseRepository<TEntity>
     where TEntity : BaseEntity

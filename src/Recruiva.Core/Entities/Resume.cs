@@ -1,6 +1,10 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Recruiva.Core.Entities.Base;
+using Recruiva.Core.Enums;
+using Recruiva.Core.ValueObjects;
 
-namespace Recruiva.Web.Entities;
+using System.ComponentModel.DataAnnotations;
+
+namespace Recruiva.Core.Entities;
 
 public class Resume : BaseEntity
 {

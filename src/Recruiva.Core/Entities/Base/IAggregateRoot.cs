@@ -1,4 +1,4 @@
-namespace Recruiva.Web.Entities.Base;
+namespace Recruiva.Core.Entities.Base;
 
 public interface IAggregateRoot
 { }

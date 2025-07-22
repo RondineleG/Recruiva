@@ -1,6 +1,6 @@
 using System.ComponentModel;
 
-namespace Recruiva.Web.Extensions;
+namespace Recruiva.Core.Extensions;
 
 public static class EnumExtensions
 {

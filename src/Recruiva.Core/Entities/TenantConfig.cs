@@ -1,6 +1,8 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Recruiva.Core.Entities.Base;
 
-namespace Recruiva.Web.Entities;
+using System.ComponentModel.DataAnnotations;
+
+namespace Recruiva.Core.Entities;
 
 public class TenantConfig : BaseEntity
 {

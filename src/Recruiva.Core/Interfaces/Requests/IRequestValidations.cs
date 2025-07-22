@@ -1,6 +1,6 @@
-using Recruiva.Web.Requests;
+using Recruiva.Core.Requests;
 
-namespace Recruiva.Web.Interfaces.Requests;
+namespace Recruiva.Core.Interfaces.Requests;
 
 public interface IRequestValidations : IRequestResult
 {

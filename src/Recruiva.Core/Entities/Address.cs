@@ -1,4 +1,6 @@
-﻿namespace Recruiva.Web.Entities;
+﻿using Recruiva.Core.Entities.Base;
+
+namespace Recruiva.Core.Entities;
 
 public class Address : BaseEntity
 {

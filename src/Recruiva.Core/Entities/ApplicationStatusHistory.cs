@@ -1,4 +1,8 @@
-﻿namespace Recruiva.Web.Entities;
+﻿using Recruiva.Core.Entities.Base;
+using Recruiva.Core.Enums;
+using Recruiva.Core.ValueObjects;
+
+namespace Recruiva.Core.Entities;
 
 public class ApplicationStatusHistory : BaseEntity
 {

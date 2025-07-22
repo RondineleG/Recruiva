@@ -1,6 +1,6 @@
-using Recruiva.Web.Interfaces.Validations;
+using Recruiva.Core.Interfaces.Validations;
 
-namespace Recruiva.Web.Extensions;
+namespace Recruiva.Core.Extensions;
 
 public static class ValidationResultExtensions
 {

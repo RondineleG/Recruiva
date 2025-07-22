@@ -1,4 +1,4 @@
-namespace Recruiva.Web.Exceptions;
+namespace Recruiva.Core.Exceptions;
 
 public abstract class CustomException(string message, string errorCode) : Exception(message)
 {

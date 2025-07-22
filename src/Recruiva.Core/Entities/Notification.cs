@@ -1,8 +1,9 @@
-﻿using Recruiva.Web.Enums;
+﻿using Recruiva.Core.Entities.Base;
+using Recruiva.Core.Enums;
 
 using System.ComponentModel.DataAnnotations;
 
-namespace Recruiva.Web.Entities;
+namespace Recruiva.Core.Entities;
 
 public class Notification : BaseEntity
 {

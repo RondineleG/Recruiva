@@ -1,4 +1,6 @@
-namespace Recruiva.Web.Interfaces.Validations;
+using Recruiva.Core.Entities.Base;
+
+namespace Recruiva.Core.Interfaces.Validations;
 
 public interface IValidationRule<in T>
     where T : BaseEntity

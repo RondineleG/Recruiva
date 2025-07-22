@@ -1,4 +1,4 @@
-namespace Recruiva.Web.Exceptions;
+namespace Recruiva.Core.Exceptions;
 
 public class NotFoundException(string message, string errorCode = "NOT_FOUND") : CustomException(message, errorCode)
 { }

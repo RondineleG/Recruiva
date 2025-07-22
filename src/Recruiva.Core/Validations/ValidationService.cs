@@ -1,9 +1,9 @@
-using Recruiva.Web.Entities.Base;
-using Recruiva.Web.Interfaces.Validations;
+using Recruiva.Core.Entities.Base;
+using Recruiva.Core.Interfaces.Validations;
 
 using System.Linq.Expressions;
 
-namespace Recruiva.Web.Validations;
+namespace Recruiva.Core.Validations;
 
 public class ValidationService<T>(IValidationBuilder<T> builder, IEntityValidator<T> validator) : IValidationService<T>
     where T : BaseEntity

@@ -1,4 +1,6 @@
-namespace Recruiva.Web.Interfaces.Validations;
+using Recruiva.Core.Validations;
+
+namespace Recruiva.Core.Interfaces.Validations;
 
 public interface IValidationResult
 {

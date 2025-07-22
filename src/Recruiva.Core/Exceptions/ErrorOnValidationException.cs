@@ -1,4 +1,4 @@
-namespace Recruiva.Web.Exceptions;
+namespace Recruiva.Core.Exceptions;
 
 public class ErrorOnValidationException(string message, string errorCode = "VALIDATION_ERROR") : CustomException(message, errorCode)
 { }

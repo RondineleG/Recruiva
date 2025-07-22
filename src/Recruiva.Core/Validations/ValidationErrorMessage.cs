@@ -1,4 +1,4 @@
-namespace Recruiva.Web.Validations;
+namespace Recruiva.Core.Validations;
 
 public sealed class ValidationErrorMessage
 {

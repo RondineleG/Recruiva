@@ -1,4 +1,6 @@
-namespace Recruiva.Web.Interfaces.UseCases;
+using Recruiva.Core.Requests;
+
+namespace Recruiva.Core.Interfaces.UseCases;
 
 public interface IUseCase<TRequest, TResponse>
 {

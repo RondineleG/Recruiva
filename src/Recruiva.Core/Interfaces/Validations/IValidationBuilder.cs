@@ -1,4 +1,4 @@
-namespace Recruiva.Web.Interfaces.Validations;
+namespace Recruiva.Core.Interfaces.Validations;
 
 public interface IValidationBuilder<T>
 {

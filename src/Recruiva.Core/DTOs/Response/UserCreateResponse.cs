@@ -1,4 +1,4 @@
-namespace Recruiva.Web.DTOs.Response
+namespace Recruiva.Core.DTOs.Response
 {
     public class UserCreateResponse
     {

@@ -1,9 +1,9 @@
-using Recruiva.Web.Exceptions;
-using Recruiva.Web.Interfaces.Validations;
+using Recruiva.Core.Exceptions;
+using Recruiva.Core.Interfaces.Validations;
 
 using System.Collections.ObjectModel;
 
-namespace Recruiva.Web.Validations;
+namespace Recruiva.Core.Validations;
 
 public sealed class ValidationResult : IValidationResult
 {

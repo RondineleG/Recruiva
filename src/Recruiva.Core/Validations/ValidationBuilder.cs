@@ -1,6 +1,9 @@
+using Recruiva.Core.Entities.Base;
+using Recruiva.Core.Interfaces.Validations;
+
 using System.Text.RegularExpressions;
 
-namespace Recruiva.Web.Validations;
+namespace Recruiva.Core.Validations;
 
 public class ValidationBuilder<T> : IValidationBuilder<T>
     where T : BaseEntity

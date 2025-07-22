@@ -1,4 +1,4 @@
-﻿namespace Recruiva.Web.Enums;
+﻿namespace Recruiva.Core.Enums;
 
 public enum EEducationLevel
 {

@@ -1,4 +1,4 @@
-namespace Recruiva.Web.Interfaces.Requests;
+namespace Recruiva.Core.Interfaces.Requests;
 
 public interface IRequestCustomResult<out T> : IRequestResult
 {

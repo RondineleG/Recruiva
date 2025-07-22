@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace Recruiva.Web.DTOs.Response
+namespace Recruiva.Core.DTOs.Response
 {
     public class UserLoginResponse
     {

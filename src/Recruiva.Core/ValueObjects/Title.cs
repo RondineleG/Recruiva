@@ -1,4 +1,7 @@
-namespace Recruiva.Web.ValueObjects;
+using Recruiva.Core.Validations;
+using Recruiva.Core.ValueObjects.Base;
+
+namespace Recruiva.Core.ValueObjects;
 
 public class Title : ValueObject
 {

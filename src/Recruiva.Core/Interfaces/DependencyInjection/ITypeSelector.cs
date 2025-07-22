@@ -1,4 +1,4 @@
-namespace Recruiva.Web.Interfaces.DependencyInjection;
+namespace Recruiva.Core.Interfaces.DependencyInjection;
 
 public interface IAssemblyScanner
 {

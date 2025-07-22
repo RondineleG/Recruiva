@@ -1,9 +1,11 @@
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
+using Recruiva.Core.ValueObjects;
+
 using System.Text.Json.Serialization;
 
-namespace Recruiva.Web.Converters;
+namespace Recruiva.Core.Converters;
 
 public class IdValueComparer : ValueComparer<Id>
 {

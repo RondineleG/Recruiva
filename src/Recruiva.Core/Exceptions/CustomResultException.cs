@@ -1,4 +1,6 @@
-namespace Recruiva.Web.Exceptions;
+using Recruiva.Core.Requests;
+
+namespace Recruiva.Core.Exceptions;
 
 public class CustomResultException(RequestResult customResult) : Exception(customResult?.Message ?? "An error occurred")
 {

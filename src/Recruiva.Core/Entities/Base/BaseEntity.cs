@@ -1,9 +1,10 @@
+using Recruiva.Core.ValueObjects;
+
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-using ValidationResult = Recruiva.Web.Validations.ValidationResult;
 
-namespace Recruiva.Web.Entities.Base;
+namespace Recruiva.Core.Entities.Base;
 
 public abstract class BaseEntity : IAggregateRoot
 {
@@ -92,7 +93,7 @@ public abstract class BaseEntity : IAggregateRoot
 
     protected virtual void ValidateEntityState()
     {
-        var result = ValidationResult
+        var result = Validations.ValidationResult
             .Success()
             .AddErrorIf(() => CreatedAt == default || CreatedAt.Kind != DateTimeKind.Utc,
                 "CreatedAt must be a valid UTC date", nameof(CreatedAt));
@@ -111,7 +112,7 @@ public abstract class BaseEntity : IAggregateRoot
 
     private static void ValidateConstructorParameters(Id id, DateTime createdAt, DateTime? updatedAt)
     {
-        var result = ValidationResult
+        var result = Validations.ValidationResult
             .Success()
             .AddErrorIf(() => id == null, "Id cannot be null", nameof(Id))
             .AddErrorIf(() => createdAt == default, "CreatedAt is required", nameof(CreatedAt))
@@ -131,7 +132,7 @@ public abstract class BaseEntity : IAggregateRoot
 
     private void ValidateInitialState()
     {
-        ValidationResult
+        Validations.ValidationResult
             .Success()
             .AddErrorIf(() => CreatedAt == default || CreatedAt.Kind != DateTimeKind.Utc,
                 "CreatedAt must be a valid UTC date", nameof(CreatedAt))

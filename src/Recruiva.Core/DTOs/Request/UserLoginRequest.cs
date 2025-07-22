@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace Recruiva.Web.DTOs.Request;
+namespace Recruiva.Core.DTOs.Request;
 
 public class UserLoginRequest
 {

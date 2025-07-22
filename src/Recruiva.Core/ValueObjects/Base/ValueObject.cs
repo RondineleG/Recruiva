@@ -1,6 +1,6 @@
-using Recruiva.Web.Validations;
+using Recruiva.Core.Validations;
 
-namespace Recruiva.Web.ValueObjects.Base;
+namespace Recruiva.Core.ValueObjects.Base;
 
 public abstract class ValueObject
 {

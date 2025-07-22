@@ -1,8 +1,10 @@
-using Recruiva.Web.Interfaces.Requests;
+using Recruiva.Core.Enums;
+using Recruiva.Core.Interfaces.Requests;
+using Recruiva.Core.Validations;
 
-using ValidationResult = Recruiva.Web.Validations.ValidationResult;
+using ValidationResult = Recruiva.Core.Validations.ValidationResult;
 
-namespace Recruiva.Web.Requests;
+namespace Recruiva.Core.Requests;
 
 public class RequestResult : IRequestValidations, IRequestError, IRequestEntityWarning
 {

@@ -1,7 +1,7 @@
-using Recruiva.Web.Entities.Base;
-using Recruiva.Web.Validations;
+using Recruiva.Core.Entities.Base;
+using Recruiva.Core.Validations;
 
-namespace Recruiva.Web.Interfaces.Validations;
+namespace Recruiva.Core.Interfaces.Validations;
 
 public interface IValidationService<T>
     where T : BaseEntity

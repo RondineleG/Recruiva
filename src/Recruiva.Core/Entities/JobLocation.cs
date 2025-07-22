@@ -1,4 +1,4 @@
-﻿namespace Recruiva.Web.Entities;
+﻿namespace Recruiva.Core.Entities;
 
 public class JobLocation
 {

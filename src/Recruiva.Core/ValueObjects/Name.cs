@@ -1,14 +1,14 @@
-using Recruiva.Web.Converters;
-using Recruiva.Web.Exceptions;
+using Recruiva.Core.Converters;
+using Recruiva.Core.Exceptions;
+using Recruiva.Core.Validations;
+using Recruiva.Core.ValueObjects.Base;
 using Recruiva.Web.Resources.Core.ValueObjects;
-using Recruiva.Web.ValueObjects.Base;
 
 using System.Globalization;
 using System.Text.Json.Serialization;
 
-using ValidationResult = Recruiva.Web.Validations.ValidationResult;
 
-namespace Recruiva.Web.ValueObjects;
+namespace Recruiva.Core.ValueObjects;
 
 [JsonConverter(typeof(NameConverter))]
 public class Name : ValueObject

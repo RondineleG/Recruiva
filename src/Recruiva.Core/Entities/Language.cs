@@ -1,6 +1,6 @@
-﻿using Recruiva.Web.Enums;
+﻿using Recruiva.Core.Enums;
 
-namespace Recruiva.Web.Entities;
+namespace Recruiva.Core.Entities;
 
 public class Language
 {

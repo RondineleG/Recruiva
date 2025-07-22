@@ -1,6 +1,6 @@
-using Recruiva.Web.Enums;
+using Recruiva.Core.Enums;
 
-namespace Recruiva.Web.Interfaces.Requests;
+namespace Recruiva.Core.Interfaces.Requests;
 
 public interface IRequestResult
 {

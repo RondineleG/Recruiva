@@ -1,4 +1,7 @@
-namespace Recruiva.Web.Exceptions;
+using Recruiva.Core.Interfaces.Validations;
+using Recruiva.Core.Validations;
+
+namespace Recruiva.Core.Exceptions;
 
 public class DomainException(string message, string errorCode = "DOMAIN_ERROR") : CustomException(message, errorCode)
 {

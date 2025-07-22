@@ -1,8 +1,11 @@
+using Recruiva.Core.Exceptions;
 using Recruiva.Core.TypeConverters;
+using Recruiva.Core.Validations;
+using Recruiva.Core.ValueObjects.Base;
 
 using System.ComponentModel;
 
-namespace Recruiva.Web.ValueObjects;
+namespace Recruiva.Core.ValueObjects;
 
 [TypeConverter(typeof(IdTypeConverter))]
 public sealed class Id : ValueObject

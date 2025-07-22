@@ -1,4 +1,6 @@
-﻿using System.ComponentModel;
+﻿using Recruiva.Core.ValueObjects;
+
+using System.ComponentModel;
 
 namespace Recruiva.Core.TypeConverters;
 
