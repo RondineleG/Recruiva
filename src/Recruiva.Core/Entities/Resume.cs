@@ -9,15 +9,15 @@ public class Resume : BaseEntity
     [Required]
     public Id CandidateId { get; set; }
 
-    public virtual ICollection<Education> EducationHistory { get; set; } = new List<Education>();
+    public virtual ICollection<Education> EducationHistory { get; set; } = [];
 
-    public virtual ICollection<Experience> ExperienceHistory { get; set; } = new List<Experience>();
+    public virtual ICollection<Experience> ExperienceHistory { get; set; } = [];
 
     public bool IsActive { get; set; }
 
-    public virtual ICollection<Language> Languages { get; set; } = new List<Language>();
+    public virtual ICollection<Language> Languages { get; set; } = [];
 
-    public virtual ICollection<ResumeSkill> Skills { get; set; } = new List<ResumeSkill>();
+    public virtual ICollection<ResumeSkill> Skills { get; set; } = [];
 
     public string? Summary { get; set; }
 

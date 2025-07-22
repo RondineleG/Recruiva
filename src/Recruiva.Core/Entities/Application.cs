@@ -9,12 +9,12 @@ public class Application : BaseEntity
     public virtual Candidate? Candidate { get; set; }
 
     [Required]
-    public Id CandidateId { get; set; } = Id.Create();
+    public Id CandidateId { get; set; }
 
     public virtual Job? Job { get; set; }
 
     [Required]
-    public Id JobId { get; set; } = Id.Create();
+    public Id JobId { get; set; }
 
     public string? Notes { get; set; }
 
@@ -24,7 +24,7 @@ public class Application : BaseEntity
 
     public EApplicationStatus Status { get; set; } = EApplicationStatus.Sent;
 
-    public virtual ICollection<ApplicationStatusHistory> StatusHistory { get; set; } = new List<ApplicationStatusHistory>();
+    public virtual ICollection<ApplicationStatusHistory> StatusHistory { get; set; } = [];
 
     public DateTime? ViewedAt { get; set; }
 }

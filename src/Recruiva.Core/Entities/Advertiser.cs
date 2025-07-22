@@ -19,7 +19,7 @@ public class Advertiser : BaseEntity
 
     public bool IsPhoneVerified { get; set; } = false;
 
-    public virtual ICollection<Job> Jobs { get; set; } = new List<Job>();
+    public virtual ICollection<Job> Jobs { get; set; } = [];
 
     public string? LogoUrl { get; set; }
 

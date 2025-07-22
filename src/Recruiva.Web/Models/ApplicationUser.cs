@@ -1,6 +1,6 @@
 namespace Recruiva.Web.Models
 {
-    public class ApplicationUser : IdentityUser
+    public class ApplicationUser : IdentityUser<Guid>
     {
         public DateTime? CreatedAt { get; set; }
 

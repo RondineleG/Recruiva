@@ -6,9 +6,16 @@ using Recruiva.Web.ValueObjects;
 
 namespace Recruiva.Web.Data;
 
-public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
-    : IdentityDbContext<ApplicationUser>(options)
+public class ApplicationDbContext : IdentityDbContext<ApplicationUser, IdentityRole<Guid>, Guid>
 {
+    public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
+    {
+    }
+
+    public ApplicationDbContext() : base(new DbContextOptions<ApplicationDbContext>())
+    {
+    }
+
     public DbSet<Advertiser> Advertisers => Set<Advertiser>();
 
     public DbSet<Application> Applications => Set<Application>();
@@ -26,6 +33,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
+
         modelBuilder.Ignore<JobBoost>();
         modelBuilder.Ignore<JobHighlight>();
         modelBuilder.Ignore<JobLocation>();
@@ -35,6 +43,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
         modelBuilder.Ignore<Education>();
         modelBuilder.Ignore<Experience>();
         modelBuilder.Ignore<Language>();
+
         modelBuilder.ApplyEntityConfigurations();
 
         foreach (var entityType in modelBuilder.Model.GetEntityTypes())
