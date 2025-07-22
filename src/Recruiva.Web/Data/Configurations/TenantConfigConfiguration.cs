@@ -10,12 +10,12 @@ public class TenantConfigConfiguration : IEntityTypeConfiguration<TenantConfig>
     {
         builder.ToTable("TenantConfigs");
         builder.HasKey(a => a.Id);
-        builder.Property(a => a.Id)
-            .HasConversion(
-                id => id.ToString(),
-                value => Id.Create(Guid.Parse(value))
-            )
-            .HasColumnType("varchar(36)");
+        builder.Property(e => e.Id)
+     .HasConversion(
+         id => id.Value,
+         value => Id.Create(value)
+     )
+     .HasColumnType("UNIQUEIDENTIFIER");
         builder.Property(t => t.DisplayName)
             .IsRequired()
             .HasMaxLength(200);

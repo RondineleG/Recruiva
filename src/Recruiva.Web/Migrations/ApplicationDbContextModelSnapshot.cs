@@ -8,7 +8,7 @@ using Recruiva.Web.Data;
 
 #nullable disable
 
-namespace Recruiva.Web.Data.Migrations
+namespace Recruiva.Web.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
     partial class ApplicationDbContextModelSnapshot : ModelSnapshot
@@ -43,10 +43,64 @@ namespace Recruiva.Web.Data.Migrations
 
                     b.HasIndex("NormalizedName")
                         .IsUnique()
+                        .HasDatabaseName("RoleNameIndex")
+                        .HasFilter("[NormalizedName] IS NOT NULL");
+
+                    b.ToTable("AspNetRoles", (string)null);
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole<System.Guid>", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("ConcurrencyStamp")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<string>("NormalizedName")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("NormalizedName")
+                        .IsUnique()
                         .HasDatabaseName("IX_Roles_NormalizedName")
                         .HasFilter("[NormalizedName] IS NOT NULL");
 
                     b.ToTable("Roles", "Identity");
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("ClaimType")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("ClaimValue")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<Guid>("RoleId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("RoleId")
+                        .HasDatabaseName("IX_RoleClaims_RoleId");
+
+                    b.ToTable("RoleClaims", "Identity");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -58,12 +112,10 @@ namespace Recruiva.Web.Data.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("ClaimType")
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ClaimValue")
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("RoleId")
                         .IsRequired()
@@ -71,13 +123,12 @@ namespace Recruiva.Web.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("RoleId")
-                        .HasDatabaseName("IX_RoleClaims_RoleId");
+                    b.HasIndex("RoleId");
 
-                    b.ToTable("RoleClaims", "Identity");
+                    b.ToTable("AspNetRoleClaims", (string)null);
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<System.Guid>", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -93,9 +144,8 @@ namespace Recruiva.Web.Data.Migrations
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
 
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("varchar(36)");
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
 
@@ -105,7 +155,32 @@ namespace Recruiva.Web.Data.Migrations
                     b.ToTable("UserClaims", "Identity");
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("ClaimType")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ClaimValue")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("AspNetUserClaims", (string)null);
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<System.Guid>", b =>
                 {
                     b.Property<string>("LoginProvider")
                         .HasMaxLength(200)
@@ -119,9 +194,8 @@ namespace Recruiva.Web.Data.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
 
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("varchar(36)");
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.HasKey("LoginProvider", "ProviderKey");
 
@@ -131,13 +205,35 @@ namespace Recruiva.Web.Data.Migrations
                     b.ToTable("UserLogins", "Identity");
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<string>", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
                 {
-                    b.Property<string>("UserId")
-                        .HasColumnType("varchar(36)");
-
-                    b.Property<string>("RoleId")
+                    b.Property<string>("LoginProvider")
                         .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("ProviderKey")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("ProviderDisplayName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("LoginProvider", "ProviderKey");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("AspNetUserLogins", (string)null);
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<System.Guid>", b =>
+                {
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("RoleId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.HasKey("UserId", "RoleId");
 
@@ -147,10 +243,25 @@ namespace Recruiva.Web.Data.Migrations
                     b.ToTable("UserRoles", "Identity");
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<string>", b =>
                 {
                     b.Property<string>("UserId")
-                        .HasColumnType("varchar(36)");
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("RoleId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("UserId", "RoleId");
+
+                    b.HasIndex("RoleId");
+
+                    b.ToTable("AspNetUserRoles", (string)null);
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<System.Guid>", b =>
+                {
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("LoginProvider")
                         .HasMaxLength(200)
@@ -169,11 +280,30 @@ namespace Recruiva.Web.Data.Migrations
                     b.ToTable("UserTokens", "Identity");
                 });
 
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
+                {
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("LoginProvider")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Value")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("UserId", "LoginProvider", "Name");
+
+                    b.ToTable("AspNetUserTokens", (string)null);
+                });
+
             modelBuilder.Entity("Recruiva.Web.Entities.Address", b =>
                 {
-                    b.Property<string>("Id")
+                    b.Property<Guid>("Id")
                         .HasMaxLength(36)
-                        .HasColumnType("varchar(36)");
+                        .HasColumnType("UNIQUEIDENTIFIER");
 
                     b.Property<string>("City")
                         .HasMaxLength(100)
@@ -254,9 +384,9 @@ namespace Recruiva.Web.Data.Migrations
 
             modelBuilder.Entity("Recruiva.Web.Entities.Advertiser", b =>
                 {
-                    b.Property<string>("Id")
+                    b.Property<Guid>("Id")
                         .HasMaxLength(36)
-                        .HasColumnType("varchar(36)");
+                        .HasColumnType("UNIQUEIDENTIFIER");
 
                     b.Property<string>("ActivePlan")
                         .HasColumnType("nvarchar(max)");
@@ -365,18 +495,17 @@ namespace Recruiva.Web.Data.Migrations
 
             modelBuilder.Entity("Recruiva.Web.Entities.Application", b =>
                 {
-                    b.Property<string>("Id")
+                    b.Property<Guid>("Id")
                         .HasMaxLength(36)
-                        .HasColumnType("varchar(36)");
+                        .HasColumnType("UNIQUEIDENTIFIER");
 
                     b.Property<DateTime?>("AppliedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
                         .HasDefaultValueSql("GETUTCDATE()");
 
-                    b.Property<string>("CandidateId")
-                        .IsRequired()
-                        .HasColumnType("varchar(36)");
+                    b.Property<Guid>("CandidateId")
+                        .HasColumnType("UNIQUEIDENTIFIER");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
@@ -399,9 +528,8 @@ namespace Recruiva.Web.Data.Migrations
                         .HasColumnType("bit")
                         .HasDefaultValue(false);
 
-                    b.Property<string>("JobId")
-                        .IsRequired()
-                        .HasColumnType("varchar(36)");
+                    b.Property<Guid>("JobId")
+                        .HasColumnType("UNIQUEIDENTIFIER");
 
                     b.Property<string>("Notes")
                         .HasMaxLength(1000)
@@ -457,17 +585,12 @@ namespace Recruiva.Web.Data.Migrations
 
             modelBuilder.Entity("Recruiva.Web.Entities.ApplicationStatusHistory", b =>
                 {
-                    b.Property<string>("Id")
+                    b.Property<Guid>("Id")
                         .HasMaxLength(36)
-                        .HasColumnType("varchar(36)");
+                        .HasColumnType("UNIQUEIDENTIFIER");
 
-                    b.Property<string>("ApplicationId")
-                        .IsRequired()
-                        .HasColumnType("varchar(36)");
-
-                    b.Property<string>("ApplicationId1")
-                        .IsRequired()
-                        .HasColumnType("varchar(36)");
+                    b.Property<Guid>("ApplicationId")
+                        .HasColumnType("UNIQUEIDENTIFIER");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
@@ -478,6 +601,7 @@ namespace Recruiva.Web.Data.Migrations
                         .HasColumnType("nvarchar(100)");
 
                     b.Property<DateTime>("Date")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
                         .HasDefaultValueSql("GETUTCDATE()");
 
@@ -525,8 +649,6 @@ namespace Recruiva.Web.Data.Migrations
                     b.HasIndex("ApplicationId")
                         .HasDatabaseName("IX_ApplicationStatusHistory_ApplicationId");
 
-                    b.HasIndex("ApplicationId1");
-
                     b.HasIndex("TenantId", "Id")
                         .IsUnique();
 
@@ -535,13 +657,12 @@ namespace Recruiva.Web.Data.Migrations
 
             modelBuilder.Entity("Recruiva.Web.Entities.Candidate", b =>
                 {
-                    b.Property<string>("Id")
+                    b.Property<Guid>("Id")
                         .HasMaxLength(36)
-                        .HasColumnType("varchar(36)");
+                        .HasColumnType("UNIQUEIDENTIFIER");
 
-                    b.Property<string>("AddressId")
-                        .IsRequired()
-                        .HasColumnType("varchar(36)");
+                    b.Property<Guid>("AddressId")
+                        .HasColumnType("UNIQUEIDENTIFIER");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
@@ -634,13 +755,12 @@ namespace Recruiva.Web.Data.Migrations
 
             modelBuilder.Entity("Recruiva.Web.Entities.Job", b =>
                 {
-                    b.Property<string>("Id")
+                    b.Property<Guid>("Id")
                         .HasMaxLength(36)
-                        .HasColumnType("varchar(36)");
+                        .HasColumnType("UNIQUEIDENTIFIER");
 
-                    b.Property<string>("AdvertiserId")
-                        .IsRequired()
-                        .HasColumnType("varchar(36)");
+                    b.Property<Guid>("AdvertiserId")
+                        .HasColumnType("UNIQUEIDENTIFIER");
 
                     b.Property<string>("Benefits")
                         .HasMaxLength(2000)
@@ -736,9 +856,9 @@ namespace Recruiva.Web.Data.Migrations
 
             modelBuilder.Entity("Recruiva.Web.Entities.Notification", b =>
                 {
-                    b.Property<string>("Id")
+                    b.Property<Guid>("Id")
                         .HasMaxLength(36)
-                        .HasColumnType("varchar(36)");
+                        .HasColumnType("UNIQUEIDENTIFIER");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
@@ -817,13 +937,12 @@ namespace Recruiva.Web.Data.Migrations
 
             modelBuilder.Entity("Recruiva.Web.Entities.Resume", b =>
                 {
-                    b.Property<string>("Id")
+                    b.Property<Guid>("Id")
                         .HasMaxLength(36)
-                        .HasColumnType("varchar(36)");
+                        .HasColumnType("UNIQUEIDENTIFIER");
 
-                    b.Property<string>("CandidateId")
-                        .IsRequired()
-                        .HasColumnType("varchar(36)");
+                    b.Property<Guid>("CandidateId")
+                        .HasColumnType("UNIQUEIDENTIFIER");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
@@ -889,9 +1008,9 @@ namespace Recruiva.Web.Data.Migrations
 
             modelBuilder.Entity("Recruiva.Web.Entities.ResumeSkill", b =>
                 {
-                    b.Property<string>("Id")
+                    b.Property<Guid>("Id")
                         .HasMaxLength(36)
-                        .HasColumnType("varchar(36)");
+                        .HasColumnType("UNIQUEIDENTIFIER");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
@@ -919,9 +1038,8 @@ namespace Recruiva.Web.Data.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
-                    b.Property<string>("ResumeId")
-                        .IsRequired()
-                        .HasColumnType("varchar(36)");
+                    b.Property<Guid>("ResumeId")
+                        .HasColumnType("UNIQUEIDENTIFIER");
 
                     b.Property<string>("Skill")
                         .HasMaxLength(100)
@@ -963,9 +1081,9 @@ namespace Recruiva.Web.Data.Migrations
 
             modelBuilder.Entity("Recruiva.Web.Entities.TenantConfig", b =>
                 {
-                    b.Property<string>("Id")
+                    b.Property<Guid>("Id")
                         .HasMaxLength(36)
-                        .HasColumnType("varchar(36)");
+                        .HasColumnType("UNIQUEIDENTIFIER");
 
                     b.Property<string>("BaseUrl")
                         .IsRequired()
@@ -1047,7 +1165,7 @@ namespace Recruiva.Web.Data.Migrations
             modelBuilder.Entity("Recruiva.Web.Models.ApplicationUser", b =>
                 {
                     b.Property<string>("Id")
-                        .HasColumnType("varchar(36)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<int>("AccessFailedCount")
                         .HasColumnType("int");
@@ -1228,15 +1346,9 @@ namespace Recruiva.Web.Data.Migrations
 
             modelBuilder.Entity("Recruiva.Web.Entities.ApplicationStatusHistory", b =>
                 {
-                    b.HasOne("Recruiva.Web.Entities.Application", null)
-                        .WithMany()
-                        .HasForeignKey("ApplicationId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("Recruiva.Web.Entities.Application", "Application")
                         .WithMany("StatusHistory")
-                        .HasForeignKey("ApplicationId1")
+                        .HasForeignKey("ApplicationId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -1264,8 +1376,8 @@ namespace Recruiva.Web.Data.Migrations
 
                     b.OwnsOne("Recruiva.Web.Entities.JobBoost", "Boost", b1 =>
                         {
-                            b1.Property<string>("JobId")
-                                .HasColumnType("varchar(36)");
+                            b1.Property<Guid>("JobId")
+                                .HasColumnType("UNIQUEIDENTIFIER");
 
                             b1.Property<DateTime?>("EndDate")
                                 .HasColumnType("datetime2")
@@ -1296,8 +1408,8 @@ namespace Recruiva.Web.Data.Migrations
 
                     b.OwnsOne("Recruiva.Web.Entities.JobCounters", "Counters", b1 =>
                         {
-                            b1.Property<string>("JobId")
-                                .HasColumnType("varchar(36)");
+                            b1.Property<Guid>("JobId")
+                                .HasColumnType("UNIQUEIDENTIFIER");
 
                             b1.Property<int>("Applications")
                                 .ValueGeneratedOnAdd()
@@ -1333,8 +1445,8 @@ namespace Recruiva.Web.Data.Migrations
 
                     b.OwnsOne("Recruiva.Web.Entities.JobHighlight", "Highlight", b1 =>
                         {
-                            b1.Property<string>("JobId")
-                                .HasColumnType("varchar(36)");
+                            b1.Property<Guid>("JobId")
+                                .HasColumnType("UNIQUEIDENTIFIER");
 
                             b1.Property<DateTime?>("EndDate")
                                 .HasColumnType("datetime2")
@@ -1360,8 +1472,8 @@ namespace Recruiva.Web.Data.Migrations
 
                     b.OwnsOne("Recruiva.Web.Entities.JobLocation", "Location", b1 =>
                         {
-                            b1.Property<string>("JobId")
-                                .HasColumnType("varchar(36)");
+                            b1.Property<Guid>("JobId")
+                                .HasColumnType("UNIQUEIDENTIFIER");
 
                             b1.Property<string>("City")
                                 .HasMaxLength(100)
@@ -1412,8 +1524,8 @@ namespace Recruiva.Web.Data.Migrations
 
                     b.OwnsOne("Recruiva.Web.Entities.ModerationInfo", "Moderation", b1 =>
                         {
-                            b1.Property<string>("JobId")
-                                .HasColumnType("varchar(36)");
+                            b1.Property<Guid>("JobId")
+                                .HasColumnType("UNIQUEIDENTIFIER");
 
                             b1.Property<DateTime?>("ModerationDate")
                                 .HasColumnType("datetime2")
@@ -1447,8 +1559,8 @@ namespace Recruiva.Web.Data.Migrations
 
                     b.OwnsOne("Recruiva.Web.Entities.SalaryRange", "Salary", b1 =>
                         {
-                            b1.Property<string>("JobId")
-                                .HasColumnType("varchar(36)");
+                            b1.Property<Guid>("JobId")
+                                .HasColumnType("UNIQUEIDENTIFIER");
 
                             b1.Property<string>("Currency")
                                 .IsRequired()
@@ -1534,9 +1646,8 @@ namespace Recruiva.Web.Data.Migrations
                                 .HasMaxLength(150)
                                 .HasColumnType("nvarchar(150)");
 
-                            b1.Property<string>("ResumeId")
-                                .IsRequired()
-                                .HasColumnType("varchar(36)");
+                            b1.Property<Guid>("ResumeId")
+                                .HasColumnType("UNIQUEIDENTIFIER");
 
                             b1.Property<DateTime>("StartDate")
                                 .HasColumnType("datetime2");
@@ -1569,9 +1680,8 @@ namespace Recruiva.Web.Data.Migrations
                                 .HasMaxLength(50)
                                 .HasColumnType("nvarchar(50)");
 
-                            b1.Property<string>("ResumeId")
-                                .IsRequired()
-                                .HasColumnType("varchar(36)");
+                            b1.Property<Guid>("ResumeId")
+                                .HasColumnType("UNIQUEIDENTIFIER");
 
                             b1.HasKey("Id");
 
@@ -1609,9 +1719,8 @@ namespace Recruiva.Web.Data.Migrations
                                 .HasMaxLength(50)
                                 .HasColumnType("nvarchar(50)");
 
-                            b1.Property<string>("ResumeId")
-                                .IsRequired()
-                                .HasColumnType("varchar(36)");
+                            b1.Property<Guid>("ResumeId")
+                                .HasColumnType("UNIQUEIDENTIFIER");
 
                             b1.Property<DateTime?>("StartDate")
                                 .HasColumnType("datetime2");

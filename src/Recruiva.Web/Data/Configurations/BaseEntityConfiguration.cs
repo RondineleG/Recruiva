@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-using Recruiva.Web.ValueObjects;
+using Recruiva.Web.Converters;
 
 namespace Recruiva.Web.Data.Configurations;
 
@@ -9,12 +9,11 @@ public class BaseEntityConfiguration<T> : IEntityTypeConfiguration<T> where T : 
     public void Configure(EntityTypeBuilder<T> builder)
     {
         builder.HasKey(a => a.Id);
-        builder.Property(a => a.Id)
-            .HasConversion(
-                id => id.ToString(),
-                value => Id.Create(Guid.Parse(value))
-            )
-            .HasColumnType("varchar(36)");
+
+        builder.Property(x => x.Id)
+           .HasConversion(new IdValueConverter(), new IdValueComparer())
+            .HasColumnType("UNIQUEIDENTIFIER")
+           .ValueGeneratedNever();
 
         builder.Property(e => e.Id)
             .IsRequired()

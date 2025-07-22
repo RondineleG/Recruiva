@@ -4,7 +4,7 @@ public class ApplicationStatusHistory : BaseEntity
 {
     public Application Application { get; set; } = default!;
 
-    public Id ApplicationId { get; set; }
+    public Id ApplicationId { get; set; } = Id.Create();
 
     public DateTime Date { get; set; } = DateTime.UtcNow;
 

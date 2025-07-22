@@ -3,10 +3,10 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace Recruiva.Web.Data.Migrations
+namespace Recruiva.Web.Migrations
 {
     /// <inheritdoc />
-    public partial class ChangeIdFormat : Migration
+    public partial class Initial : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -18,7 +18,7 @@ namespace Recruiva.Web.Data.Migrations
                 name: "Addresses",
                 columns: table => new
                 {
-                    Id = table.Column<string>(type: "varchar(36)", maxLength: 36, nullable: false),
+                    Id = table.Column<Guid>(type: "UNIQUEIDENTIFIER", maxLength: 36, nullable: false),
                     City = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
                     Complement = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
                     Country = table.Column<string>(type: "nchar(5)", fixedLength: true, maxLength: 5, nullable: true, defaultValue: "BR"),
@@ -42,10 +42,24 @@ namespace Recruiva.Web.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "AspNetRoles",
+                columns: table => new
+                {
+                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
+                    NormalizedName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
+                    ConcurrencyStamp = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AspNetRoles", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Notifications",
                 columns: table => new
                 {
-                    Id = table.Column<string>(type: "varchar(36)", maxLength: 36, nullable: false),
+                    Id = table.Column<Guid>(type: "UNIQUEIDENTIFIER", maxLength: 36, nullable: false),
                     IsRead = table.Column<bool>(type: "bit", nullable: false, defaultValue: false),
                     Message = table.Column<string>(type: "nvarchar(1000)", maxLength: 1000, nullable: false),
                     ReadAt = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -67,11 +81,27 @@ namespace Recruiva.Web.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "RoleClaims",
+                schema: "Identity",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    RoleId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    ClaimType = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: true),
+                    ClaimValue = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_RoleClaims", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Roles",
                 schema: "Identity",
                 columns: table => new
                 {
-                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Name = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     NormalizedName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     ConcurrencyStamp = table.Column<string>(type: "nvarchar(max)", nullable: true)
@@ -85,7 +115,7 @@ namespace Recruiva.Web.Data.Migrations
                 name: "TenantConfigs",
                 columns: table => new
                 {
-                    Id = table.Column<string>(type: "varchar(36)", maxLength: 36, nullable: false),
+                    Id = table.Column<Guid>(type: "UNIQUEIDENTIFIER", maxLength: 36, nullable: false),
                     BaseUrl = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: false),
                     DisplayName = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
                     IsActive = table.Column<bool>(type: "bit", nullable: false, defaultValue: true),
@@ -108,11 +138,55 @@ namespace Recruiva.Web.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "UserClaims",
+                schema: "Identity",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    ClaimType = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: true),
+                    ClaimValue = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_UserClaims", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "UserLogins",
+                schema: "Identity",
+                columns: table => new
+                {
+                    LoginProvider = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
+                    ProviderKey = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
+                    ProviderDisplayName = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: true),
+                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_UserLogins", x => new { x.LoginProvider, x.ProviderKey });
+                });
+
+            migrationBuilder.CreateTable(
+                name: "UserRoles",
+                schema: "Identity",
+                columns: table => new
+                {
+                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    RoleId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_UserRoles", x => new { x.UserId, x.RoleId });
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Users",
                 schema: "Identity",
                 columns: table => new
                 {
-                    Id = table.Column<string>(type: "varchar(36)", nullable: false),
+                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: true, defaultValueSql: "GETUTCDATE()"),
                     FirstName = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     IsActive = table.Column<bool>(type: "bit", nullable: false, defaultValue: true),
@@ -140,10 +214,25 @@ namespace Recruiva.Web.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "UserTokens",
+                schema: "Identity",
+                columns: table => new
+                {
+                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    LoginProvider = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
+                    Value = table.Column<string>(type: "nvarchar(2000)", maxLength: 2000, nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_UserTokens", x => new { x.UserId, x.LoginProvider, x.Name });
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Advertisers",
                 columns: table => new
                 {
-                    Id = table.Column<string>(type: "varchar(36)", maxLength: 36, nullable: false),
+                    Id = table.Column<Guid>(type: "UNIQUEIDENTIFIER", maxLength: 36, nullable: false),
                     ActivePlan = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     AddressId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     CompanyDescription = table.Column<string>(type: "nvarchar(max)", nullable: true),
@@ -181,8 +270,8 @@ namespace Recruiva.Web.Data.Migrations
                 name: "Candidates",
                 columns: table => new
                 {
-                    Id = table.Column<string>(type: "varchar(36)", maxLength: 36, nullable: false),
-                    AddressId = table.Column<string>(type: "varchar(36)", nullable: false),
+                    Id = table.Column<Guid>(type: "UNIQUEIDENTIFIER", maxLength: 36, nullable: false),
+                    AddressId = table.Column<Guid>(type: "UNIQUEIDENTIFIER", nullable: false),
                     DateOfBirth = table.Column<DateTime>(type: "date", nullable: false),
                     Email = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     IsEmailVerified = table.Column<bool>(type: "bit", nullable: false),
@@ -212,44 +301,41 @@ namespace Recruiva.Web.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "RoleClaims",
-                schema: "Identity",
+                name: "AspNetRoleClaims",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     RoleId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    ClaimType = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: true),
-                    ClaimValue = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true)
+                    ClaimType = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ClaimValue = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_RoleClaims", x => x.Id);
+                    table.PrimaryKey("PK_AspNetRoleClaims", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_RoleClaims_Roles_RoleId",
+                        name: "FK_AspNetRoleClaims_AspNetRoles_RoleId",
                         column: x => x.RoleId,
-                        principalSchema: "Identity",
-                        principalTable: "Roles",
+                        principalTable: "AspNetRoles",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
-                name: "UserClaims",
-                schema: "Identity",
+                name: "AspNetUserClaims",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    UserId = table.Column<string>(type: "varchar(36)", nullable: false),
-                    ClaimType = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: true),
-                    ClaimValue = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true)
+                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    ClaimType = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ClaimValue = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_UserClaims", x => x.Id);
+                    table.PrimaryKey("PK_AspNetUserClaims", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_UserClaims_Users_UserId",
+                        name: "FK_AspNetUserClaims_Users_UserId",
                         column: x => x.UserId,
                         principalSchema: "Identity",
                         principalTable: "Users",
@@ -258,20 +344,19 @@ namespace Recruiva.Web.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "UserLogins",
-                schema: "Identity",
+                name: "AspNetUserLogins",
                 columns: table => new
                 {
-                    LoginProvider = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
-                    ProviderKey = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
-                    ProviderDisplayName = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: true),
-                    UserId = table.Column<string>(type: "varchar(36)", nullable: false)
+                    LoginProvider = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    ProviderKey = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    ProviderDisplayName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_UserLogins", x => new { x.LoginProvider, x.ProviderKey });
+                    table.PrimaryKey("PK_AspNetUserLogins", x => new { x.LoginProvider, x.ProviderKey });
                     table.ForeignKey(
-                        name: "FK_UserLogins_Users_UserId",
+                        name: "FK_AspNetUserLogins_Users_UserId",
                         column: x => x.UserId,
                         principalSchema: "Identity",
                         principalTable: "Users",
@@ -280,25 +365,23 @@ namespace Recruiva.Web.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "UserRoles",
-                schema: "Identity",
+                name: "AspNetUserRoles",
                 columns: table => new
                 {
-                    UserId = table.Column<string>(type: "varchar(36)", nullable: false),
+                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     RoleId = table.Column<string>(type: "nvarchar(450)", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_UserRoles", x => new { x.UserId, x.RoleId });
+                    table.PrimaryKey("PK_AspNetUserRoles", x => new { x.UserId, x.RoleId });
                     table.ForeignKey(
-                        name: "FK_UserRoles_Roles_RoleId",
+                        name: "FK_AspNetUserRoles_AspNetRoles_RoleId",
                         column: x => x.RoleId,
-                        principalSchema: "Identity",
-                        principalTable: "Roles",
+                        principalTable: "AspNetRoles",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_UserRoles_Users_UserId",
+                        name: "FK_AspNetUserRoles_Users_UserId",
                         column: x => x.UserId,
                         principalSchema: "Identity",
                         principalTable: "Users",
@@ -307,20 +390,19 @@ namespace Recruiva.Web.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "UserTokens",
-                schema: "Identity",
+                name: "AspNetUserTokens",
                 columns: table => new
                 {
-                    UserId = table.Column<string>(type: "varchar(36)", nullable: false),
-                    LoginProvider = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
-                    Name = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
-                    Value = table.Column<string>(type: "nvarchar(2000)", maxLength: 2000, nullable: true)
+                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    LoginProvider = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Value = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_UserTokens", x => new { x.UserId, x.LoginProvider, x.Name });
+                    table.PrimaryKey("PK_AspNetUserTokens", x => new { x.UserId, x.LoginProvider, x.Name });
                     table.ForeignKey(
-                        name: "FK_UserTokens_Users_UserId",
+                        name: "FK_AspNetUserTokens_Users_UserId",
                         column: x => x.UserId,
                         principalSchema: "Identity",
                         principalTable: "Users",
@@ -332,8 +414,8 @@ namespace Recruiva.Web.Data.Migrations
                 name: "Jobs",
                 columns: table => new
                 {
-                    Id = table.Column<string>(type: "varchar(36)", maxLength: 36, nullable: false),
-                    AdvertiserId = table.Column<string>(type: "varchar(36)", nullable: false),
+                    Id = table.Column<Guid>(type: "UNIQUEIDENTIFIER", maxLength: 36, nullable: false),
+                    AdvertiserId = table.Column<Guid>(type: "UNIQUEIDENTIFIER", nullable: false),
                     Benefits = table.Column<string>(type: "nvarchar(2000)", maxLength: 2000, nullable: true),
                     BoostEndDate = table.Column<DateTime>(type: "datetime2", nullable: true),
                     BoostIsActive = table.Column<bool>(type: "bit", nullable: true, defaultValue: false),
@@ -392,8 +474,8 @@ namespace Recruiva.Web.Data.Migrations
                 name: "Resumes",
                 columns: table => new
                 {
-                    Id = table.Column<string>(type: "varchar(36)", maxLength: 36, nullable: false),
-                    CandidateId = table.Column<string>(type: "varchar(36)", nullable: false),
+                    Id = table.Column<Guid>(type: "UNIQUEIDENTIFIER", maxLength: 36, nullable: false),
+                    CandidateId = table.Column<Guid>(type: "UNIQUEIDENTIFIER", nullable: false),
                     IsActive = table.Column<bool>(type: "bit", nullable: false, defaultValue: true),
                     Summary = table.Column<string>(type: "nvarchar(2000)", maxLength: 2000, nullable: true),
                     Title = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
@@ -421,10 +503,10 @@ namespace Recruiva.Web.Data.Migrations
                 name: "Applications",
                 columns: table => new
                 {
-                    Id = table.Column<string>(type: "varchar(36)", maxLength: 36, nullable: false),
+                    Id = table.Column<Guid>(type: "UNIQUEIDENTIFIER", maxLength: 36, nullable: false),
                     AppliedAt = table.Column<DateTime>(type: "datetime2", nullable: true, defaultValueSql: "GETUTCDATE()"),
-                    CandidateId = table.Column<string>(type: "varchar(36)", nullable: false),
-                    JobId = table.Column<string>(type: "varchar(36)", nullable: false),
+                    CandidateId = table.Column<Guid>(type: "UNIQUEIDENTIFIER", nullable: false),
+                    JobId = table.Column<Guid>(type: "UNIQUEIDENTIFIER", nullable: false),
                     Notes = table.Column<string>(type: "nvarchar(1000)", maxLength: 1000, nullable: true),
                     RejectedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
                     SelectedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -468,7 +550,7 @@ namespace Recruiva.Web.Data.Migrations
                     Level = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
                     StartDate = table.Column<DateTime>(type: "datetime2", nullable: true),
                     Status = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
-                    ResumeId = table.Column<string>(type: "varchar(36)", nullable: false)
+                    ResumeId = table.Column<Guid>(type: "UNIQUEIDENTIFIER", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -493,7 +575,7 @@ namespace Recruiva.Web.Data.Migrations
                     IsCurrent = table.Column<bool>(type: "bit", nullable: false, defaultValue: false),
                     Position = table.Column<string>(type: "nvarchar(150)", maxLength: 150, nullable: false),
                     StartDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    ResumeId = table.Column<string>(type: "varchar(36)", nullable: false)
+                    ResumeId = table.Column<Guid>(type: "UNIQUEIDENTIFIER", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -514,7 +596,7 @@ namespace Recruiva.Web.Data.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Level = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
                     Name = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
-                    ResumeId = table.Column<string>(type: "varchar(36)", nullable: false)
+                    ResumeId = table.Column<Guid>(type: "UNIQUEIDENTIFIER", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -531,9 +613,9 @@ namespace Recruiva.Web.Data.Migrations
                 name: "ResumeSkills",
                 columns: table => new
                 {
-                    Id = table.Column<string>(type: "varchar(36)", maxLength: 36, nullable: false),
+                    Id = table.Column<Guid>(type: "UNIQUEIDENTIFIER", maxLength: 36, nullable: false),
                     Level = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
-                    ResumeId = table.Column<string>(type: "varchar(36)", nullable: false),
+                    ResumeId = table.Column<Guid>(type: "UNIQUEIDENTIFIER", nullable: false),
                     Skill = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
                     YearsOfExperience = table.Column<float>(type: "real", nullable: false, defaultValue: 0f),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
@@ -560,9 +642,8 @@ namespace Recruiva.Web.Data.Migrations
                 name: "ApplicationStatusHistory",
                 columns: table => new
                 {
-                    Id = table.Column<string>(type: "varchar(36)", maxLength: 36, nullable: false),
-                    ApplicationId1 = table.Column<string>(type: "varchar(36)", nullable: false),
-                    ApplicationId = table.Column<string>(type: "varchar(36)", nullable: false),
+                    Id = table.Column<Guid>(type: "UNIQUEIDENTIFIER", maxLength: 36, nullable: false),
+                    ApplicationId = table.Column<Guid>(type: "UNIQUEIDENTIFIER", nullable: false),
                     Date = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "GETUTCDATE()"),
                     Note = table.Column<string>(type: "nvarchar(1000)", maxLength: 1000, nullable: true),
                     Responsible = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
@@ -582,12 +663,6 @@ namespace Recruiva.Web.Data.Migrations
                     table.ForeignKey(
                         name: "FK_ApplicationStatusHistory_Applications_ApplicationId",
                         column: x => x.ApplicationId,
-                        principalTable: "Applications",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_ApplicationStatusHistory_Applications_ApplicationId1",
-                        column: x => x.ApplicationId1,
                         principalTable: "Applications",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -661,15 +736,37 @@ namespace Recruiva.Web.Data.Migrations
                 column: "ApplicationId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ApplicationStatusHistory_ApplicationId1",
-                table: "ApplicationStatusHistory",
-                column: "ApplicationId1");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_ApplicationStatusHistory_TenantId_Id",
                 table: "ApplicationStatusHistory",
                 columns: new[] { "TenantId", "Id" },
                 unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AspNetRoleClaims_RoleId",
+                table: "AspNetRoleClaims",
+                column: "RoleId");
+
+            migrationBuilder.CreateIndex(
+                name: "RoleNameIndex",
+                table: "AspNetRoles",
+                column: "NormalizedName",
+                unique: true,
+                filter: "[NormalizedName] IS NOT NULL");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AspNetUserClaims_UserId",
+                table: "AspNetUserClaims",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AspNetUserLogins_UserId",
+                table: "AspNetUserLogins",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AspNetUserRoles_RoleId",
+                table: "AspNetUserRoles",
+                column: "RoleId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Candidates_AddressId",
@@ -883,6 +980,21 @@ namespace Recruiva.Web.Data.Migrations
                 name: "ApplicationStatusHistory");
 
             migrationBuilder.DropTable(
+                name: "AspNetRoleClaims");
+
+            migrationBuilder.DropTable(
+                name: "AspNetUserClaims");
+
+            migrationBuilder.DropTable(
+                name: "AspNetUserLogins");
+
+            migrationBuilder.DropTable(
+                name: "AspNetUserRoles");
+
+            migrationBuilder.DropTable(
+                name: "AspNetUserTokens");
+
+            migrationBuilder.DropTable(
                 name: "EducationHistory");
 
             migrationBuilder.DropTable(
@@ -899,6 +1011,10 @@ namespace Recruiva.Web.Data.Migrations
 
             migrationBuilder.DropTable(
                 name: "RoleClaims",
+                schema: "Identity");
+
+            migrationBuilder.DropTable(
+                name: "Roles",
                 schema: "Identity");
 
             migrationBuilder.DropTable(
@@ -924,15 +1040,14 @@ namespace Recruiva.Web.Data.Migrations
                 name: "Applications");
 
             migrationBuilder.DropTable(
-                name: "Resumes");
-
-            migrationBuilder.DropTable(
-                name: "Roles",
-                schema: "Identity");
+                name: "AspNetRoles");
 
             migrationBuilder.DropTable(
                 name: "Users",
                 schema: "Identity");
+
+            migrationBuilder.DropTable(
+                name: "Resumes");
 
             migrationBuilder.DropTable(
                 name: "Jobs");

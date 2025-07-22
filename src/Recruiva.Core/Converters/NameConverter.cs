@@ -1,8 +1,28 @@
-using Recruiva.Web.ValueObjects;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 using System.Text.Json.Serialization;
 
 namespace Recruiva.Web.Converters;
+
+public class IdValueComparer : ValueComparer<Id>
+{
+    public IdValueComparer() : base(
+        (l, r) => (l == null && r == null) || (l != null && r != null && l.Value == r.Value),
+        id => id != null ? id.Value.GetHashCode() : 0,
+        id => id != null ? Id.Create(id.Value) : null!)
+    {
+    }
+}
+
+public class IdValueConverter : ValueConverter<Id, Guid>
+{
+    public IdValueConverter() : base(
+        id => id != null ? id.Value : Guid.Empty,
+        guid => guid != Guid.Empty ? Id.Create(guid) : null!)
+    {
+    }
+}
 
 public class NameConverter : JsonConverter<Name>
 {

@@ -1,8 +1,8 @@
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore;
 
+using Recruiva.Web.Converters;
 using Recruiva.Web.Data.Extensions;
-using Recruiva.Web.Models;
+using Recruiva.Web.ValueObjects;
 
 namespace Recruiva.Web.Data;
 
@@ -36,5 +36,17 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
         modelBuilder.Ignore<Experience>();
         modelBuilder.Ignore<Language>();
         modelBuilder.ApplyEntityConfigurations();
+
+        foreach (var entityType in modelBuilder.Model.GetEntityTypes())
+        {
+            foreach (var property in entityType.GetProperties())
+            {
+                if (property.ClrType == typeof(Id) || property.ClrType == typeof(Id))
+                {
+                    property.SetValueConverter(new IdValueConverter());
+                    property.SetValueComparer(new IdValueComparer());
+                }
+            }
+        }
     }
 }

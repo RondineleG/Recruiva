@@ -1,5 +1,10 @@
+using Recruiva.Core.TypeConverters;
+
+using System.ComponentModel;
+
 namespace Recruiva.Web.ValueObjects;
 
+[TypeConverter(typeof(IdTypeConverter))]
 public sealed class Id : ValueObject
 {
     private Id(Guid value)
@@ -28,40 +33,38 @@ public sealed class Id : ValueObject
 
     public static implicit operator Id(Guid guid) => Create(guid);
 
+    public static implicit operator Id?(string? value) =>
+            string.IsNullOrWhiteSpace(value) ? null : TryCreate(value, out var id) ? id : null;
+
     public static implicit operator string(Id id) => id.ToString();
 
-    public static bool operator !=(Id? left, Id? right)
-    {
-        return !(left == right);
-    }
+    public static bool operator !=(Id? left, Id? right) => !(left == right);
 
-    public static bool operator ==(Id? left, Id? right)
-    {
-        return left?.Equals(right) ?? right is null;
-    }
+    public static bool operator ==(Id? left, Id? right) => left?.Equals(right) ?? right is null;
 
-    public static bool TryCreate(string value, out Id? id)
+    public static bool TryCreate(string? value, out Id? id)
     {
         id = null;
-
         if (string.IsNullOrWhiteSpace(value))
             return false;
-
         if (!Guid.TryParse(value, out var guid))
             return false;
-
         return TryCreate(guid, out id);
     }
 
     public static bool TryCreate(Guid guid, out Id? id)
     {
         id = null;
-
         if (guid == Guid.Empty)
             return false;
-
         id = new Id(guid);
         return true;
+    }
+
+    public int CompareTo(Id? other)
+    {
+        if (other is null) return 1;
+        return Value.CompareTo(other.Value);
     }
 
     public bool Equals(Id? other)

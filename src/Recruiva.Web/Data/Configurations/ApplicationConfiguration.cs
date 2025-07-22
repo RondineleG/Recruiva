@@ -10,12 +10,12 @@ public class ApplicationConfiguration : IEntityTypeConfiguration<Application>
     {
         builder.ToTable("Applications");
         builder.HasKey(a => a.Id);
-        builder.Property(a => a.Id)
-            .HasConversion(
-                id => id.ToString(),
-                value => Id.Create(Guid.Parse(value))
-            )
-            .HasColumnType("varchar(36)");
+        builder.Property(e => e.Id)
+     .HasConversion(
+         id => id.Value,
+         value => Id.Create(value)
+     )
+     .HasColumnType("UNIQUEIDENTIFIER");
         builder.Property(a => a.Status)
             .HasConversion<string>()
             .HasMaxLength(50);

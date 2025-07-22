@@ -1,7 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-using Recruiva.Web.ValueObjects;
-
 namespace Recruiva.Web.Data.Configurations;
 
 public class ApplicationUserConfiguration : IEntityTypeConfiguration<ApplicationUser>
@@ -9,13 +7,9 @@ public class ApplicationUserConfiguration : IEntityTypeConfiguration<Application
     public void Configure(EntityTypeBuilder<ApplicationUser> builder)
     {
         builder.ToTable("Users", "Identity");
+
         builder.HasKey(a => a.Id);
-        builder.Property(a => a.Id)
-            .HasConversion(
-                id => id.ToString(),
-                value => Id.Create(Guid.Parse(value))
-            )
-            .HasColumnType("varchar(36)");
+
         builder.Property(u => u.FirstName)
             .IsRequired()
             .HasMaxLength(100);

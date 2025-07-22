@@ -10,12 +10,12 @@ public class NotificationConfiguration : IEntityTypeConfiguration<Notification>
     {
         builder.ToTable("Notifications");
         builder.HasKey(a => a.Id);
-        builder.Property(a => a.Id)
-            .HasConversion(
-                id => id.ToString(),
-                value => Id.Create(Guid.Parse(value))
-            )
-            .HasColumnType("varchar(36)");
+        builder.Property(e => e.Id)
+     .HasConversion(
+         id => id.Value,
+         value => Id.Create(value)
+     )
+     .HasColumnType("UNIQUEIDENTIFIER");
         builder.Property(n => n.Title)
             .IsRequired()
             .HasMaxLength(200);

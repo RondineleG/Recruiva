@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 using ValidationResult = Recruiva.Web.Validations.ValidationResult;
 
@@ -21,6 +22,35 @@ public abstract class BaseEntity : IAggregateRoot
         UpdatedAt = updatedAt;
     }
 
+    protected BaseEntity(Guid id, DateTime createdAt, string tenantId)
+    {
+        Id = Id.Create(id);
+        CreatedAt = createdAt;
+        TenantId = tenantId;
+    }
+
+    protected BaseEntity(
+        Guid id,
+        DateTime createdAt,
+        string tenantId,
+        string createdBy = "",
+        DateTime? updatedAt = null,
+        string updatedBy = "",
+        DateTime? deletedAt = null,
+        string deletedBy = "",
+        bool isDeleted = false)
+    {
+        Id = Id.Create(id);
+        CreatedAt = createdAt;
+        TenantId = tenantId;
+        CreatedBy = createdBy;
+        UpdatedAt = updatedAt;
+        UpdatedBy = updatedBy;
+        DeletedAt = deletedAt;
+        DeletedBy = deletedBy;
+        IsDeleted = isDeleted;
+    }
+
     public DateTime CreatedAt { get; protected set; } = DateTime.UtcNow;
 
     public string CreatedBy { get; set; } = string.Empty;
@@ -30,7 +60,8 @@ public abstract class BaseEntity : IAggregateRoot
     public string DeletedBy { get; set; } = string.Empty;
 
     [Key]
-    public Id Id { get; set; }
+    [DatabaseGenerated(DatabaseGeneratedOption.None)]
+    public Id Id { get; set; } = null!;
 
     public bool IsDeleted { get; set; }
 
@@ -46,6 +77,13 @@ public abstract class BaseEntity : IAggregateRoot
         return GetType().Name;
     }
 
+    protected void InitializeNewEntity()
+    {
+        Id = Id.Create();
+        CreatedAt = DateTime.UtcNow;
+        ValidateInitialState();
+    }
+
     protected void Update()
     {
         UpdatedAt = DateTime.UtcNow;
@@ -56,13 +94,16 @@ public abstract class BaseEntity : IAggregateRoot
     {
         var result = ValidationResult
             .Success()
-            .AddErrorIf(() => CreatedAt == default || CreatedAt.Kind != DateTimeKind.Utc, "CreatedAt must be a valid UTC date", nameof(CreatedAt));
+            .AddErrorIf(() => CreatedAt == default || CreatedAt.Kind != DateTimeKind.Utc,
+                "CreatedAt must be a valid UTC date", nameof(CreatedAt));
 
         if (UpdatedAt.HasValue)
         {
             result
-                .AddErrorIf(() => UpdatedAt.Value.Kind != DateTimeKind.Utc, "UpdatedAt must be UTC", nameof(UpdatedAt))
-                .AddErrorIf(() => UpdatedAt.Value <= CreatedAt, "UpdatedAt must be greater than CreatedAt", nameof(UpdatedAt));
+                .AddErrorIf(() => UpdatedAt.Value.Kind != DateTimeKind.Utc,
+                    "UpdatedAt must be UTC", nameof(UpdatedAt))
+                .AddErrorIf(() => UpdatedAt.Value <= CreatedAt,
+                    "UpdatedAt must be greater than CreatedAt", nameof(UpdatedAt));
         }
 
         result.ThrowIfInvalid();
@@ -79,8 +120,10 @@ public abstract class BaseEntity : IAggregateRoot
         if (updatedAt.HasValue)
         {
             result
-                .AddErrorIf(() => updatedAt.Value.Kind != DateTimeKind.Utc, "UpdatedAt must be UTC", nameof(UpdatedAt))
-                .AddErrorIf(() => updatedAt.Value <= createdAt, "UpdatedAt must be greater than CreatedAt", nameof(UpdatedAt));
+                .AddErrorIf(() => updatedAt.Value.Kind != DateTimeKind.Utc,
+                    "UpdatedAt must be UTC", nameof(UpdatedAt))
+                .AddErrorIf(() => updatedAt.Value <= createdAt,
+                    "UpdatedAt must be greater than CreatedAt", nameof(UpdatedAt));
         }
 
         result.ThrowIfInvalid();
@@ -90,7 +133,8 @@ public abstract class BaseEntity : IAggregateRoot
     {
         ValidationResult
             .Success()
-            .AddErrorIf(() => CreatedAt == default || CreatedAt.Kind != DateTimeKind.Utc, "CreatedAt must be a valid UTC date", nameof(CreatedAt))
+            .AddErrorIf(() => CreatedAt == default || CreatedAt.Kind != DateTimeKind.Utc,
+                "CreatedAt must be a valid UTC date", nameof(CreatedAt))
             .AddErrorIf(() => Id == null, "Id cannot be null", nameof(Id))
             .ThrowIfInvalid();
     }

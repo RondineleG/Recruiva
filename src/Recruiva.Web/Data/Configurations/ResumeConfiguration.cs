@@ -10,12 +10,12 @@ public class ResumeConfiguration : IEntityTypeConfiguration<Resume>
     {
         builder.ToTable("Resumes");
         builder.HasKey(a => a.Id);
-        builder.Property(a => a.Id)
-            .HasConversion(
-                id => id.ToString(),
-                value => Id.Create(Guid.Parse(value))
-            )
-            .HasColumnType("varchar(36)");
+        builder.Property(e => e.Id)
+     .HasConversion(
+         id => id.Value,
+         value => Id.Create(value)
+     )
+     .HasColumnType("UNIQUEIDENTIFIER");
         builder.Property(r => r.Title)
             .IsRequired()
             .HasMaxLength(100);
