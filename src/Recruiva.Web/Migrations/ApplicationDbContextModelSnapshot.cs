@@ -1269,7 +1269,7 @@ namespace Recruiva.Web.Migrations
 
                             b1.HasKey("JobId");
 
-                            b1.ToTable("Jobs");
+                            b1.ToTable("Jobs", (string)null);
 
                             b1.WithOwner()
                                 .HasForeignKey("JobId");
@@ -1306,7 +1306,7 @@ namespace Recruiva.Web.Migrations
 
                             b1.HasKey("JobId");
 
-                            b1.ToTable("Jobs");
+                            b1.ToTable("Jobs", (string)null);
 
                             b1.WithOwner()
                                 .HasForeignKey("JobId");
@@ -1333,7 +1333,7 @@ namespace Recruiva.Web.Migrations
 
                             b1.HasKey("JobId");
 
-                            b1.ToTable("Jobs");
+                            b1.ToTable("Jobs", (string)null);
 
                             b1.WithOwner()
                                 .HasForeignKey("JobId");
@@ -1385,7 +1385,7 @@ namespace Recruiva.Web.Migrations
 
                             b1.HasKey("JobId");
 
-                            b1.ToTable("Jobs");
+                            b1.ToTable("Jobs", (string)null);
 
                             b1.WithOwner()
                                 .HasForeignKey("JobId");
@@ -1420,7 +1420,7 @@ namespace Recruiva.Web.Migrations
 
                             b1.HasKey("JobId");
 
-                            b1.ToTable("Jobs");
+                            b1.ToTable("Jobs", (string)null);
 
                             b1.WithOwner()
                                 .HasForeignKey("JobId");
@@ -1455,7 +1455,7 @@ namespace Recruiva.Web.Migrations
 
                             b1.HasKey("JobId");
 
-                            b1.ToTable("Jobs");
+                            b1.ToTable("Jobs", (string)null);
 
                             b1.WithOwner()
                                 .HasForeignKey("JobId");
@@ -1484,6 +1484,53 @@ namespace Recruiva.Web.Migrations
                         .HasForeignKey("CandidateId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.OwnsMany("Recruiva.Web.Enums.Education", "EducationHistory", b1 =>
+                        {
+                            b1.Property<int>("Id")
+                                .ValueGeneratedOnAdd()
+                                .HasColumnType("int");
+
+                            SqlServerPropertyBuilderExtensions.UseIdentityColumn(b1.Property<int>("Id"));
+
+                            b1.Property<string>("Course")
+                                .IsRequired()
+                                .HasMaxLength(150)
+                                .HasColumnType("nvarchar(150)");
+
+                            b1.Property<DateTime?>("EndDate")
+                                .HasColumnType("datetime2");
+
+                            b1.Property<string>("Institution")
+                                .IsRequired()
+                                .HasMaxLength(150)
+                                .HasColumnType("nvarchar(150)");
+
+                            b1.Property<string>("Level")
+                                .IsRequired()
+                                .HasMaxLength(50)
+                                .HasColumnType("nvarchar(50)");
+
+                            b1.Property<Guid>("ResumeId")
+                                .HasColumnType("UNIQUEIDENTIFIER");
+
+                            b1.Property<DateTime?>("StartDate")
+                                .HasColumnType("datetime2");
+
+                            b1.Property<string>("Status")
+                                .IsRequired()
+                                .HasMaxLength(50)
+                                .HasColumnType("nvarchar(50)");
+
+                            b1.HasKey("Id");
+
+                            b1.HasIndex("ResumeId");
+
+                            b1.ToTable("EducationHistory", (string)null);
+
+                            b1.WithOwner()
+                                .HasForeignKey("ResumeId");
+                        });
 
                     b.OwnsMany("Recruiva.Web.Entities.Experience", "ExperienceHistory", b1 =>
                         {
@@ -1557,53 +1604,6 @@ namespace Recruiva.Web.Migrations
                             b1.HasIndex("ResumeId");
 
                             b1.ToTable("Languages", (string)null);
-
-                            b1.WithOwner()
-                                .HasForeignKey("ResumeId");
-                        });
-
-                    b.OwnsMany("Recruiva.Web.Enums.Education", "EducationHistory", b1 =>
-                        {
-                            b1.Property<int>("Id")
-                                .ValueGeneratedOnAdd()
-                                .HasColumnType("int");
-
-                            SqlServerPropertyBuilderExtensions.UseIdentityColumn(b1.Property<int>("Id"));
-
-                            b1.Property<string>("Course")
-                                .IsRequired()
-                                .HasMaxLength(150)
-                                .HasColumnType("nvarchar(150)");
-
-                            b1.Property<DateTime?>("EndDate")
-                                .HasColumnType("datetime2");
-
-                            b1.Property<string>("Institution")
-                                .IsRequired()
-                                .HasMaxLength(150)
-                                .HasColumnType("nvarchar(150)");
-
-                            b1.Property<string>("Level")
-                                .IsRequired()
-                                .HasMaxLength(50)
-                                .HasColumnType("nvarchar(50)");
-
-                            b1.Property<Guid>("ResumeId")
-                                .HasColumnType("UNIQUEIDENTIFIER");
-
-                            b1.Property<DateTime?>("StartDate")
-                                .HasColumnType("datetime2");
-
-                            b1.Property<string>("Status")
-                                .IsRequired()
-                                .HasMaxLength(50)
-                                .HasColumnType("nvarchar(50)");
-
-                            b1.HasKey("Id");
-
-                            b1.HasIndex("ResumeId");
-
-                            b1.ToTable("EducationHistory", (string)null);
 
                             b1.WithOwner()
                                 .HasForeignKey("ResumeId");

@@ -1,0 +1,51 @@
+﻿@page "/"
+
+@inject AddressService AddressService
+@inject NavigationManager Navigation
+@using Recruiva.Core.Entities;
+
+<PageTitle>Endereços</PageTitle>
+
+<h1>Lista de Endereços</h1>
+<button class="btn btn-primary" @onclick="Create">Novo Endereço</button>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Cidade</th>
+            <th>Bairro</th>
+            <th>Rua</th>
+            <th>Número</th>
+            <th>Ações</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var address in Addresses)
+        {
+            <tr>
+                <td>@address.City</td>
+                <td>@address.District</td>
+                <td>@address.Street</td>
+                <td>@address.Number</td>
+                <td>
+                    <button class="btn btn-warning" @onclick="() => Edit(address.Id)">Editar</button>
+                    <button class="btn btn-danger" @onclick="() => Delete(address.Id)">Excluir</button>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@code {
+    private List<Address> Addresses = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        Addresses = await AddressService.GetAllAsync();
+    }
+
+    private void Create() => Navigation.NavigateTo("/address/create");
+
+    private void Edit(Guid id) => Navigation.NavigateTo($"/address/edit/{id}");
+
+    private void Delete(Guid id) => Navigation.NavigateTo($"/address/delete/{id}");
+}

@@ -1,0 +1,77 @@
+﻿@page "/address/edit/{Id:guid}"
+
+@inject AddressService AddressService
+@inject NavigationManager Navigation
+@using Recruiva.Core.Entities;
+
+<PageTitle>Editar Endereço</PageTitle>
+
+<h1>Editar Endereço</h1>
+@if (address == null)
+{
+    <p>Carregando...</p>
+}
+else
+{
+    <EditForm Model="address" OnValidSubmit="HandleValidSubmit">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+        <div class="form-group">
+            <label>Cidade</label>
+            <InputText class="form-control" @bind-Value="address.City" />
+        </div>
+        <div class="form-group">
+            <label>Complemento</label>
+            <InputText class="form-control" @bind-Value="address.Complement" />
+        </div>
+        <div class="form-group">
+            <label>País</label>
+            <InputText class="form-control" @bind-Value="address.Country" />
+        </div>
+        <div class="form-group">
+            <label>Bairro</label>
+            <InputText class="form-control" @bind-Value="address.District" />
+        </div>
+        <div class="form-group">
+            <label>Número</label>
+            <InputText class="form-control" @bind-Value="address.Number" />
+        </div>
+        <div class="form-group">
+            <label>Estado</label>
+            <InputText class="form-control" @bind-Value="address.State" />
+        </div>
+        <div class="form-group">
+            <label>Rua</label>
+            <InputText class="form-control" @bind-Value="address.Street" />
+        </div>
+        <div class="form-group">
+            <label>CEP</label>
+            <InputText class="form-control" @bind-Value="address.ZipCode" />
+        </div>
+        <button type="submit" class="btn btn-success">Salvar</button>
+        <button type="button" class="btn btn-secondary" @onclick="Cancel">Cancelar</button>
+    </EditForm>
+}
+
+@code {
+    [Parameter]
+    public Guid Id { get; set; }
+
+    private Address? address;
+
+    protected override async Task OnInitializedAsync()
+    {
+        address = await AddressService.GetByIdAsync(Id);
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        if (address != null)
+        {
+            await AddressService.UpdateAsync(address);
+            Navigation.NavigateTo("/address/list");
+        }
+    }
+
+    private void Cancel() => Navigation.NavigateTo("/address/list");
+}

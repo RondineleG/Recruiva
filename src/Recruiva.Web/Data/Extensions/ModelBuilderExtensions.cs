@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 
+using Recruiva.Core.Entities.Base;
 using Recruiva.Web.Data.Configurations;
 
 using System.Reflection;

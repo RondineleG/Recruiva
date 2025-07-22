@@ -1,5 +1,5 @@
-using Recruiva.Web.DTOs.Request;
-using Recruiva.Web.DTOs.Response;
+using Recruiva.Core.DTOs.Request;
+using Recruiva.Core.DTOs.Response;
 
 namespace Recruiva.Web.Services;
 

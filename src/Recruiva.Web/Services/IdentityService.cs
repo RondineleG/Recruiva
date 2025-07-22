@@ -1,8 +1,8 @@
 using Microsoft.Extensions.Options;
 
+using Recruiva.Core.DTOs.Request;
+using Recruiva.Core.DTOs.Response;
 using Recruiva.Web.Configurations;
-using Recruiva.Web.DTOs.Request;
-using Recruiva.Web.DTOs.Response;
 
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;

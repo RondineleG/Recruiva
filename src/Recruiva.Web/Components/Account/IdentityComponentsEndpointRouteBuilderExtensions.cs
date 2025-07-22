@@ -1,21 +1,14 @@
 using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Http.Extensions;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Primitives;
 
 using Recruiva.Web.Components.Account.Pages;
 using Recruiva.Web.Components.Account.Pages.Manage;
-using Recruiva.Web.Models;
-
-using System.Security.Claims;
 
 namespace Recruiva.Web.Components.Account
 {
     internal static class IdentityComponentsEndpointRouteBuilderExtensions
     {
-        // These endpoints are required by the Identity Razor components defined in the
-        // /Components/Account/Pages directory of this project.
         public static IEndpointConventionBuilder MapAdditionalIdentityEndpoints(this IEndpointRouteBuilder endpoints)
         {
             ArgumentNullException.ThrowIfNull(endpoints);
@@ -24,10 +17,11 @@ namespace Recruiva.Web.Components.Account
 
             accountGroup.MapPost("/PerformExternalLogin", (
                 HttpContext context,
-                [FromServices] SignInManager<ApplicationUser> signInManager,
                 [FromForm] string provider,
                 [FromForm] string returnUrl) =>
             {
+                var signInManager = context.RequestServices.GetRequiredService<SignInManager<ApplicationUser>>();
+
                 IEnumerable<KeyValuePair<string, StringValues>> query = [
                     new("ReturnUrl", returnUrl),
                     new("Action", ExternalLogin.LoginCallbackAction)];
@@ -42,10 +36,10 @@ namespace Recruiva.Web.Components.Account
             });
 
             accountGroup.MapPost("/Logout", async (
-                ClaimsPrincipal user,
-                SignInManager<ApplicationUser> signInManager,
+                HttpContext context,
                 [FromForm] string returnUrl) =>
             {
+                var signInManager = context.RequestServices.GetRequiredService<SignInManager<ApplicationUser>>();
                 await signInManager.SignOutAsync();
                 return TypedResults.LocalRedirect($"~/{returnUrl}");
             });
@@ -54,18 +48,20 @@ namespace Recruiva.Web.Components.Account
 
             manageGroup.MapPost("/LinkExternalLogin", async (
                 HttpContext context,
-                [FromServices] SignInManager<ApplicationUser> signInManager,
                 [FromForm] string provider) =>
             {
-                // Clear the existing external cookie to ensure a clean login process
                 await context.SignOutAsync(IdentityConstants.ExternalScheme);
 
+                var signInManager = context.RequestServices.GetRequiredService<SignInManager<ApplicationUser>>();
                 var redirectUrl = UriHelper.BuildRelative(
                     context.Request.PathBase,
                     "/Account/Manage/ExternalLogins",
                     QueryString.Create("Action", ExternalLogins.LinkLoginCallbackAction));
 
-                var properties = signInManager.ConfigureExternalAuthenticationProperties(provider, redirectUrl, signInManager.UserManager.GetUserId(context.User));
+                var properties = signInManager.ConfigureExternalAuthenticationProperties(
+                    provider,
+                    redirectUrl,
+                    signInManager.UserManager.GetUserId(context.User));
                 return TypedResults.Challenge(properties, [provider]);
             });
 
@@ -73,10 +69,11 @@ namespace Recruiva.Web.Components.Account
             var downloadLogger = loggerFactory.CreateLogger("DownloadPersonalData");
 
             manageGroup.MapPost("/DownloadPersonalData", async (
-                HttpContext context,
-                [FromServices] UserManager<ApplicationUser> userManager,
-                [FromServices] AuthenticationStateProvider authenticationStateProvider) =>
+                HttpContext context) =>
             {
+                var userManager = context.RequestServices.GetRequiredService<UserManager<ApplicationUser>>();
+                var authenticationStateProvider = context.RequestServices.GetRequiredService<AuthenticationStateProvider>();
+
                 var user = await userManager.GetUserAsync(context.User);
                 if (user is null)
                 {
@@ -86,7 +83,6 @@ namespace Recruiva.Web.Components.Account
                 var userId = await userManager.GetUserIdAsync(user);
                 downloadLogger.LogInformation("User with ID '{UserId}' asked for their personal data.", userId);
 
-                // Only include personal data for download
                 var personalData = new Dictionary<string, string>();
                 var personalDataProps = typeof(ApplicationUser).GetProperties().Where(
                     prop => Attribute.IsDefined(prop, typeof(PersonalDataAttribute)));

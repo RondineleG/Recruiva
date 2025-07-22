@@ -1,8 +1,10 @@
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 
-using Recruiva.Web.Converters;
+using Recruiva.Core.Converters;
+using Recruiva.Core.Entities;
+using Recruiva.Core.Enums;
+using Recruiva.Core.ValueObjects;
 using Recruiva.Web.Data.Extensions;
-using Recruiva.Web.ValueObjects;
 
 namespace Recruiva.Web.Data;
 
@@ -15,6 +17,8 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser, IdentityR
     public ApplicationDbContext() : base(new DbContextOptions<ApplicationDbContext>())
     {
     }
+
+    public DbSet<Address> Addresses => Set<Address>();
 
     public DbSet<Advertiser> Advertisers => Set<Advertiser>();
 

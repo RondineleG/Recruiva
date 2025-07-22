@@ -1,6 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-using Recruiva.Web.ValueObjects;
+using Recruiva.Core.Entities;
+using Recruiva.Core.Enums;
+using Recruiva.Core.ValueObjects;
 
 namespace Recruiva.Web.Data.Configurations;
 

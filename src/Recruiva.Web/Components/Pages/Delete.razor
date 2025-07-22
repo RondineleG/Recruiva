@@ -1,0 +1,41 @@
+﻿@page "/address/delete/{Id:guid}"
+
+@inject AddressService AddressService
+@inject NavigationManager Navigation
+@using Recruiva.Core.Entities;
+
+<PageTitle>Excluir Endereço</PageTitle>
+
+@if (address == null)
+{
+    <p>Carregando...</p>
+}
+else
+{
+    <h3>Deseja realmente excluir este endereço?</h3>
+    <div>
+        <strong>@address.Street, @address.Number - @address.City/@address.State</strong>
+    </div>
+    <button class="btn btn-danger" @onclick="Remove">Excluir</button>
+    <button class="btn btn-secondary" @onclick="Cancel">Cancelar</button>
+}
+
+@code {
+    [Parameter]
+    public Guid Id { get; set; }
+
+    private Address? address;
+
+    protected override async Task OnInitializedAsync()
+    {
+        address = await AddressService.GetByIdAsync(Id);
+    }
+
+    private async Task Remove()
+    {
+        await AddressService.DeleteAsync(Id);
+        Navigation.NavigateTo("/address/list");
+    }
+
+    private void Cancel() => Navigation.NavigateTo("/address/list");
+}

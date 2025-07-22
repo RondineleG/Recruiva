@@ -1,3 +1,6 @@
+using Recruiva.Web.Repositories;
+using Recruiva.Web.Services;
+
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddRazorComponents()
@@ -36,7 +39,8 @@ builder.Services.AddIdentityCore<ApplicationUser>(options =>
 
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 builder.Services.AddSingleton<IEmailSender<ApplicationUser>, IdentityNoOpEmailSender>();
-
+builder.Services.AddScoped<AddressRepository>();
+builder.Services.AddScoped<AddressService>();
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())

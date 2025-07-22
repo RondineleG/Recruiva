@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-using Recruiva.Web.Converters;
+using Recruiva.Core.Converters;
+using Recruiva.Core.Entities.Base;
 
 namespace Recruiva.Web.Data.Configurations;
 
