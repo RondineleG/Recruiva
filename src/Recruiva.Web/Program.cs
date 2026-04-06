@@ -1,6 +1,7 @@
 using Recruiva.Core.DTOs.Request;
 using Recruiva.Core.DTOs.Response;
 using Recruiva.Core.Entities;
+using Recruiva.Core.Interfaces.Repositories;
 using Recruiva.Core.Interfaces.Repositories.Base;
 using Recruiva.Core.Interfaces.Storage;
 using Recruiva.Core.Interfaces.UseCases;
@@ -53,10 +54,13 @@ builder.Services.AddIdentityCore<ApplicationUser>(options =>
 .AddEntityFrameworkStores<ApplicationDbContext>();
 
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
-builder.Services.AddSingleton<IEmailSender<ApplicationUser>, IdentityNoOpEmailSender>();
+
+// Registrar EmailSender (SendGrid com fallback para NoOp em desenvolvimento)
+builder.Services.AddScoped<Recruiva.Core.Interfaces.Services.IEmailSender, Recruiva.Web.Services.SendGridEmailSender>();
 
 // Registrar Repositórios
-builder.Services.AddScoped<IBaseRepository<Job>, JobRepository>();
+builder.Services.AddScoped<IJobRepository, JobRepository>();
+builder.Services.AddScoped<IBaseRepository<Job>, JobRepository>(); // Para UseCases que usam IBaseRepository
 builder.Services.AddScoped<IBaseRepository<Candidate>, CandidateRepository>();
 builder.Services.AddScoped<IBaseRepository<Advertiser>, AdvertiserRepository>();
 builder.Services.AddScoped<IBaseRepository<Application>, ApplicationRepository>();
@@ -86,9 +90,11 @@ builder.Services.AddScoped<UpdateApplicationStatusUseCase>();
 
 // Registrar Use Cases de Candidates
 builder.Services.AddScoped<CreateCandidateUseCase>();
+builder.Services.AddScoped<Recruiva.Core.UseCases.Candidates.UpdateCandidateUseCase>();
 
 // Registrar Use Cases de Advertisers
 builder.Services.AddScoped<CreateAdvertiserUseCase>();
+builder.Services.AddScoped<Recruiva.Core.UseCases.Advertisers.UpdateAdvertiserUseCase>();
 
 // Registrar Use Cases de Resumes
 builder.Services.AddScoped<CreateResumeUseCase>();
@@ -104,6 +110,7 @@ builder.Services.AddScoped<IEntityValidator<Resume>, ResumeValidator>();
 builder.Services.AddScoped<CreateNotificationUseCase>();
 builder.Services.AddScoped<ListNotificationsByUserUseCase>();
 builder.Services.AddScoped<MarkNotificationAsReadUseCase>();
+builder.Services.AddScoped<Recruiva.Core.UseCases.Notifications.SendEmailNotificationUseCase>();
 
 // Registrar Storage Provider
 builder.Services.AddScoped<IStorageProvider, LocalStorageProvider>();

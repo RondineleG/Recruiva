@@ -1,33 +1,256 @@
 @page "/profile/candidate"
+@attribute [Microsoft.AspNetCore.Authorization.Authorize]
+@inject Recruiva.Core.UseCases.Candidates.UpdateCandidateUseCase UpdateCandidateUseCase
+@inject Recruiva.Core.Interfaces.Repositories.Base.IBaseRepository<Recruiva.Core.Entities.Candidate> CandidateRepository
+@inject Recruiva.Web.Services.ICurrentUserHelper CurrentUserHelper
+@inject Microsoft.AspNetCore.Components.NavigationManager Navigation
+@inject Microsoft.AspNetCore.Components.Forms.EditContext EditContext
 
 <PageTitle>Meu Perfil - Recruiva</PageTitle>
 
 <div class="container mt-4">
     <h1>👤 Meu Perfil de Candidato</h1>
-    
-    <div class="alert alert-info">
-        <i class="bi bi-info-circle"></i> 
-        Funcionalidade em desenvolvimento. Em breve você poderá editar seu perfil aqui.
-    </div>
 
-    <div class="row mt-4">
-        <div class="col-md-6">
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title">Dados Pessoais</h5>
-                    <p class="card-text text-muted">Nome, email, telefone e data de nascimento</p>
-                    <button class="btn btn-outline-primary btn-sm" disabled>Editar (Em breve)</button>
+    @if (_isLoading)
+    {
+        <div class="d-flex justify-content-center my-4">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Carregando...</span>
+            </div>
+        </div>
+    }
+    else if (_candidate != null)
+    {
+        <div class="row mt-4">
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">Dados Pessoais</h5>
+                    </div>
+                    <div class="card-body">
+                        @if (!string.IsNullOrEmpty(_successMessage))
+                        {
+                            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                                @_successMessage
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        }
+
+                        @if (!string.IsNullOrEmpty(_errorMessage))
+                        {
+                            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                @_errorMessage
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        }
+
+                        <EditForm Model="_editModel" OnValidSubmit="HandleSaveAsync">
+                            <DataAnnotationsValidator />
+
+                            <div class="mb-3">
+                                <label class="form-label">Nome Completo *</label>
+                                <InputText @bind-Value="_editModel.Name" class="form-control" />
+                                <ValidationMessage For="@(() => _editModel.Name)" />
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Email</label>
+                                <InputText @bind-Value="_editModel.Email" class="form-control" disabled />
+                                <small class="text-muted">Email não pode ser alterado</small>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Telefone</label>
+                                <InputText @bind-Value="_editModel.Phone" class="form-control" />
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Data de Nascimento *</label>
+                                <InputDate @bind-Value="_editModel.DateOfBirth" class="form-control" />
+                                <ValidationMessage For="@(() => _editModel.DateOfBirth)" />
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">LinkedIn</label>
+                                <InputText @bind-Value="_editModel.LinkedIn" class="form-control" placeholder="https://linkedin.com/in/seu-perfil" />
+                            </div>
+
+                            <div class="d-flex gap-2">
+                                <button type="submit" class="btn btn-primary" disabled="@_isSaving">
+                                    @if (_isSaving)
+                                    {
+                                        <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+                                    }
+                                    Salvar Alterações
+                                </button>
+                                <button type="button" class="btn btn-outline-secondary" @onclick="CancelEdit">Cancelar</button>
+                            </div>
+                        </EditForm>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">Informações da Conta</h5>
+                    </div>
+                    <div class="card-body">
+                        <dl class="row mb-0">
+                            <dt class="col-sm-5">Status</dt>
+                            <dd class="col-sm-7">
+                                <span class="badge @(GetStatusBadgeClass())">@_candidate.Status</span>
+                            </dd>
+
+                            <dt class="col-sm-5">Email Verificado</dt>
+                            <dd class="col-sm-7">
+                                @if (_candidate.IsEmailVerified)
+                                {
+                                    <span class="badge bg-success">Sim</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-warning">Não</span>
+                                }
+                            </dd>
+
+                            <dt class="col-sm-5">Membro desde</dt>
+                            <dd class="col-sm-7">@_candidate.CreatedAt.ToString("dd/MM/yyyy")</dd>
+                        </dl>
+                    </div>
                 </div>
             </div>
         </div>
-        <div class="col-md-6">
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title">LinkedIn</h5>
-                    <p class="card-text text-muted">Integração com seu perfil do LinkedIn</p>
-                    <button class="btn btn-outline-primary btn-sm" disabled>Conectar (Em breve)</button>
-                </div>
-            </div>
+    }
+    else
+    {
+        <div class="alert alert-warning mt-4">
+            <i class="bi bi-exclamation-triangle"></i>
+            Candidato não encontrado.
         </div>
-    </div>
+    }
 </div>
+
+@code {
+    private Recruiva.Core.Entities.Candidate? _candidate;
+    private EditModel _editModel = new();
+    private bool _isLoading = true;
+    private bool _isSaving = false;
+    private string? _successMessage;
+    private string? _errorMessage;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadCandidateAsync();
+    }
+
+    private async Task LoadCandidateAsync()
+    {
+        _isLoading = true;
+        try
+        {
+            var candidateId = CurrentUserHelper.GetCandidateId();
+            if (candidateId.HasValue)
+            {
+                var result = await CandidateRepository.GetByIdAsync(Recruiva.Core.ValueObjects.Id.Create(candidateId.Value));
+                if (result.Status == Recruiva.Core.Enums.EResultStatus.Success && result.Data != null)
+                {
+                    _candidate = result.Data;
+                    _editModel = new EditModel
+                    {
+                        Id = _candidate.Id.Value,
+                        Name = _candidate.Name,
+                        Email = _candidate.Email,
+                        Phone = _candidate.Phone,
+                        DateOfBirth = _candidate.DateOfBirth,
+                        LinkedIn = _candidate.LinkedIn
+                    };
+                }
+            }
+        }
+        finally
+        {
+            _isLoading = false;
+        }
+    }
+
+    private async Task HandleSaveAsync()
+    {
+        _isSaving = true;
+        _successMessage = null;
+        _errorMessage = null;
+
+        try
+        {
+            var request = new Recruiva.Core.DTOs.Request.UpdateCandidateRequest
+            {
+                Id = _editModel.Id,
+                Name = _editModel.Name,
+                Phone = _editModel.Phone,
+                DateOfBirth = _editModel.DateOfBirth,
+                LinkedIn = _editModel.LinkedIn,
+                AddressId = _editModel.AddressId
+            };
+
+            var result = await UpdateCandidateUseCase.ExecuteAsync(request);
+
+            if (result.Status == Recruiva.Core.Enums.EResultStatus.Success)
+            {
+                _successMessage = "Perfil atualizado com sucesso!";
+                await LoadCandidateAsync();
+            }
+            else
+            {
+                _errorMessage = result.Message;
+            }
+        }
+        catch (Exception ex)
+        {
+            _errorMessage = $"Erro ao salvar: {ex.Message}";
+        }
+        finally
+        {
+            _isSaving = false;
+        }
+    }
+
+    private void CancelEdit()
+    {
+        if (_candidate != null)
+        {
+            _editModel = new EditModel
+            {
+                Id = _candidate.Id.Value,
+                Name = _candidate.Name,
+                Email = _candidate.Email,
+                Phone = _candidate.Phone,
+                DateOfBirth = _candidate.DateOfBirth,
+                LinkedIn = _candidate.LinkedIn
+            };
+            _successMessage = null;
+            _errorMessage = null;
+        }
+    }
+
+    private string GetStatusBadgeClass()
+    {
+        return _candidate?.Status switch
+        {
+            Recruiva.Core.Enums.EAccountStatus.Active => "bg-success",
+            Recruiva.Core.Enums.EAccountStatus.Incomplete => "bg-warning",
+            Recruiva.Core.Enums.EAccountStatus.Blocked => "bg-danger",
+            _ => "bg-secondary"
+        };
+    }
+
+    private class EditModel
+    {
+        public Guid Id { get; set; }
+        public string Name { get; set; } = string.Empty;
+        public string Email { get; set; } = string.Empty;
+        public string? Phone { get; set; }
+        public DateTime DateOfBirth { get; set; }
+        public string? LinkedIn { get; set; }
+        public Guid? AddressId { get; set; }
+    }
+}
