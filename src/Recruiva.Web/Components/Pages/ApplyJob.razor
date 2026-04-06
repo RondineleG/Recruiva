@@ -2,7 +2,9 @@
 @using Recruiva.Core.DTOs.Request
 @using Recruiva.Core.Enums
 @using Recruiva.Core.UseCases.Applications
+@using Recruiva.Web.Services
 @inject CreateApplicationUseCase CreateApplicationUseCase
+@inject ICurrentUserHelper CurrentUserHelper
 @inject NavigationManager Navigation
 
 <PageTitle>Candidatar-se - Recruiva</PageTitle>
@@ -89,9 +91,13 @@
     {
         // TODO: Obter título da vaga
         jobTitle = $"Vaga {JobId.ToString().Substring(0, 8)}";
-        
-        // TODO: Obter CandidateId do usuário logado
-        model.CandidateId = Guid.Parse("44444444-4444-4444-4444-444444444444");
+
+        // Obter CandidateId do usuário logado
+        var candidateId = CurrentUserHelper.GetCandidateId();
+        if (candidateId.HasValue)
+        {
+            model.CandidateId = candidateId.Value;
+        }
         model.JobId = JobId;
     }
 

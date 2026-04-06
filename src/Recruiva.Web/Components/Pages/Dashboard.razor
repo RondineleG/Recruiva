@@ -3,7 +3,11 @@
 @using Recruiva.Core.DTOs.Response
 @using Recruiva.Core.Enums
 @using Recruiva.Core.UseCases.Jobs
+@using Recruiva.Web.Services
+@using Recruiva.Web.UseCases.Analytics
 @inject SearchJobsUseCase SearchJobsUseCase
+@inject GetDashboardAnalyticsUseCase DashboardAnalyticsUseCase
+@inject ICurrentUserHelper CurrentUserHelper
 @inject NavigationManager Navigation
 
 <PageTitle>Dashboard - Recruiva</PageTitle>
@@ -17,41 +21,128 @@
         </div>
     </div>
 
-    <!-- Estatísticas -->
-    <div class="row mb-4">
-        <div class="col-md-3">
-            <div class="card bg-primary text-white">
-                <div class="card-body">
-                    <h3><i class="bi bi-briefcase"></i> @totalJobs</h3>
-                    <p class="mb-0">Vagas Ativas</p>
+    @if (isLoading)
+    {
+        <div class="text-center py-5">
+            <div class="spinner-border text-primary" role="status"></div>
+            <p class="mt-2">Carregando dashboard...</p>
+        </div>
+    }
+    else
+    {
+        <!-- Estatísticas -->
+        <div class="row mb-4">
+            <div class="col-md-3">
+                <div class="card bg-primary text-white">
+                    <div class="card-body">
+                        <h3><i class="bi bi-briefcase"></i> @analytics?.TotalJobs</h3>
+                        <p class="mb-0">Total de Vagas</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card bg-success text-white">
+                    <div class="card-body">
+                        <h3><i class="bi bi-check-circle"></i> @analytics?.ActiveJobs</h3>
+                        <p class="mb-0">Vagas Ativas</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card bg-info text-white">
+                    <div class="card-body">
+                        <h3><i class="bi bi-people"></i> @analytics?.TotalCandidates</h3>
+                        <p class="mb-0">Candidatos</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card bg-warning text-white">
+                    <div class="card-body">
+                        <h3><i class="bi bi-send"></i> @analytics?.TotalApplications</h3>
+                        <p class="mb-0">Candidaturas</p>
+                    </div>
                 </div>
             </div>
         </div>
-        <div class="col-md-3">
-            <div class="card bg-success text-white">
-                <div class="card-body">
-                    <h3><i class="bi bi-building"></i> @totalCompanies</h3>
-                    <p class="mb-0">Empresas</p>
+
+        <!-- Gráfico de Vagas por Status -->
+        @if (analytics?.JobsByStatus != null && analytics.JobsByStatus.Any())
+        {
+            <div class="row mb-4">
+                <div class="col">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">&#x1F4CA; Vagas por Status</h5>
+                            <div class="mt-3">
+                                @foreach (var status in analytics.JobsByStatus)
+                                {
+                                    var percentage = analytics.TotalJobs > 0 ? (status.Value * 100 / analytics.TotalJobs) : 0;
+                                    var bgColor = status.Key switch
+                                    {
+                                        "Active" => "bg-success",
+                                        "Expired" => "bg-danger",
+                                        "Paused" => "bg-warning",
+                                        "Hidden" => "bg-secondary",
+                                        "Rejected" => "bg-dark",
+                                        _ => "bg-primary"
+                                    };
+
+                                    <div class="mb-2">
+                                        <div class="d-flex justify-content-between">
+                                            <span>@status.Key</span>
+                                            <span>@status.Value (@percentage%)</span>
+                                        </div>
+                                        <div class="progress" style="height: 20px;">
+                                            <div class="progress-bar @bgColor" role="progressbar" style="width: @percentage%" aria-valuenow="@percentage" aria-valuemin="0" aria-valuemax="100"></div>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card bg-info text-white">
-                <div class="card-body">
-                    <h3><i class="bi bi-people"></i> @totalCandidates</h3>
-                    <p class="mb-0">Candidatos</p>
+        }
+
+        <!-- Gráfico de Candidaturas por Status -->
+        @if (analytics?.ApplicationsByStatus != null && analytics.ApplicationsByStatus.Any())
+        {
+            <div class="row mb-4">
+                <div class="col">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">&#x1F4EC; Candidaturas por Status</h5>
+                            <div class="mt-3">
+                                @foreach (var status in analytics.ApplicationsByStatus)
+                                {
+                                    var percentage = analytics.TotalApplications > 0 ? (status.Value * 100 / analytics.TotalApplications) : 0;
+                                    var bgColor = status.Key switch
+                                    {
+                                        "Sent" => "bg-primary",
+                                        "Viewed" => "bg-info",
+                                        "Selected" => "bg-success",
+                                        "Rejected" => "bg-danger",
+                                        _ => "bg-secondary"
+                                    };
+
+                                    <div class="mb-2">
+                                        <div class="d-flex justify-content-between">
+                                            <span>@status.Key</span>
+                                            <span>@status.Value (@percentage%)</span>
+                                        </div>
+                                        <div class="progress" style="height: 20px;">
+                                            <div class="progress-bar @bgColor" role="progressbar" style="width: @percentage%" aria-valuenow="@percentage" aria-valuemin="0" aria-valuemax="100"></div>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card bg-warning text-white">
-                <div class="card-body">
-                    <h3><i class="bi bi-send"></i> @totalApplications</h3>
-                    <p class="mb-0">Candidaturas</p>
-                </div>
-            </div>
-        </div>
-    </div>
+        }
+    }
 
     <!-- Ações Rápidas -->
     <div class="row mb-4">
@@ -110,17 +201,10 @@
         </div>
     </div>
 
-    @if (isLoading)
-    {
-        <div class="text-center py-5">
-            <div class="spinner-border text-primary" role="status"></div>
-            <p class="mt-2">Carregando vagas...</p>
-        </div>
-    }
-    else if (recentJobs != null && recentJobs.Jobs != null && recentJobs.Jobs.Any())
+    @if (analytics?.RecentJobs != null && analytics.RecentJobs.Any())
     {
         <div class="row g-3">
-            @foreach (var job in recentJobs.Jobs.Take(6))
+            @foreach (var job in analytics.RecentJobs.Take(6))
             {
                 <div class="col-md-6 col-lg-4">
                     <div class="card h-100">
@@ -160,7 +244,7 @@
             }
         </div>
     }
-    else
+    else if (!isLoading)
     {
         <div class="alert alert-info">
             <i class="bi bi-info-circle"></i> Nenhuma vaga disponível no momento.
@@ -169,27 +253,17 @@
 </div>
 
 @code {
-    private ListJobsResponse? recentJobs;
+    private DashboardAnalyticsResponse? analytics;
     private bool isLoading = true;
-
-    // Estatísticas mockadas (virão do backend)
-    private int totalJobs = 127;
-    private int totalCompanies = 45;
-    private int totalCandidates = 523;
-    private int totalApplications = 1247;
 
     protected override async Task OnInitializedAsync()
     {
-        var request = new ListJobsRequest
-        {
-            Page = 1,
-            Size = 6
-        };
+        var advertiserId = CurrentUserHelper.GetAdvertiserId();
 
-        var result = await SearchJobsUseCase.ExecuteAsync(request);
+        var result = await DashboardAnalyticsUseCase.ExecuteAsync(advertiserId);
         if (result.Status == EResultStatus.Success)
         {
-            recentJobs = result.Data;
+            analytics = result.Data;
         }
 
         isLoading = false;

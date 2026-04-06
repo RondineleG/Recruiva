@@ -136,7 +136,7 @@ public static class SeedData
         {
             new()
             {
-                Id = Id.Create(Guid.NewGuid()),
+                Id = Id.Create(Guid.Parse("60000000-0000-0000-0000-000000000001")),
                 TenantId = tenantId,
                 AdvertiserId = advertiser1.Id,
                 Title = "Desenvolvedor Full Stack Pleno",
@@ -155,7 +155,7 @@ public static class SeedData
             },
             new()
             {
-                Id = Id.Create(Guid.NewGuid()),
+                Id = Id.Create(Guid.Parse("60000000-0000-0000-0000-000000000002")),
                 TenantId = tenantId,
                 AdvertiserId = advertiser2.Id,
                 Title = "Analista de Marketing Digital",
@@ -171,10 +171,130 @@ public static class SeedData
                 Boost = new JobBoost { IsActive = false },
                 Highlight = new JobHighlight { IsActive = false },
                 Counters = new JobCounters { Views = 92, Applications = 31 }
+            },
+            new()
+            {
+                Id = Id.Create(Guid.Parse("60000000-0000-0000-0000-000000000003")),
+                TenantId = tenantId,
+                AdvertiserId = advertiser1.Id,
+                Title = "Desenvolvedor Backend Senior",
+                Description = "Vaga para desenvolvedor backend com experiência em arquitetura de microsserviços.",
+                Requirements = "C#, .NET Core, Docker, Kubernetes",
+                Category = "Tecnologia",
+                Tags = "Backend, C#, Docker",
+                Status = EJobStatus.Active,
+                ExpirationDate = DateTime.UtcNow.AddDays(45),
+                Location = new JobLocation { City = "São Paulo", State = "SP", Type = "OnSite", IsRemote = false },
+                Salary = new SalaryRange { Min = 15000, Max = 20000, Display = true },
+                Moderation = new ModerationInfo { Status = EModerationStatus.Approved },
+                Boost = new JobBoost { IsActive = false },
+                Highlight = new JobHighlight { IsActive = false },
+                Counters = new JobCounters { Views = 78, Applications = 23 }
+            },
+            new()
+            {
+                Id = Id.Create(Guid.Parse("60000000-0000-0000-0000-000000000004")),
+                TenantId = tenantId,
+                AdvertiserId = advertiser2.Id,
+                Title = "Gerente de Projetos",
+                Description = "Gerenciamento de projetos de marketing digital para clientes de grande porte.",
+                Requirements = "PMP, Scrum, experiência em gestão de equipes",
+                Category = "Gestão",
+                Tags = "Projetos, Gestão, Scrum",
+                Status = EJobStatus.Active,
+                ExpirationDate = DateTime.UtcNow.AddDays(90),
+                Location = new JobLocation { City = "Rio de Janeiro", State = "RJ", Type = "Hybrid", IsRemote = true },
+                Salary = new SalaryRange { Min = 12000, Max = 16000, Display = true },
+                Moderation = new ModerationInfo { Status = EModerationStatus.Approved },
+                Boost = new JobBoost { IsActive = false },
+                Highlight = new JobHighlight { IsActive = false },
+                Counters = new JobCounters { Views = 56, Applications = 18 }
+            },
+            new()
+            {
+                Id = Id.Create(Guid.Parse("60000000-0000-0000-0000-000000000005")),
+                TenantId = tenantId,
+                AdvertiserId = advertiser1.Id,
+                Title = "Desenvolvedor Frontend Junior",
+                Description = "Oportunidade para desenvolvedor frontend iniciante.",
+                Requirements = "HTML, CSS, JavaScript, React básico",
+                Category = "Tecnologia",
+                Tags = "Frontend, React, JavaScript",
+                Status = EJobStatus.Paused,
+                ExpirationDate = DateTime.UtcNow.AddDays(30),
+                Location = new JobLocation { City = "Remoto", State = "SP", Type = "Remote", IsRemote = true },
+                Salary = new SalaryRange { Min = 3000, Max = 5000, Display = true },
+                Moderation = new ModerationInfo { Status = EModerationStatus.Pending },
+                Boost = new JobBoost { IsActive = false },
+                Highlight = new JobHighlight { IsActive = false },
+                Counters = new JobCounters { Views = 15, Applications = 5 }
             }
         };
 
         context.Jobs.AddRange(jobs);
+        await context.SaveChangesAsync();
+
+        // Criar candidaturas de exemplo
+        var applications = new List<Application>
+        {
+            new()
+            {
+                Id = Id.Create(Guid.Parse("70000000-0000-0000-0000-000000000001")),
+                TenantId = tenantId,
+                CandidateId = candidate1.Id,
+                JobId = jobs[0].Id,
+                Status = EApplicationStatus.Sent,
+                AppliedAt = DateTime.UtcNow.AddDays(-5),
+                Notes = "Tenho grande interesse na vaga e acredito que meu perfil se encaixa perfeitamente."
+            },
+            new()
+            {
+                Id = Id.Create(Guid.Parse("70000000-0000-0000-0000-000000000002")),
+                TenantId = tenantId,
+                CandidateId = candidate2.Id,
+                JobId = jobs[0].Id,
+                Status = EApplicationStatus.Viewed,
+                AppliedAt = DateTime.UtcNow.AddDays(-4),
+                ViewedAt = DateTime.UtcNow.AddDays(-3),
+                Notes = "Experiência sólida em .NET e React."
+            },
+            new()
+            {
+                Id = Id.Create(Guid.Parse("70000000-0000-0000-0000-000000000003")),
+                TenantId = tenantId,
+                CandidateId = candidate1.Id,
+                JobId = jobs[1].Id,
+                Status = EApplicationStatus.Selected,
+                AppliedAt = DateTime.UtcNow.AddDays(-10),
+                ViewedAt = DateTime.UtcNow.AddDays(-8),
+                SelectedAt = DateTime.UtcNow.AddDays(-2),
+                Notes = "Transição de carreira para marketing digital."
+            },
+            new()
+            {
+                Id = Id.Create(Guid.Parse("70000000-0000-0000-0000-000000000004")),
+                TenantId = tenantId,
+                CandidateId = candidate2.Id,
+                JobId = jobs[2].Id,
+                Status = EApplicationStatus.Rejected,
+                AppliedAt = DateTime.UtcNow.AddDays(-15),
+                ViewedAt = DateTime.UtcNow.AddDays(-12),
+                RejectedAt = DateTime.UtcNow.AddDays(-7),
+                Notes = "Não possui experiência com Kubernetes."
+            },
+            new()
+            {
+                Id = Id.Create(Guid.Parse("70000000-0000-0000-0000-000000000005")),
+                TenantId = tenantId,
+                CandidateId = candidate1.Id,
+                JobId = jobs[3].Id,
+                Status = EApplicationStatus.Sent,
+                AppliedAt = DateTime.UtcNow.AddDays(-1),
+                Notes = "Experiência em gestão de projetos ágeis."
+            }
+        };
+
+        context.Applications.AddRange(applications);
         await context.SaveChangesAsync();
     }
 }

@@ -111,6 +111,13 @@ builder.Services.AddScoped<IStorageProvider, LocalStorageProvider>();
 // Registrar Use Case de Upload
 builder.Services.AddScoped<UploadFileUseCase>();
 
+// Registrar CurrentUserHelper
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<ICurrentUserHelper, CurrentUserHelper>();
+
+// Registrar UseCase de Analytics
+builder.Services.AddScoped<Recruiva.Web.UseCases.Analytics.GetDashboardAnalyticsUseCase>();
+
 // Serviços existentes
 builder.Services.AddScoped<AddressRepository>();
 builder.Services.AddScoped<AddressService>();

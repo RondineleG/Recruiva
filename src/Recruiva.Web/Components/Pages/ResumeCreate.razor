@@ -1,4 +1,6 @@
 @page "/resumes/new"
+@using Recruiva.Web.Services
+@inject ICurrentUserHelper CurrentUserHelper
 
 <PageTitle>Criar Currículo - Recruiva</PageTitle>
 
@@ -104,8 +106,12 @@
 
     protected override void OnInitialized()
     {
-        // TODO: Obter CandidateId do usuário logado
-        model.CandidateId = Guid.Parse("44444444-4444-4444-4444-444444444444");
+        // Obter CandidateId do usuário logado
+        var candidateId = CurrentUserHelper.GetCandidateId();
+        if (candidateId.HasValue)
+        {
+            model.CandidateId = candidateId.Value;
+        }
     }
 
     private async Task SubmitForm()

@@ -1,5 +1,7 @@
 @page "/resumes"
 @page "/resumes/create"
+@using Recruiva.Web.Services
+@inject ICurrentUserHelper CurrentUserHelper
 
 <PageTitle>Meus Currículos - Recruiva</PageTitle>
 
@@ -70,9 +72,9 @@
 
     protected override async Task OnInitializedAsync()
     {
-        // TODO: Obter CandidateId do usuário logado
-        var candidateId = Guid.Parse("44444444-4444-4444-4444-444444444444");
-        
+        // Obter CandidateId do usuário logado
+        var candidateId = CurrentUserHelper.GetCandidateId();
+
         // TODO: Implementar listagem real
         resumes = new List<ResumeResponse>();
         isLoading = false;

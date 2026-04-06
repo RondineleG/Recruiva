@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 
 using Recruiva.Core.DTOs.Request;
@@ -13,17 +14,18 @@ public class IdentityService : IIdentityService
 {
     public IdentityService(SignInManager<ApplicationUser> signInManager,
                            UserManager<ApplicationUser> userManager,
-                           IOptions<JwtOptions> jwtOptions)
+                           IOptions<JwtOptions> jwtOptions,
+                           ApplicationDbContext applicationDbContext)
     {
         _signInManager = signInManager;
         _userManager = userManager;
         _jwtOptions = jwtOptions.Value;
+        _applicationDbContext = applicationDbContext;
     }
 
+    private readonly ApplicationDbContext _applicationDbContext;
     private readonly JwtOptions _jwtOptions;
-
     private readonly SignInManager<ApplicationUser> _signInManager;
-
     private readonly UserManager<ApplicationUser> _userManager;
 
     public async Task<UserLoginResponse> Login(UserLoginRequest request)
@@ -119,7 +121,7 @@ public class IdentityService : IIdentityService
         var claims = new List<Claim>
         {
             new(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
-            new(JwtRegisteredClaimNames.Email, user.Email),
+            new(JwtRegisteredClaimNames.Email, user.Email ?? string.Empty),
             new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
             new(JwtRegisteredClaimNames.Nbf, DateTime.Now.ToString()),
             new(JwtRegisteredClaimNames.Iat, DateTimeOffset.Now.ToUnixTimeSeconds().ToString())
@@ -132,6 +134,31 @@ public class IdentityService : IIdentityService
 
             claims.AddRange(userClaims);
             claims.AddRange(roles.Select(role => new Claim("role", role)));
+
+            // Buscar Candidate e Advertiser pelo email e adicionar claims correspondentes
+            var email = user.Email;
+            if (!string.IsNullOrEmpty(email))
+            {
+                var candidate = await _applicationDbContext.Candidates
+                    .FirstOrDefaultAsync(c => c.Email == email && !c.IsDeleted)
+                    .ConfigureAwait(false);
+
+                if (candidate != null)
+                {
+                    claims.Add(new Claim(ClaimsExtensions.CandidateIdClaimType, candidate.Id.Value.ToString()));
+                    claims.Add(new Claim(ClaimsExtensions.UserTypeClaimType, "candidate"));
+                }
+
+                var advertiser = await _applicationDbContext.Advertisers
+                    .FirstOrDefaultAsync(a => a.Email == email && !a.IsDeleted)
+                    .ConfigureAwait(false);
+
+                if (advertiser != null)
+                {
+                    claims.Add(new Claim(ClaimsExtensions.AdvertiserIdClaimType, advertiser.Id.Value.ToString()));
+                    claims.Add(new Claim(ClaimsExtensions.UserTypeClaimType, "advertiser"));
+                }
+            }
         }
 
         return claims;

@@ -2,7 +2,9 @@
 @using Recruiva.Core.DTOs.Request
 @using Recruiva.Core.Enums
 @using Recruiva.Core.UseCases.Jobs
+@using Recruiva.Web.Services
 @inject CreateJobUseCase CreateJobUseCase
+@inject ICurrentUserHelper CurrentUserHelper
 @inject NavigationManager Navigation
 
 <PageTitle>Criar Nova Vaga - Recruiva</PageTitle>
@@ -182,11 +184,15 @@
         isSubmitting = true;
         errorMessage = string.Empty;
 
-        // TODO: Obter AdvertiserId do usuário logado
-        model.AdvertiserId = Guid.NewGuid(); // Placeholder
+        // Obter AdvertiserId do usuário logado
+        var advertiserId = CurrentUserHelper.GetAdvertiserId();
+        if (advertiserId.HasValue)
+        {
+            model.AdvertiserId = advertiserId.Value;
+        }
 
         var result = await CreateJobUseCase.ExecuteAsync(model);
-        
+
         if (result.Status == EResultStatus.Success)
         {
             Navigation.NavigateTo($"/jobs/{result.Data!.Id}");
