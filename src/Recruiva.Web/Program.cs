@@ -2,6 +2,7 @@ using Recruiva.Core.DTOs.Request;
 using Recruiva.Core.DTOs.Response;
 using Recruiva.Core.Entities;
 using Recruiva.Core.Interfaces.Repositories.Base;
+using Recruiva.Core.Interfaces.Storage;
 using Recruiva.Core.Interfaces.UseCases;
 using Recruiva.Core.Interfaces.Validations;
 using Recruiva.Core.UseCases.Jobs;
@@ -10,6 +11,7 @@ using Recruiva.Core.UseCases.Candidates;
 using Recruiva.Core.UseCases.Advertisers;
 using Recruiva.Core.UseCases.Resumes;
 using Recruiva.Core.UseCases.Notifications;
+using Recruiva.Core.UseCases.Storage;
 using Recruiva.Core.Validations;
 using Recruiva.Web.Repositories;
 using Recruiva.Web.Services;
@@ -102,6 +104,12 @@ builder.Services.AddScoped<IEntityValidator<Resume>, ResumeValidator>();
 builder.Services.AddScoped<CreateNotificationUseCase>();
 builder.Services.AddScoped<ListNotificationsByUserUseCase>();
 builder.Services.AddScoped<MarkNotificationAsReadUseCase>();
+
+// Registrar Storage Provider
+builder.Services.AddScoped<IStorageProvider, LocalStorageProvider>();
+
+// Registrar Use Case de Upload
+builder.Services.AddScoped<UploadFileUseCase>();
 
 // Serviços existentes
 builder.Services.AddScoped<AddressRepository>();

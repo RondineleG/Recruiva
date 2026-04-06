@@ -44,6 +44,8 @@ public class AdvertiserValidator : IEntityValidator<Advertiser>
             result.AddError("CNPJ/CPF é obrigatório.", "TaxId");
         else if (entity.TaxId.Length > 50)
             result.AddError("CNPJ/CPF deve ter no máximo 50 caracteres.", "TaxId");
+        else if (!IsValidTaxId(entity.TaxId))
+            result.AddError("CNPJ/CPF inválido.", "TaxId");
 
         // Validar website se informado (URL válida)
         if (!string.IsNullOrEmpty(entity.Website) && !UrlRegex.IsMatch(entity.Website))
@@ -55,5 +57,23 @@ public class AdvertiserValidator : IEntityValidator<Advertiser>
     public IValidationResult ValidateUpdate(Advertiser entity)
     {
         return Validate(entity);
+    }
+
+    /// <summary>
+    /// Valida TaxId detectando automaticamente se é CPF ou CNPJ baseado no tamanho.
+    /// CPF: 11 dígitos | CNPJ: 14 dígitos
+    /// </summary>
+    private static bool IsValidTaxId(string taxId)
+    {
+        // Remover formatação para contagem de dígitos
+        var digitsOnly = taxId.Replace(".", "").Replace("-", "").Replace("/", "").Trim();
+
+        // Detectar tipo baseado no tamanho
+        return digitsOnly.Length switch
+        {
+            11 => CpfValidator.IsValid(taxId),
+            14 => CnpjValidator.IsValid(taxId),
+            _ => false // Tamanho inválido
+        };
     }
 }
