@@ -1,0 +1,59 @@
+using Recruiva.Core.Entities;
+using Recruiva.Core.Interfaces.Validations;
+
+using System.Text.RegularExpressions;
+
+namespace Recruiva.Core.Validations;
+
+public class AdvertiserValidator : IEntityValidator<Advertiser>
+{
+    private static readonly Regex EmailRegex = new(
+        @"^[^@\s]+@[^@\s]+\.[^@\s]+$",
+        RegexOptions.Compiled | RegexOptions.IgnoreCase,
+        TimeSpan.FromMilliseconds(250));
+
+    private static readonly Regex UrlRegex = new(
+        @"^https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)$",
+        RegexOptions.Compiled | RegexOptions.IgnoreCase,
+        TimeSpan.FromMilliseconds(250));
+
+    public IValidationResult Validate(Advertiser entity)
+    {
+        var result = new ValidationResult();
+
+        // Validar nome (3-100 chars)
+        if (string.IsNullOrWhiteSpace(entity.Name))
+            result.AddError("Nome é obrigatório.", "Name");
+        else if (entity.Name.Length < 3 || entity.Name.Length > 100)
+            result.AddError("Nome deve ter entre 3 e 100 caracteres.", "Name");
+
+        // Validar email (formato e obrigatório)
+        if (string.IsNullOrWhiteSpace(entity.Email))
+            result.AddError("Email é obrigatório.", "Email");
+        else if (!EmailRegex.IsMatch(entity.Email))
+            result.AddError("Email em formato inválido.", "Email");
+
+        // Validar telefone (obrigatório, max 25 chars)
+        if (string.IsNullOrWhiteSpace(entity.Phone))
+            result.AddError("Telefone é obrigatório.", "Phone");
+        else if (entity.Phone.Length > 25)
+            result.AddError("Telefone deve ter no máximo 25 caracteres.", "Phone");
+
+        // Validar TaxId (CNPJ/CPF, obrigatório, max 50 chars)
+        if (string.IsNullOrWhiteSpace(entity.TaxId))
+            result.AddError("CNPJ/CPF é obrigatório.", "TaxId");
+        else if (entity.TaxId.Length > 50)
+            result.AddError("CNPJ/CPF deve ter no máximo 50 caracteres.", "TaxId");
+
+        // Validar website se informado (URL válida)
+        if (!string.IsNullOrEmpty(entity.Website) && !UrlRegex.IsMatch(entity.Website))
+            result.AddError("Website deve ser uma URL válida.", "Website");
+
+        return result;
+    }
+
+    public IValidationResult ValidateUpdate(Advertiser entity)
+    {
+        return Validate(entity);
+    }
+}

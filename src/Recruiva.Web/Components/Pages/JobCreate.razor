@@ -1,0 +1,206 @@
+@page "/jobs/create"
+@using Recruiva.Core.DTOs.Request
+@using Recruiva.Core.Enums
+@using Recruiva.Core.UseCases.Jobs
+@inject CreateJobUseCase CreateJobUseCase
+@inject NavigationManager Navigation
+
+<PageTitle>Criar Nova Vaga - Recruiva</PageTitle>
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1>📝 Criar Nova Vaga</h1>
+                <button class="btn btn-secondary" @onclick="Cancel">
+                    ← Cancelar
+                </button>
+            </div>
+
+            @if (!string.IsNullOrEmpty(errorMessage))
+            {
+                <div class="alert alert-danger">
+                    <i class="bi bi-exclamation-triangle"></i> @errorMessage
+                </div>
+            }
+
+            <div class="card">
+                <div class="card-body">
+                    <EditForm Model="model" OnValidSubmit="SubmitForm">
+                        <DataAnnotationsValidator />
+
+                        <!-- Informações Básicas -->
+                        <h5 class="mb-3"><i class="bi bi-info-circle"></i> Informações Básicas</h5>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Título da Vaga *</label>
+                            <InputText class="form-control" @bind-Value="model.Title" placeholder="Ex: Desenvolvedor Full Stack Pleno" />
+                            <ValidationMessage class="text-danger" For="@(() => model.Title)" />
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Descrição *</label>
+                            <InputTextArea class="form-control" @bind-Value="model.Description" rows="5" placeholder="Descreva a vaga, responsabilidades e oportunidades..." />
+                            <ValidationMessage class="text-danger" For="@(() => model.Description)" />
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Categoria</label>
+                                <InputText class="form-control" @bind-Value="model.Category" placeholder="Ex: Tecnologia, Marketing, Vendas..." />
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Tags</label>
+                                <InputText class="form-control" @bind-Value="model.Tags" placeholder="Ex: .NET, React, Python (separadas por vírgula)" />
+                            </div>
+                        </div>
+
+                        <hr class="my-4" />
+
+                        <!-- Requisitos e Responsabilidades -->
+                        <h5 class="mb-3"><i class="bi bi-check2-square"></i> Requisitos e Responsabilidades</h5>
+
+                        <div class="mb-3">
+                            <label class="form-label">Requisitos</label>
+                            <InputTextArea class="form-control" @bind-Value="model.Requirements" rows="4" placeholder="Liste os requisitos necessários..." />
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Responsabilidades</label>
+                            <InputTextArea class="form-control" @bind-Value="model.Responsibilities" rows="4" placeholder="Descreva as principais responsabilidades..." />
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Benefícios</label>
+                            <InputTextArea class="form-control" @bind-Value="model.Benefits" rows="3" placeholder="Liste os benefícios oferecidos..." />
+                        </div>
+
+                        <hr class="my-4" />
+
+                        <!-- Localização -->
+                        <h5 class="mb-3"><i class="bi bi-geo-alt"></i> Localização</h5>
+
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Tipo de Trabalho *</label>
+                                <InputSelect class="form-select" @bind-Value="model.Type">
+                                    <option value="OnSite">Presencial</option>
+                                    <option value="Remote">Remoto</option>
+                                    <option value="Hybrid">Híbrido</option>
+                                </InputSelect>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Cidade</label>
+                                <InputText class="form-control" @bind-Value="model.City" placeholder="Cidade..." />
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Estado</label>
+                                <InputText class="form-control" @bind-Value="model.State" placeholder="UF..." maxlength="2" />
+                            </div>
+                        </div>
+
+                        <div class="mb-3 form-check">
+                            <InputCheckbox class="form-check-input" @bind-Value="model.IsRemote" />
+                            <label class="form-check-label">Trabalho remoto disponível</label>
+                        </div>
+
+                        <hr class="my-4" />
+
+                        <!-- Salário -->
+                        <h5 class="mb-3"><i class="bi bi-currency-exchange"></i> Faixa Salarial</h5>
+
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Salário Mínimo (R$)</label>
+                                <InputNumber class="form-control" @bind-Value="model.SalaryMin" placeholder="0,00" />
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Salário Máximo (R$)</label>
+                                <InputNumber class="form-control" @bind-Value="model.SalaryMax" placeholder="0,00" />
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Moeda</label>
+                                <InputSelect class="form-select" @bind-Value="model.SalaryCurrency">
+                                    <option value="BRL">BRL - Real Brasileiro</option>
+                                    <option value="USD">USD - Dólar Americano</option>
+                                    <option value="EUR">EUR - Euro</option>
+                                </InputSelect>
+                            </div>
+                        </div>
+
+                        <div class="mb-3 form-check">
+                            <InputCheckbox class="form-check-input" @bind-Value="model.SalaryDisplay" />
+                            <label class="form-check-label">Exibir faixa salarial na listagem</label>
+                        </div>
+
+                        <hr class="my-4" />
+
+                        <!-- Data de Expiração -->
+                        <h5 class="mb-3"><i class="bi bi-calendar-event"></i> Validade</h5>
+
+                        <div class="mb-3">
+                            <label class="form-label">Data de Expiração *</label>
+                            <InputDate class="form-control" @bind-Value="model.ExpirationDate" />
+                            <div class="form-text">A vaga será automaticamente expirada nesta data.</div>
+                        </div>
+
+                        <hr class="my-4" />
+
+                        <!-- Botões -->
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-success btn-lg" disabled="isSubmitting">
+                                @if (isSubmitting)
+                                {
+                                    <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+                                }
+                                <i class="bi bi-check-circle"></i> Criar Vaga
+                            </button>
+                        </div>
+                    </EditForm>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private CreateJobRequest model = new()
+    {
+        ExpirationDate = DateTime.UtcNow.AddDays(30),
+        Country = "BR",
+        Type = "OnSite",
+        ShowAddress = true,
+        SalaryCurrency = "BRL",
+        SalaryDisplay = true
+    };
+
+    private string errorMessage = string.Empty;
+    private bool isSubmitting = false;
+
+    private async Task SubmitForm()
+    {
+        isSubmitting = true;
+        errorMessage = string.Empty;
+
+        // TODO: Obter AdvertiserId do usuário logado
+        model.AdvertiserId = Guid.NewGuid(); // Placeholder
+
+        var result = await CreateJobUseCase.ExecuteAsync(model);
+        
+        if (result.Status == EResultStatus.Success)
+        {
+            Navigation.NavigateTo($"/jobs/{result.Data!.Id}");
+        }
+        else
+        {
+            errorMessage = result.Message;
+        }
+
+        isSubmitting = false;
+    }
+
+    private void Cancel()
+    {
+        Navigation.NavigateTo("/jobs");
+    }
+}

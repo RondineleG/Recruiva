@@ -3,7 +3,10 @@ global using Microsoft.AspNetCore.Identity;
 global using Microsoft.AspNetCore.Mvc;
 global using Microsoft.EntityFrameworkCore;
 
+global using Recruiva.Core.DTOs.Response;
 global using Recruiva.Core.Entities;
+global using Recruiva.Core.Enums;
+global using Recruiva.Core.UseCases.Jobs;
 global using Recruiva.Web.Components;
 global using Recruiva.Web.Components.Account;
 global using Recruiva.Web.Data;

@@ -1,8 +1,89 @@
 ﻿@inherits LayoutComponentBase
 
-@Body
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+    <div class="container">
+        <a class="navbar-brand" href="/">
+            <strong>🎯 Recruiva</strong>
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav me-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="/">
+                        <i class="bi bi-house"></i> Dashboard
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/jobs">
+                        <i class="bi bi-briefcase"></i> Vagas
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/jobs/create">
+                        <i class="bi bi-plus-circle"></i> Criar Vaga
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/my-jobs">
+                        <i class="bi bi-folder"></i> Minhas Vagas
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/my-applications">
+                        <i class="bi bi-send"></i> Minhas Candidaturas
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/received-applications">
+                        <i class="bi bi-envelope-open"></i> Candidaturas Recebidas
+                    </a>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">
+                        <i class="bi bi-person"></i> Perfil
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="/profile/candidate"><i class="bi bi-person-badge"></i> Perfil Candidato</a></li>
+                        <li><a class="dropdown-item" href="/profile/advertiser"><i class="bi bi-building"></i> Perfil Empresa</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="/resumes"><i class="bi bi-file-earmark-text"></i> Currículos</a></li>
+                    </ul>
+                </li>
+            </ul>
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link" href="/account/login">
+                        <i class="bi bi-box-arrow-in-right"></i> Entrar
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/account/register">
+                        <i class="bi bi-person-plus"></i> Registrar
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
 
-<div id="blazor-error-ui">
+<!-- Main Content -->
+<main class="container-fluid mt-3">
+    @Body
+</main>
+
+<!-- Footer -->
+<footer class="bg-light text-center text-muted py-4 mt-5">
+    <div class="container">
+        <p>&copy; 2026 Recruiva. Todos os direitos reservados.</p>
+        <p class="small">Plataforma gratuita de recrutamento</p>
+    </div>
+</footer>
+
+<!-- Error UI -->
+<div id="blazor-error-ui" class="alert alert-danger" style="display: none;">
     An unhandled error has occurred.
     <a href="" class="reload">Reload</a>
     <a class="dismiss">🗙</a>

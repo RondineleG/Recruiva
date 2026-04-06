@@ -1,0 +1,246 @@
+@page "/jobs"
+@using Recruiva.Core.DTOs.Request
+@using Recruiva.Core.DTOs.Response
+@using Recruiva.Core.Enums
+@using Recruiva.Core.UseCases.Jobs
+@inject SearchJobsUseCase SearchJobsUseCase
+@inject NavigationManager Navigation
+
+<PageTitle>Vagas Disponíveis - Recruiva</PageTitle>
+
+<div class="container mt-4">
+    <div class="row mb-4">
+        <div class="col">
+            <h1 class="mb-3">🔍 Vagas Disponíveis</h1>
+        </div>
+        <div class="col text-end">
+            <button class="btn btn-primary" @onclick="NavigateToCreate">
+                <i class="bi bi-plus-circle"></i> Criar Nova Vaga
+            </button>
+        </div>
+    </div>
+
+    <!-- Filtros de Busca -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label class="form-label">Buscar</label>
+                    <input type="text" class="form-control" @bind="searchTerm" placeholder="Título, descrição ou categoria..." />
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Cidade</label>
+                    <input type="text" class="form-control" @bind="city" placeholder="Cidade..." />
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Estado</label>
+                    <input type="text" class="form-control" @bind="state" placeholder="UF..." maxlength="2" />
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Salário Mínimo</label>
+                    <input type="number" class="form-control" @bind="salaryMin" placeholder="R$ ..." />
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Salário Máximo</label>
+                    <input type="number" class="form-control" @bind="salaryMax" placeholder="R$ ..." />
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Tipo</label>
+                    <select class="form-select" @bind="isRemote">
+                        <option value="">Todos</option>
+                        <option value="true">Remoto</option>
+                        <option value="false">Presencial</option>
+                    </select>
+                </div>
+                <div class="col-md-3 d-flex align-items-end">
+                    <button class="btn btn-primary w-100" @onclick="Search">🔍 Buscar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading -->
+    @if (isLoading)
+    {
+        <div class="text-center py-5">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Carregando...</span>
+            </div>
+            <p class="mt-2">Carregando vagas...</p>
+        </div>
+    }
+    else
+    {
+        <!-- Lista de Vagas -->
+        @if (searchResponse?.Jobs == null || !searchResponse.Jobs.Any())
+        {
+            <div class="alert alert-info">
+                <i class="bi bi-info-circle"></i> Nenhuma vaga encontrada.
+            </div>
+        }
+        else
+        {
+            <div class="row g-3">
+                @foreach (var job in searchResponse.Jobs)
+                {
+                    <div class="col-md-6 col-lg-4">
+                        <div class="card h-100 @(job.IsRemote ? "border-success" : "")">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                    <h5 class="card-title mb-0">@job.Title</h5>
+                                    @if (job.IsRemote)
+                                    {
+                                        <span class="badge bg-success">🏠 Remoto</span>
+                                    }
+                                </div>
+                                
+                                @if (!string.IsNullOrEmpty(job.AdvertiserName))
+                                {
+                                    <p class="text-muted mb-2">
+                                        <i class="bi bi-building"></i> @job.AdvertiserName
+                                    </p>
+                                }
+
+                                @if (!string.IsNullOrEmpty(job.City))
+                                {
+                                    <p class="text-muted mb-2">
+                                        <i class="bi bi-geo-alt"></i> @job.City, @job.State
+                                    </p>
+                                }
+
+                                @if (job.SalaryDisplay && job.SalaryMin.HasValue)
+                                {
+                                    <p class="text-success mb-2">
+                                        <i class="bi bi-currency-exchange"></i> 
+                                        R$ @job.SalaryMin.Value.ToString("N2") - R$ @job.SalaryMax.Value.ToString("N2")
+                                    </p>
+                                }
+
+                                @if (!string.IsNullOrEmpty(job.Category))
+                                {
+                                    <span class="badge bg-info">@job.Category</span>
+                                }
+
+                                <p class="text-muted small mt-2">
+                                    <i class="bi bi-eye"></i> @job.Views visualizações | 
+                                    <i class="bi bi-people"></i> @job.Applications candidaturas
+                                </p>
+                            </div>
+                            <div class="card-footer bg-transparent">
+                                <button class="btn btn-outline-primary w-100" @onclick="() => ViewDetails(job.Id)">
+                                    Ver Detalhes
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+
+            <!-- Paginação -->
+            @if (searchResponse.TotalPages > 1)
+            {
+                <nav class="mt-4">
+                    <ul class="pagination justify-content-center">
+                        @if (searchResponse.HasPreviousPage)
+                        {
+                            <li class="page-item">
+                                <button class="page-link" @onclick="() => GoToPage(searchResponse.Page - 1)">Anterior</button>
+                            </li>
+                        }
+                        
+                        @for (int i = 1; i <= Math.Min(searchResponse.TotalPages, 5); i++)
+                        {
+                            <li class="page-item @(i == searchResponse.Page ? "active" : "")">
+                                <button class="page-link" @onclick="() => GoToPage(i)">@i</button>
+                            </li>
+                        }
+
+                        @if (searchResponse.HasNextPage)
+                        {
+                            <li class="page-item">
+                                <button class="page-link" @onclick="() => GoToPage(searchResponse.Page + 1)">Próximo</button>
+                            </li>
+                        }
+                    </ul>
+                </nav>
+            }
+
+            <div class="text-muted text-center mt-3">
+                Mostrando @searchResponse.Jobs.Count() de @searchResponse.TotalCount vagas
+            </div>
+        }
+    }
+</div>
+
+@code {
+    private string searchTerm = string.Empty;
+    private string city = string.Empty;
+    private string state = string.Empty;
+    private decimal? salaryMin;
+    private decimal? salaryMax;
+    private string isRemote = string.Empty;
+    
+    private ListJobsResponse? searchResponse;
+    private bool isLoading = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await Search();
+    }
+
+    private async Task Search()
+    {
+        isLoading = true;
+        
+        var request = new ListJobsRequest
+        {
+            Page = 1,
+            Size = 20,
+            SearchTerm = searchTerm,
+            City = city,
+            State = state,
+            SalaryMin = salaryMin,
+            SalaryMax = salaryMax,
+            IsRemote = string.IsNullOrEmpty(isRemote) ? null : bool.Parse(isRemote)
+        };
+
+        var result = await SearchJobsUseCase.ExecuteAsync(request);
+        if (result.Status == EResultStatus.Success)
+        {
+            searchResponse = result.Data;
+        }
+        
+        isLoading = false;
+    }
+
+    private void ViewDetails(Guid jobId)
+    {
+        Navigation.NavigateTo($"/jobs/{jobId}");
+    }
+
+    private void NavigateToCreate()
+    {
+        Navigation.NavigateTo("/jobs/create");
+    }
+
+    private async Task GoToPage(int page)
+    {
+        var request = new ListJobsRequest
+        {
+            Page = page,
+            Size = 20,
+            SearchTerm = searchTerm,
+            City = city,
+            State = state,
+            SalaryMin = salaryMin,
+            SalaryMax = salaryMax,
+            IsRemote = string.IsNullOrEmpty(isRemote) ? null : bool.Parse(isRemote)
+        };
+
+        var result = await SearchJobsUseCase.ExecuteAsync(request);
+        if (result.Status == EResultStatus.Success)
+        {
+            searchResponse = result.Data;
+        }
+    }
+}

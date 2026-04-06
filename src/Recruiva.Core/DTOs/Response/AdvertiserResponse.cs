@@ -1,0 +1,18 @@
+namespace Recruiva.Core.DTOs.Response;
+
+public class AdvertiserResponse
+{
+    public Guid Id { get; set; }
+    public string Name { get; set; } = string.Empty;
+    public string Email { get; set; } = string.Empty;
+    public string Phone { get; set; } = string.Empty;
+    public string TaxId { get; set; } = string.Empty;
+    public string PersonType { get; set; } = string.Empty;
+    public string? CompanyDescription { get; set; }
+    public string? Website { get; set; }
+    public string? LogoUrl { get; set; }
+    public string Status { get; set; } = string.Empty;
+    public bool IsEmailVerified { get; set; }
+    public string? ActivePlan { get; set; }
+    public DateTime CreatedAt { get; set; }
+}

@@ -1,0 +1,217 @@
+@page "/"
+@page "/dashboard"
+@using Recruiva.Core.DTOs.Response
+@using Recruiva.Core.Enums
+@using Recruiva.Core.UseCases.Jobs
+@inject SearchJobsUseCase SearchJobsUseCase
+@inject NavigationManager Navigation
+
+<PageTitle>Dashboard - Recruiva</PageTitle>
+
+<div class="container-fluid mt-4">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col">
+            <h1>&#x1F4CA; Dashboard</h1>
+            <p class="text-muted">Bem-vindo ao Recruiva - Sua plataforma de recrutamento</p>
+        </div>
+    </div>
+
+    <!-- Estatísticas -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card bg-primary text-white">
+                <div class="card-body">
+                    <h3><i class="bi bi-briefcase"></i> @totalJobs</h3>
+                    <p class="mb-0">Vagas Ativas</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-success text-white">
+                <div class="card-body">
+                    <h3><i class="bi bi-building"></i> @totalCompanies</h3>
+                    <p class="mb-0">Empresas</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-info text-white">
+                <div class="card-body">
+                    <h3><i class="bi bi-people"></i> @totalCandidates</h3>
+                    <p class="mb-0">Candidatos</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-warning text-white">
+                <div class="card-body">
+                    <h3><i class="bi bi-send"></i> @totalApplications</h3>
+                    <p class="mb-0">Candidaturas</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Ações Rápidas -->
+    <div class="row mb-4">
+        <div class="col">
+            <h4>&#x26A1; Ações Rápidas</h4>
+        </div>
+    </div>
+    <div class="row g-3 mb-4">
+        <div class="col-md-4">
+            <div class="card h-100">
+                <div class="card-body text-center">
+                    <i class="bi bi-search display-6 text-primary"></i>
+                    <h5 class="card-title mt-3">Buscar Vagas</h5>
+                    <p class="card-text text-muted">Encontre a vaga ideal para você</p>
+                    <button class="btn btn-primary" @onclick="NavigateToJobs">
+                        Ver Vagas
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card h-100">
+                <div class="card-body text-center">
+                    <i class="bi bi-plus-circle display-6 text-success"></i>
+                    <h5 class="card-title mt-3">Criar Vaga</h5>
+                    <p class="card-text text-muted">Publique uma nova vaga</p>
+                    <button class="btn btn-success" @onclick="NavigateToCreateJob">
+                        Nova Vaga
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card h-100">
+                <div class="card-body text-center">
+                    <i class="bi bi-file-earmark-text display-6 text-info"></i>
+                    <h5 class="card-title mt-3">Meu Currículo</h5>
+                    <p class="card-text text-muted">Gerencie seus currículos</p>
+                    <button class="btn btn-info" @onclick="NavigateToResumes">
+                        Ver Currículos
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Vagas Recentes -->
+    <div class="row">
+        <div class="col">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h4>&#x1F525; Vagas Recentes</h4>
+                <button class="btn btn-outline-primary" @onclick="NavigateToJobs">
+                    Ver Todas &rarr;
+                </button>
+            </div>
+        </div>
+    </div>
+
+    @if (isLoading)
+    {
+        <div class="text-center py-5">
+            <div class="spinner-border text-primary" role="status"></div>
+            <p class="mt-2">Carregando vagas...</p>
+        </div>
+    }
+    else if (recentJobs != null && recentJobs.Jobs != null && recentJobs.Jobs.Any())
+    {
+        <div class="row g-3">
+            @foreach (var job in recentJobs.Jobs.Take(6))
+            {
+                <div class="col-md-6 col-lg-4">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h5 class="card-title">@job.Title</h5>
+                            @if (!string.IsNullOrEmpty(job.AdvertiserName))
+                            {
+                                <p class="text-muted mb-2">
+                                    <i class="bi bi-building"></i> @job.AdvertiserName
+                                </p>
+                            }
+                            @if (!string.IsNullOrEmpty(job.City))
+                            {
+                                <p class="text-muted mb-2">
+                                    <i class="bi bi-geo-alt"></i> @job.City, @job.State
+                                </p>
+                            }
+                            @if (job.SalaryDisplay && job.SalaryMin.HasValue)
+                            {
+                                <p class="text-success mb-2">
+                                    <i class="bi bi-currency-exchange"></i>
+                                    R$ @job.SalaryMin.Value.ToString("N2") - R$ @job.SalaryMax.Value.ToString("N2")
+                                </p>
+                            }
+                            @if (!string.IsNullOrEmpty(job.Category))
+                            {
+                                <span class="badge bg-info">@job.Category</span>
+                            }
+                        </div>
+                        <div class="card-footer bg-transparent">
+                            <button class="btn btn-outline-primary w-100" @onclick="() => ViewJobDetails(job.Id)">
+                                Ver Detalhes
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-info">
+            <i class="bi bi-info-circle"></i> Nenhuma vaga disponível no momento.
+        </div>
+    }
+</div>
+
+@code {
+    private ListJobsResponse? recentJobs;
+    private bool isLoading = true;
+
+    // Estatísticas mockadas (virão do backend)
+    private int totalJobs = 127;
+    private int totalCompanies = 45;
+    private int totalCandidates = 523;
+    private int totalApplications = 1247;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var request = new ListJobsRequest
+        {
+            Page = 1,
+            Size = 6
+        };
+
+        var result = await SearchJobsUseCase.ExecuteAsync(request);
+        if (result.Status == EResultStatus.Success)
+        {
+            recentJobs = result.Data;
+        }
+
+        isLoading = false;
+    }
+
+    private void ViewJobDetails(Guid jobId)
+    {
+        Navigation.NavigateTo($"/jobs/{jobId}");
+    }
+
+    private void NavigateToJobs()
+    {
+        Navigation.NavigateTo("/jobs");
+    }
+
+    private void NavigateToCreateJob()
+    {
+        Navigation.NavigateTo("/jobs/create");
+    }
+
+    private void NavigateToResumes()
+    {
+        Navigation.NavigateTo("/resumes");
+    }
+}

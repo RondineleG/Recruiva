@@ -1,0 +1,192 @@
+@page "/notifications"
+@using Recruiva.Core.DTOs.Response;
+@using Recruiva.Core.Enums;
+@using Recruiva.Core.UseCases.Notifications;
+@inject ListNotificationsByUserUseCase ListNotificationsUseCase;
+@inject MarkNotificationAsReadUseCase MarkNotificationAsReadUseCase;
+@inject NavigationManager Navigation;
+
+<PageTitle>Central de Notificações - Recruiva</PageTitle>
+
+<div class="container-fluid mt-4">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col">
+            <h1>🔔 Central de Notificações</h1>
+            <p class="text-muted">Gerencie suas notificações e fique por dentro das novidades</p>
+        </div>
+    </div>
+
+    <!-- Resumo -->
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card bg-primary text-white">
+                <div class="card-body">
+                    <h3><i class="bi bi-bell"></i> @totalNotifications</h3>
+                    <p class="mb-0">Total de Notificações</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card bg-warning text-white">
+                <div class="card-body">
+                    <h3><i class="bi bi-envelope"></i> @unreadCount</h3>
+                    <p class="mb-0">Não Lidas</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card bg-success text-white">
+                <div class="card-body">
+                    <h3><i class="bi bi-envelope-open"></i> @readCount</h3>
+                    <p class="mb-0">Lidas</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Ações -->
+    <div class="row mb-3">
+        <div class="col d-flex justify-content-between align-items-center">
+            <h4>📋 Notificações</h4>
+            <div>
+                <button class="btn btn-outline-primary me-2" @onclick="MarkAllAsRead" disabled="@(unreadCount == 0)">
+                    <i class="bi bi-check-all"></i> Marcar todas como lidas
+                </button>
+                <button class="btn btn-outline-secondary" @onclick="LoadNotifications">
+                    <i class="bi bi-arrow-clockwise"></i> Atualizar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lista de Notificações -->
+    @if (isLoading)
+    {
+        <div class="text-center py-5">
+            <div class="spinner-border text-primary" role="status"></div>
+            <p class="mt-2">Carregando notificações...</p>
+        </div>
+    }
+    else if (notifications?.Any() == true)
+    {
+        <div class="list-group">
+            @foreach (var notification in notifications)
+            {
+                <div class="list-group-item @(notification.IsRead ? "" : "list-group-item-info")">
+                    <div class="d-flex w-100 justify-content-between align-items-start">
+                        <div class="flex-grow-1">
+                            <div class="d-flex align-items-center mb-1">
+                                @if (!notification.IsRead)
+                                {
+                                    <span class="badge bg-primary me-2">Nova</span>
+                                }
+                                <h5 class="mb-1">
+                                    @GetNotificationIcon(notification.Type) @notification.Title
+                                </h5>
+                            </div>
+                            <p class="mb-1">@notification.Message</p>
+                            <small class="text-muted">
+                                <i class="bi bi-clock"></i> @FormatDate(notification.CreatedAt)
+                                @if (notification.IsRead && notification.ReadAt.HasValue)
+                                {
+                                    <span class="ms-3">
+                                        <i class="bi bi-check-circle"></i> Lida em @FormatDate(notification.ReadAt.Value)
+                                    </span>
+                                }
+                            </small>
+                        </div>
+                        @if (!notification.IsRead)
+                        {
+                            <button class="btn btn-sm btn-outline-primary ms-2" @onclick="() => MarkAsRead(notification.Id)">
+                                <i class="bi bi-check"></i> Marcar como lida
+                            </button>
+                        }
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-info">
+            <i class="bi bi-info-circle"></i> Nenhuma notificação encontrada.
+        </div>
+    }
+</div>
+
+@code {
+    private List<NotificationResponse>? notifications;
+    private bool isLoading = true;
+
+    private int totalNotifications => notifications?.Count ?? 0;
+    private int unreadCount => notifications?.Count(n => !n.IsRead) ?? 0;
+    private int readCount => notifications?.Count(n => n.IsRead) ?? 0;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadNotifications();
+    }
+
+    private async Task LoadNotifications()
+    {
+        isLoading = true;
+        // TODO: Obter recipientId do usuário autenticado
+        var recipientId = "default";
+        var result = await ListNotificationsUseCase.ExecuteAsync(recipientId);
+        if (result.Status == EResultStatus.Success)
+        {
+            notifications = result.Data;
+        }
+        isLoading = false;
+    }
+
+    private async Task MarkAsRead(Guid notificationId)
+    {
+        var result = await MarkNotificationAsReadUseCase.ExecuteAsync(notificationId);
+        if (result.Status == EResultStatus.Success)
+        {
+            await LoadNotifications();
+        }
+    }
+
+    private async Task MarkAllAsRead()
+    {
+        var unreadNotifications = notifications?.Where(n => !n.IsRead).ToList();
+        if (unreadNotifications == null) return;
+
+        foreach (var notification in unreadNotifications)
+        {
+            await MarkNotificationAsReadUseCase.ExecuteAsync(notification.Id);
+        }
+
+        await LoadNotifications();
+    }
+
+    private string GetNotificationIcon(ENotificationType type) => type switch
+    {
+        ENotificationType.System => "⚙️",
+        ENotificationType.NewJob => "💼",
+        ENotificationType.ApplicationStatus => "📄",
+        ENotificationType.JobExpired => "⚠️",
+        ENotificationType.Promotional => "🎉",
+        _ => "🔔"
+    };
+
+    private string FormatDate(DateTime date)
+    {
+        var now = DateTime.UtcNow;
+        var diff = now - date;
+
+        if (diff.TotalMinutes < 1)
+            return "Agora mesmo";
+        if (diff.TotalMinutes < 60)
+            return $"{(int)diff.TotalMinutes} min atrás";
+        if (diff.TotalHours < 24)
+            return $"{(int)diff.TotalHours}h atrás";
+        if (diff.TotalDays < 7)
+            return $"{(int)diff.TotalDays} dias atrás";
+
+        return date.ToString("dd/MM/yyyy HH:mm");
+    }
+}

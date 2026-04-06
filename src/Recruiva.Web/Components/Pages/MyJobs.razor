@@ -1,0 +1,34 @@
+@page "/my-jobs"
+@inject NavigationManager Navigation
+
+<PageTitle>Minhas Vagas - Recruiva</PageTitle>
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>&#x1F4BC; Minhas Vagas</h1>
+        <button class="btn btn-primary" @onclick="NavigateToCreateJob">
+            <i class="bi bi-plus-circle"></i> Nova Vaga
+        </button>
+    </div>
+
+    <div class="alert alert-info">
+        <i class="bi bi-info-circle"></i>
+        Funcionalidade em desenvolvimento. Em breve você poderá gerenciar todas as suas vagas aqui.
+    </div>
+
+    <div class="text-center mt-5">
+        <i class="bi bi-briefcase display-1 text-muted"></i>
+        <h3 class="mt-3">Gerencie suas vagas</h3>
+        <p class="text-muted">Crie e gerencie suas vagas de emprego</p>
+        <button class="btn btn-primary" @onclick="NavigateToCreateJob">
+            <i class="bi bi-plus-circle"></i> Criar Vaga
+        </button>
+    </div>
+</div>
+
+@code {
+    private void NavigateToCreateJob()
+    {
+        Navigation.NavigateTo("/jobs/create");
+    }
+}

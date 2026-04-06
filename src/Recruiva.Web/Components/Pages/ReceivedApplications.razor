@@ -1,0 +1,123 @@
+@page "/received-applications"
+@page "/jobs/{jobId:guid}/applications"
+@using Recruiva.Core.DTOs.Response
+@using Recruiva.Core.Enums
+@using Recruiva.Core.UseCases.Applications
+@inject ListApplicationsByJobUseCase ListApplicationsByJobUseCase
+@inject NavigationManager Navigation
+
+<PageTitle>Candidaturas Recebidas - Recruiva</PageTitle>
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>&#x1F4EC; Candidaturas Recebidas</h1>
+        <button class="btn btn-secondary" @onclick="NavigateToMyJobs">
+            &larr; Minhas Vagas
+        </button>
+    </div>
+
+    @if (isLoading)
+    {
+        <div class="text-center py-5">
+            <div class="spinner-border text-primary" role="status"></div>
+            <p class="mt-2">Carregando candidaturas...</p>
+        </div>
+    }
+    else if (applications != null && applications.Any())
+    {
+        <div class="card">
+            <div class="card-body">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Candidato</th>
+                            <th>Status</th>
+                            <th>Data</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var app in applications)
+                        {
+                            <tr>
+                                <td>
+                                    <strong>@app.CandidateName</strong>
+                                    <br />
+                                    <small class="text-muted">@app.CandidateEmail</small>
+                                </td>
+                                <td>
+                                    @switch (app.Status)
+                                    {
+                                        case "Sent":
+                                            <span class="badge bg-primary">Enviada</span>
+                                            break;
+                                        case "Viewed":
+                                            <span class="badge bg-info">Visualizada</span>
+                                            break;
+                                        case "Selected":
+                                            <span class="badge bg-success">Selecionada</span>
+                                            break;
+                                        case "Rejected":
+                                            <span class="badge bg-danger">Rejeitada</span>
+                                            break;
+                                        default:
+                                            <span class="badge bg-secondary">@app.Status</span>
+                                            break;
+                                    }
+                                </td>
+                                <td>@app.AppliedAt?.ToString("dd/MM/yyyy HH:mm")</td>
+                                <td>
+                                    <button class="btn btn-sm btn-success" @onclick="() => UpdateStatus(app.Id, EApplicationStatus.Selected)">
+                                        <i class="bi bi-check"></i> Selecionar
+                                    </button>
+                                    <button class="btn btn-sm btn-danger" @onclick="() => UpdateStatus(app.Id, EApplicationStatus.Rejected)">
+                                        <i class="bi bi-x"></i> Rejeitar
+                                    </button>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-info">
+            <i class="bi bi-info-circle"></i> Nenhuma candidatura recebida ainda.
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public Guid? JobId { get; set; }
+
+    private IEnumerable<ApplicationResponse>? applications;
+    private bool isLoading = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (JobId.HasValue)
+        {
+            var result = await ListApplicationsByJobUseCase.ExecuteAsync(JobId.Value);
+            if (result.Status == EResultStatus.Success)
+            {
+                applications = result.Data;
+            }
+        }
+
+        isLoading = false;
+    }
+
+    private async Task UpdateStatus(Guid applicationId, EApplicationStatus newStatus)
+    {
+        // TODO: Implementar atualização de status
+        await OnInitializedAsync();
+    }
+
+    private void NavigateToMyJobs()
+    {
+        Navigation.NavigateTo("/my-jobs");
+    }
+}

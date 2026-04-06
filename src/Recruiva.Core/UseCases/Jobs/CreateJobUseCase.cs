@@ -1,0 +1,107 @@
+using Recruiva.Core.DTOs.Request;
+using Recruiva.Core.DTOs.Response;
+using Recruiva.Core.Entities;
+using Recruiva.Core.Enums;
+using Recruiva.Core.Interfaces.Repositories.Base;
+using Recruiva.Core.Interfaces.UseCases;
+using Recruiva.Core.Interfaces.Validations;
+using Recruiva.Core.Requests;
+using Recruiva.Core.ValueObjects;
+
+namespace Recruiva.Core.UseCases.Jobs;
+
+public class CreateJobUseCase : IUseCase<CreateJobRequest, JobResponse>
+{
+    private readonly IBaseRepository<Job> _jobRepository;
+    private readonly IEntityValidator<Job> _jobValidator;
+
+    public CreateJobUseCase(IBaseRepository<Job> jobRepository, IEntityValidator<Job> jobValidator)
+    {
+        _jobRepository = jobRepository;
+        _jobValidator = jobValidator;
+    }
+
+    public async Task<RequestResult<JobResponse>> ExecuteAsync(CreateJobRequest request)
+    {
+        var job = new Job
+        {
+            Id = Id.Create(Guid.NewGuid()),
+            AdvertiserId = Id.Create(request.AdvertiserId),
+            Title = request.Title,
+            Description = request.Description,
+            Requirements = request.Requirements,
+            Responsibilities = request.Responsibilities,
+            Benefits = request.Benefits,
+            Category = request.Category,
+            Tags = request.Tags,
+            ExpirationDate = request.ExpirationDate,
+            Status = EJobStatus.Active,
+            TenantId = "default",
+            Location = new JobLocation
+            {
+                City = request.City,
+                State = request.State,
+                Country = request.Country,
+                Type = request.Type,
+                IsRemote = request.IsRemote,
+                ShowAddress = request.ShowAddress
+            },
+            Salary = new SalaryRange
+            {
+                Min = request.SalaryMin,
+                Max = request.SalaryMax,
+                Currency = request.SalaryCurrency,
+                Display = request.SalaryDisplay
+            },
+            Moderation = new ModerationInfo { Status = EModerationStatus.Pending },
+            Boost = new JobBoost { IsActive = false },
+            Highlight = new JobHighlight { IsActive = false },
+            Counters = new JobCounters()
+        };
+
+        var validationResult = _jobValidator.Validate(job);
+        if (!validationResult.IsValid)
+        {
+            var createResult = RequestResult<JobResponse>.WithNoContent();
+            foreach (var error in validationResult.Errors)
+            {
+                createResult.ValidationResult.AddError(error.Message, error.Field);
+            }
+            return createResult;
+        }
+
+        var createJobResult = await _jobRepository.CreateAsync(job);
+        if (createJobResult.Status != EResultStatus.Success)
+            return RequestResult<JobResponse>.WithError(createJobResult.Message);
+
+        return RequestResult<JobResponse>.Success(MapToResponse(createJobResult.Data!));
+    }
+
+    private static JobResponse MapToResponse(Job job) => new()
+    {
+        Id = job.Id.Value,
+        Title = job.Title,
+        Description = job.Description,
+        Requirements = job.Requirements,
+        Responsibilities = job.Responsibilities,
+        Benefits = job.Benefits,
+        Category = job.Category,
+        Tags = job.Tags,
+        ExpirationDate = job.ExpirationDate,
+        Status = job.Status.ToString(),
+        City = job.Location?.City,
+        State = job.Location?.State,
+        Country = job.Location?.Country ?? "BR",
+        Type = job.Location?.Type ?? "OnSite",
+        IsRemote = job.Location?.IsRemote ?? false,
+        SalaryMin = job.Salary?.Min,
+        SalaryMax = job.Salary?.Max,
+        SalaryCurrency = job.Salary?.Currency ?? "BRL",
+        SalaryDisplay = job.Salary?.Display ?? true,
+        Views = job.Counters?.Views ?? 0,
+        Applications = job.Counters?.Applications ?? 0,
+        AdvertiserId = job.AdvertiserId.Value,
+        CreatedAt = job.CreatedAt,
+        UpdatedAt = job.UpdatedAt
+    };
+}
