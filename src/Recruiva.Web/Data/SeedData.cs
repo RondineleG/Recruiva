@@ -13,6 +13,55 @@ public static class SeedData
 
         var tenantId = "default";
 
+        // Seed dos Planos de Assinatura
+        var planFree = new SubscriptionPlan
+        {
+            Id = Id.Create(Guid.Parse("80000000-0000-0000-0000-000000000001")),
+            TenantId = tenantId,
+            Name = "Free",
+            Description = "Plano básico gratuito para pequenas empresas",
+            Price = 0,
+            MaxJobs = 3,
+            HasBoost = false,
+            HasHighlight = false,
+            HasAnalytics = false,
+            MaxResumes = 5,
+            IsActive = true
+        };
+
+        var planPremium = new SubscriptionPlan
+        {
+            Id = Id.Create(Guid.Parse("80000000-0000-0000-0000-000000000002")),
+            TenantId = tenantId,
+            Name = "Premium",
+            Description = "Plano intermediário com recursos essenciais",
+            Price = 29.90m,
+            MaxJobs = 15,
+            HasBoost = true,
+            HasHighlight = true,
+            HasAnalytics = false,
+            MaxResumes = 25,
+            IsActive = true
+        };
+
+        var planEnterprise = new SubscriptionPlan
+        {
+            Id = Id.Create(Guid.Parse("80000000-0000-0000-0000-000000000003")),
+            TenantId = tenantId,
+            Name = "Enterprise",
+            Description = "Plano completo para grandes empresas",
+            Price = 99.90m,
+            MaxJobs = -1, // Ilimitado
+            HasBoost = true,
+            HasHighlight = true,
+            HasAnalytics = true,
+            MaxResumes = 100,
+            IsActive = true
+        };
+
+        context.SubscriptionPlans.AddRange(planFree, planPremium, planEnterprise);
+        await context.SaveChangesAsync();
+
         var tenantConfig = new TenantConfig
         {
             Id = Id.Create(Guid.Parse("11111111-1111-1111-1111-111111111111")),
@@ -99,6 +148,22 @@ public static class SeedData
         };
 
         context.Advertisers.AddRange(advertiser1, advertiser2);
+        await context.SaveChangesAsync();
+
+        // Seed de assinatura de teste para advertiser1
+        var testSubscription = new Subscription
+        {
+            Id = Id.Create(Guid.Parse("90000000-0000-0000-0000-000000000001")),
+            TenantId = tenantId,
+            AdvertiserId = advertiser1.Id,
+            PlanId = planPremium.Id,
+            StartDate = DateTime.UtcNow.AddDays(-15),
+            EndDate = DateTime.UtcNow.AddDays(15),
+            Status = ESubscriptionStatus.Active,
+            PaymentId = "test_payment_123"
+        };
+
+        context.Subscriptions.Add(testSubscription);
         await context.SaveChangesAsync();
 
         var candidate1 = new Candidate

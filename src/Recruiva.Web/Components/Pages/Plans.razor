@@ -1,0 +1,218 @@
+@page "/plans"
+@using Recruiva.Core.DTOs.Response
+@using Recruiva.Core.UseCases.Subscriptions
+@using Recruiva.Core.Interfaces.Services
+@inject GetAvailablePlansUseCase GetAvailablePlansUseCase
+@inject UpgradePlanUseCase UpgradePlanUseCase
+@inject ICurrentUserHelper CurrentUserHelper
+@inject NavigationManager Navigation
+@inject ILogger<Plans> Logger
+
+<PageTitle>Planos e Preços - Recruiva</PageTitle>
+
+<div class="container-fluid mt-4">
+    <div class="row mb-4">
+        <div class="col">
+            <h1>&#x1F48E; Planos e Preços</h1>
+            <p class="text-muted">Escolha o plano ideal para impulsionar suas contratações</p>
+        </div>
+    </div>
+
+    @if (isLoading)
+    {
+        <div class="text-center py-5">
+            <div class="spinner-border text-primary" role="status"></div>
+            <p class="mt-2">Carregando planos...</p>
+        </div>
+    }
+    else
+    {
+        @if (!string.IsNullOrEmpty(errorMessage))
+        {
+            <div class="alert alert-danger">@errorMessage</div>
+        }
+        else if (availablePlans != null && availablePlans.Plans.Any())
+        {
+            @if (availablePlans.CurrentSubscription != null)
+            {
+                <div class="alert alert-info d-flex align-items-center mb-4">
+                    <i class="bi bi-info-circle me-2"></i>
+                    <div>
+                        <strong>Seu plano atual:</strong> @availablePlans.CurrentSubscription.PlanName
+                        @if (availablePlans.CurrentSubscription.EndDate.HasValue)
+                        {
+                            <span class="ms-2">| Válido até: @availablePlans.CurrentSubscription.EndDate.Value.ToString("dd/MM/yyyy")</span>
+                        }
+                    </div>
+                </div>
+            }
+
+            <div class="row g-4">
+                @foreach (var plan in availablePlans.Plans.OrderBy(p => p.Price))
+                {
+                    var isCurrentPlan = availablePlans.CurrentSubscription?.PlanName == plan.Name;
+                    var cardClass = plan.Name switch
+                    {
+                        "Free" => "border-primary",
+                        "Premium" => "border-success",
+                        "Enterprise" => "border-dark",
+                        _ => ""
+                    };
+
+                    <div class="col-md-4">
+                        <div class="card h-100 @cardClass @(isCurrentPlan ? "border-3 shadow-lg" : "shadow-sm")">
+                            @if (isCurrentPlan)
+                            {
+                                <div class="card-header bg-primary text-white text-center">
+                                    <strong>&#x2714; Plano Atual</strong>
+                                </div>
+                            }
+                            <div class="card-body">
+                                <h3 class="card-title text-center">@plan.Name</h3>
+                                <p class="text-muted text-center small">@plan.Description</p>
+                                
+                                <div class="text-center my-4">
+                                    @if (plan.Price == 0)
+                                    {
+                                        <h2 class="text-primary">Grátis</h2>
+                                    }
+                                    else
+                                    {
+                                        <h2 class="text-primary">R$ @plan.Price.ToString("N2")</h2>
+                                        <small class="text-muted">/mês</small>
+                                    }
+                                </div>
+
+                                <ul class="list-unstyled">
+                                    <li class="mb-2">
+                                        <i class="bi @(plan.MaxJobs == -1 ? "bi-infinity text-success" : "bi-briefcase text-primary")"></i>
+                                        <strong>Vagas:</strong>
+                                        @(plan.MaxJobs == -1 ? "Ilimitadas" : $"{plan.MaxJobs} vagas")
+                                    </li>
+                                    <li class="mb-2">
+                                        <i class="bi @(plan.HasBoost ? "bi-rocket-takeoff text-success" : "bi-x text-muted")"></i>
+                                        Boost de vagas: @(plan.HasBoost ? "Sim" : "Não")
+                                    </li>
+                                    <li class="mb-2">
+                                        <i class="bi @(plan.HasHighlight ? "bi-star-fill text-success" : "bi-x text-muted")"></i>
+                                        Destaque: @(plan.HasHighlight ? "Sim" : "Não")
+                                    </li>
+                                    <li class="mb-2">
+                                        <i class="bi @(plan.HasAnalytics ? "bi-graph-up text-success" : "bi-x text-muted")"></i>
+                                        Analytics: @(plan.HasAnalytics ? "Sim" : "Não")
+                                    </li>
+                                    <li class="mb-2">
+                                        <i class="bi bi-file-earmark-text text-primary"></i>
+                                        <strong>Currículos:</strong> @plan.MaxResumes
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="card-footer bg-transparent text-center">
+                                @if (isCurrentPlan)
+                                {
+                                    <button class="btn btn-secondary w-100" disabled>
+                                        Plano Atual
+                                    </button>
+                                }
+                                else
+                                {
+                                    <button class="btn btn-primary w-100" @onclick="() => UpgradePlan(plan.Id)">
+                                        @(plan.Price == 0 ? "Downgrade" : "Upgrade")
+                                    </button>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+        else
+        {
+            <div class="alert alert-warning">
+                <i class="bi bi-exclamation-triangle"></i> Nenhum plano disponível no momento.
+            </div>
+        }
+    }
+</div>
+
+@code {
+    private AvailablePlansResponse? availablePlans;
+    private bool isLoading = true;
+    private string? errorMessage;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            var advertiserIdNullable = CurrentUserHelper.GetAdvertiserId();
+            if (!advertiserIdNullable.HasValue || advertiserIdNullable.Value == Guid.Empty)
+            {
+                errorMessage = "Usuário não identificado. Faça login novamente.";
+                isLoading = false;
+                return;
+            }
+
+            var advertiserId = advertiserIdNullable.Value;
+            var result = await GetAvailablePlansUseCase.ExecuteAsync(advertiserId);
+            if (result.Status == Core.Enums.EResultStatus.Success)
+            {
+                availablePlans = result.Data;
+            }
+            else
+            {
+                errorMessage = result.Message ?? "Erro ao carregar planos.";
+            }
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Erro ao carregar planos disponíveis");
+            errorMessage = "Erro interno ao carregar planos. Tente novamente mais tarde.";
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private async Task UpgradePlan(Guid planId)
+    {
+        try
+        {
+            var advertiserIdNullable = CurrentUserHelper.GetAdvertiserId();
+            if (!advertiserIdNullable.HasValue || advertiserIdNullable.Value == Guid.Empty)
+            {
+                errorMessage = "Usuário não identificado. Faça login novamente.";
+                return;
+            }
+
+            var advertiserId = advertiserIdNullable.Value;
+
+            var request = new Core.DTOs.Request.UpgradePlanRequest
+            {
+                AdvertiserId = advertiserId,
+                NewPlanId = planId,
+                PaymentMethod = "manual"
+            };
+
+            var result = await UpgradePlanUseCase.ExecuteAsync(request);
+            if (result.Status == Core.Enums.EResultStatus.Success)
+            {
+                Navigation.NavigateTo("/my-subscription");
+            }
+            else
+            {
+                errorMessage = result.Message ?? "Erro ao realizar upgrade.";
+            }
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Erro ao fazer upgrade de plano");
+            errorMessage = "Erro interno ao fazer upgrade. Tente novamente mais tarde.";
+        }
+    }
+
+    private void NavigateToPlans()
+    {
+        Navigation.NavigateTo("/plans");
+    }
+}

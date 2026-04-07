@@ -13,6 +13,7 @@ using Recruiva.Core.UseCases.Advertisers;
 using Recruiva.Core.UseCases.Resumes;
 using Recruiva.Core.UseCases.Notifications;
 using Recruiva.Core.UseCases.Storage;
+using Recruiva.Core.UseCases.Subscriptions;
 using Recruiva.Core.Validations;
 using Recruiva.Web.Repositories;
 using Recruiva.Web.Services;
@@ -68,6 +69,12 @@ builder.Services.AddScoped<IBaseRepository<Resume>, ResumeRepository>();
 builder.Services.AddScoped<IBaseRepository<Notification>, NotificationRepository>();
 builder.Services.AddScoped<IBaseRepository<TenantConfig>, TenantConfigRepository>();
 
+// Registrar Repositórios de Assinatura
+builder.Services.AddScoped<IBaseRepository<SubscriptionPlan>, SubscriptionPlanRepository>();
+builder.Services.AddScoped<IBaseRepository<Subscription>, SubscriptionRepository>();
+builder.Services.AddScoped<SubscriptionRepository>();
+builder.Services.AddScoped<SubscriptionPlanRepository>();
+
 // Registrar Validadores
 builder.Services.AddScoped<IEntityValidator<Job>, JobValidator>();
 builder.Services.AddScoped<IEntityValidator<Candidate>, CandidateValidator>();
@@ -117,6 +124,12 @@ builder.Services.AddScoped<CreateNotificationUseCase>();
 builder.Services.AddScoped<ListNotificationsByUserUseCase>();
 builder.Services.AddScoped<MarkNotificationAsReadUseCase>();
 builder.Services.AddScoped<Recruiva.Core.UseCases.Notifications.SendEmailNotificationUseCase>();
+
+// Registrar Use Cases de Assinatura
+builder.Services.AddScoped<GetAvailablePlansUseCase>();
+builder.Services.AddScoped<UpgradePlanUseCase>();
+builder.Services.AddScoped<CancelSubscriptionUseCase>();
+builder.Services.AddScoped<CheckJobLimitUseCase>();
 
 // Registrar Storage Provider
 builder.Services.AddScoped<IStorageProvider, LocalStorageProvider>();

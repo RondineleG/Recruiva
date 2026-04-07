@@ -34,6 +34,10 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser, IdentityR
 
     public DbSet<TenantConfig> TenantConfigs => Set<TenantConfig>();
 
+    public DbSet<SubscriptionPlan> SubscriptionPlans => Set<SubscriptionPlan>();
+
+    public DbSet<Subscription> Subscriptions => Set<Subscription>();
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
