@@ -5,6 +5,7 @@ using Recruiva.Core.Enums;
 using Recruiva.Core.Interfaces.Repositories.Base;
 using Recruiva.Core.Interfaces.UseCases;
 using Recruiva.Core.Requests;
+using Recruiva.Core.UseCases.Notifications;
 using Recruiva.Core.ValueObjects;
 
 namespace Recruiva.Core.UseCases.Applications;
@@ -12,10 +13,14 @@ namespace Recruiva.Core.UseCases.Applications;
 public class UpdateApplicationStatusUseCase : IUseCase<UpdateApplicationStatusRequest, ApplicationResponse>
 {
     private readonly IBaseRepository<Application> _applicationRepository;
+    private readonly NotifyOnApplicationStatusChangedUseCase _notifyOnStatusChangedUseCase;
 
-    public UpdateApplicationStatusUseCase(IBaseRepository<Application> applicationRepository)
+    public UpdateApplicationStatusUseCase(
+        IBaseRepository<Application> applicationRepository,
+        NotifyOnApplicationStatusChangedUseCase notifyOnStatusChangedUseCase)
     {
         _applicationRepository = applicationRepository;
+        _notifyOnStatusChangedUseCase = notifyOnStatusChangedUseCase;
     }
 
     public async Task<RequestResult<ApplicationResponse>> ExecuteAsync(UpdateApplicationStatusRequest request)
@@ -45,6 +50,16 @@ public class UpdateApplicationStatusUseCase : IUseCase<UpdateApplicationStatusRe
         var updateResult = await _applicationRepository.UpdateAsync(application);
         if (updateResult.Status != EResultStatus.Success)
             return RequestResult<ApplicationResponse>.WithError(updateResult.Message);
+
+        // Enviar notificação por email para o candidato (não bloqueante)
+        try
+        {
+            await _notifyOnStatusChangedUseCase.ExecuteAsync(new NotifyOnApplicationStatusChangedRequest(updateResult.Data!.Id.Value));
+        }
+        catch (Exception)
+        {
+            // Falha na notificação não deve impedir a atualização do status
+        }
 
         return RequestResult<ApplicationResponse>.Success(MapToResponse(updateResult.Data!));
     }

@@ -5,7 +5,25 @@
 @inject GetJobByIdUseCase GetJobByIdUseCase
 @inject NavigationManager Navigation
 
-<PageTitle>Detalhes da Vaga - Recruiva</PageTitle>
+<PageTitle>@(job?.Title ?? "Detalhes da Vaga") - Recruiva</PageTitle>
+
+<HeadContent>
+    @if (job != null)
+    {
+        <meta name="description" content="@job.Title - @(job.AdvertiserName ?? "Empresa confidencial") em @(!string.IsNullOrEmpty(job.City) ? $"{job.City}, {job.State}" : "Localização a combinar")" />
+        <meta property="og:title" content="@job.Title - Recruiva" />
+        <meta property="og:description" content="@job.Description.Substring(0, Math.Min(160, job.Description.Length))..." />
+        <meta property="og:type" content="article" />
+        <meta property="og:url" content="@Navigation.Uri" />
+    }
+    else
+    {
+        <meta name="description" content="Detalhes da vaga - Recruiva" />
+        <meta property="og:title" content="Recruiva - Detalhes da Vaga" />
+        <meta property="og:description" content="Veja os detalhes desta vaga e candidate-se" />
+        <meta property="og:type" content="website" />
+    }
+</HeadContent>
 
 <div class="container mt-4">
     @if (isLoading)

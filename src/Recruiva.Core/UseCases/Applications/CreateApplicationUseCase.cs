@@ -5,6 +5,7 @@ using Recruiva.Core.Enums;
 using Recruiva.Core.Interfaces.Repositories.Base;
 using Recruiva.Core.Interfaces.UseCases;
 using Recruiva.Core.Requests;
+using Recruiva.Core.UseCases.Notifications;
 using Recruiva.Core.ValueObjects;
 
 namespace Recruiva.Core.UseCases.Applications;
@@ -13,11 +14,16 @@ public class CreateApplicationUseCase : IUseCase<CreateApplicationRequest, Appli
 {
     private readonly IBaseRepository<Application> _applicationRepository;
     private readonly IBaseRepository<Job> _jobRepository;
+    private readonly NotifyOnApplicationCreatedUseCase _notifyOnCreatedUseCase;
 
-    public CreateApplicationUseCase(IBaseRepository<Application> applicationRepository, IBaseRepository<Job> jobRepository)
+    public CreateApplicationUseCase(
+        IBaseRepository<Application> applicationRepository,
+        IBaseRepository<Job> jobRepository,
+        NotifyOnApplicationCreatedUseCase notifyOnCreatedUseCase)
     {
         _applicationRepository = applicationRepository;
         _jobRepository = jobRepository;
+        _notifyOnCreatedUseCase = notifyOnCreatedUseCase;
     }
 
     public async Task<RequestResult<ApplicationResponse>> ExecuteAsync(CreateApplicationRequest request)
@@ -52,6 +58,16 @@ public class CreateApplicationUseCase : IUseCase<CreateApplicationRequest, Appli
         {
             job.Counters.Applications++;
             await _jobRepository.UpdateAsync(job);
+        }
+
+        // Enviar notificação por email para o anunciante (não bloqueante)
+        try
+        {
+            await _notifyOnCreatedUseCase.ExecuteAsync(new NotifyOnApplicationCreatedRequest(result.Data!.Id.Value));
+        }
+        catch (Exception)
+        {
+            // Falha na notificação não deve impedir a criação da candidatura
         }
 
         return RequestResult<ApplicationResponse>.Success(MapToResponse(result.Data!));

@@ -6,11 +6,14 @@
 @using Microsoft.AspNetCore.Identity
 @using Microsoft.AspNetCore.WebUtilities
 @using Recruiva.Web.Models
+@using Recruiva.Core.UseCases.Notifications
+@using Recruiva.Core.Enums
 
 @inject UserManager<ApplicationUser> UserManager
 @inject IUserStore<ApplicationUser> UserStore
 @inject SignInManager<ApplicationUser> SignInManager
 @inject IEmailSender<ApplicationUser> EmailSender
+@inject EmailConfirmationUseCase EmailConfirmationUseCase
 @inject ILogger<Register> Logger
 @inject NavigationManager NavigationManager
 @inject IdentityRedirectManager RedirectManager
@@ -22,6 +25,13 @@
 <div class="row">
     <div class="col-md-4">
         <StatusMessage Message="@Message" />
+        @if (!string.IsNullOrEmpty(successMessage))
+        {
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                <i class="bi bi-check-circle"></i> @successMessage
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        }
         <EditForm Model="Input" asp-route-returnUrl="@ReturnUrl" method="post" OnValidSubmit="RegisterUser" FormName="register">
             <DataAnnotationsValidator />
             <h2>Create a new account.</h2>
@@ -56,6 +66,7 @@
 
 @code {
     private IEnumerable<IdentityError>? identityErrors;
+    private string? successMessage;
 
     [SupplyParameterFromForm]
     private InputModel Input { get; set; } = new();
@@ -90,6 +101,26 @@
             new Dictionary<string, object?> { ["userId"] = userId, ["code"] = code, ["returnUrl"] = ReturnUrl });
 
         await EmailSender.SendConfirmationLinkAsync(user, Input.Email, HtmlEncoder.Default.Encode(callbackUrl));
+
+        // Enviar email de confirmação via UseCase
+        var emailConfirmationRequest = new EmailConfirmationRequest
+        {
+            UserId = userId.ToString(),
+            Email = Input.Email,
+            UserName = Input.Email.Split('@').FirstOrDefault() ?? Input.Email,
+            ConfirmationLink = callbackUrl
+        };
+
+        var emailResult = await EmailConfirmationUseCase.ExecuteAsync(emailConfirmationRequest);
+        if (emailResult.Status == EResultStatus.Success)
+        {
+            successMessage = "Email de confirmação enviado com sucesso! Verifique sua caixa de entrada.";
+            Logger.LogInformation("Email de confirmação enviado para {Email}", Input.Email);
+        }
+        else
+        {
+            Logger.LogWarning("Falha ao enviar email de confirmação via UseCase: {Message}", emailResult.Message);
+        }
 
         if (UserManager.Options.SignIn.RequireConfirmedAccount)
         {

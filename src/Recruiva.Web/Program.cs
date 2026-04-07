@@ -95,6 +95,11 @@ builder.Services.AddScoped<ListApplicationsByJobUseCase>();
 builder.Services.AddScoped<ListApplicationsByCandidateUseCase>();
 builder.Services.AddScoped<UpdateApplicationStatusUseCase>();
 
+// Registrar Use Cases de Notifications
+builder.Services.AddScoped<NotifyOnApplicationCreatedUseCase>();
+builder.Services.AddScoped<NotifyOnApplicationStatusChangedUseCase>();
+builder.Services.AddScoped<NotifyOnJobExpiredUseCase>();
+
 // Registrar Use Cases de Candidates
 builder.Services.AddScoped<CreateCandidateUseCase>();
 builder.Services.AddScoped<Recruiva.Core.UseCases.Candidates.ListCandidatesUseCase>();
@@ -124,6 +129,8 @@ builder.Services.AddScoped<CreateNotificationUseCase>();
 builder.Services.AddScoped<ListNotificationsByUserUseCase>();
 builder.Services.AddScoped<MarkNotificationAsReadUseCase>();
 builder.Services.AddScoped<Recruiva.Core.UseCases.Notifications.SendEmailNotificationUseCase>();
+builder.Services.AddScoped<Recruiva.Core.UseCases.Notifications.EmailConfirmationUseCase>();
+builder.Services.AddScoped<Recruiva.Core.UseCases.Notifications.PasswordResetUseCase>();
 
 // Registrar Use Cases de Assinatura
 builder.Services.AddScoped<GetAvailablePlansUseCase>();
@@ -143,6 +150,9 @@ builder.Services.AddScoped<ICurrentUserHelper, CurrentUserHelper>();
 
 // Registrar UseCase de Analytics
 builder.Services.AddScoped<Recruiva.Web.UseCases.Analytics.GetDashboardAnalyticsUseCase>();
+
+// Registrar Background Services
+builder.Services.AddHostedService<JobExpirationBackgroundService>();
 
 // Serviços existentes
 builder.Services.AddScoped<AddressRepository>();
