@@ -10,5 +10,11 @@ public class CandidateResponse
     public string? LinkedIn { get; set; }
     public string Status { get; set; } = string.Empty;
     public bool IsEmailVerified { get; set; }
+    public bool IsPhoneVerified { get; set; }
+    public string? City { get; set; }
+    public string? State { get; set; }
+    public int ResumesCount { get; set; }
+    public int ApplicationsCount { get; set; }
     public DateTime CreatedAt { get; set; }
+    public DateTime? UpdatedAt { get; set; }
 }

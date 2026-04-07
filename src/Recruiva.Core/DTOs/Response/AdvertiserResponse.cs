@@ -13,6 +13,11 @@ public class AdvertiserResponse
     public string? LogoUrl { get; set; }
     public string Status { get; set; } = string.Empty;
     public bool IsEmailVerified { get; set; }
+    public bool IsPhoneVerified { get; set; }
     public string? ActivePlan { get; set; }
+    public string? City { get; set; }
+    public string? State { get; set; }
+    public int JobsCount { get; set; }
     public DateTime CreatedAt { get; set; }
+    public DateTime? UpdatedAt { get; set; }
 }

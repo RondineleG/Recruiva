@@ -90,10 +90,16 @@ builder.Services.AddScoped<UpdateApplicationStatusUseCase>();
 
 // Registrar Use Cases de Candidates
 builder.Services.AddScoped<CreateCandidateUseCase>();
+builder.Services.AddScoped<Recruiva.Core.UseCases.Candidates.ListCandidatesUseCase>();
+builder.Services.AddScoped<Recruiva.Core.UseCases.Candidates.GetCandidateByIdUseCase>();
+builder.Services.AddScoped<Recruiva.Core.UseCases.Candidates.DeleteCandidateUseCase>();
 builder.Services.AddScoped<Recruiva.Core.UseCases.Candidates.UpdateCandidateUseCase>();
 
 // Registrar Use Cases de Advertisers
 builder.Services.AddScoped<CreateAdvertiserUseCase>();
+builder.Services.AddScoped<Recruiva.Core.UseCases.Advertisers.ListAdvertisersUseCase>();
+builder.Services.AddScoped<Recruiva.Core.UseCases.Advertisers.GetAdvertiserByIdUseCase>();
+builder.Services.AddScoped<Recruiva.Core.UseCases.Advertisers.DeleteAdvertiserUseCase>();
 builder.Services.AddScoped<Recruiva.Core.UseCases.Advertisers.UpdateAdvertiserUseCase>();
 
 // Registrar Use Cases de Resumes
