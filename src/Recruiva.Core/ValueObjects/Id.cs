@@ -17,6 +17,8 @@ public sealed class Id : ValueObject
 
     public Guid Value { get; }
 
+    public static Id Empty => new(Guid.Empty);
+
     public static Id Create()
     {
         return new Id(Guid.NewGuid());
@@ -57,9 +59,11 @@ public sealed class Id : ValueObject
 
     public static bool TryCreate(Guid guid, out Id? id)
     {
-        id = null;
         if (guid == Guid.Empty)
+        {
+            id = null;
             return false;
+        }
         id = new Id(guid);
         return true;
     }

@@ -55,13 +55,19 @@ public class IdentityService : IIdentityService
         var response = new UserLoginResponse();
         var usuario = await _userManager.FindByIdAsync(usuarioId).ConfigureAwait(false);
 
+        if (usuario is null)
+        {
+            response.AddErro("User not found");
+            return response;
+        }
+
         if (await _userManager.IsLockedOutAsync(usuario).ConfigureAwait(false))
             response.AddErro("This account is blocked");
         else if (!await _userManager.IsEmailConfirmedAsync(usuario).ConfigureAwait(false))
             response.AddErro("This account needs to confirm your email before you log in");
 
         if (response.Sucesso)
-            return await GenerateCredentials(usuario.Email).ConfigureAwait(false);
+            return await GenerateCredentials(usuario.Email ?? string.Empty).ConfigureAwait(false);
 
         return response;
     }
@@ -91,6 +97,13 @@ public class IdentityService : IIdentityService
     private async Task<UserLoginResponse> GenerateCredentials(string email)
     {
         var user = await _userManager.FindByEmailAsync(email).ConfigureAwait(false);
+        if (user is null)
+        {
+            var response = new UserLoginResponse();
+            response.AddErro("User not found");
+            return response;
+        }
+
         var accessTokenClaims = await ObterClaims(user, adicionarClaimsUsuario: true).ConfigureAwait(false);
         var refreshTokenClaims = await ObterClaims(user, adicionarClaimsUsuario: false).ConfigureAwait(false);
 

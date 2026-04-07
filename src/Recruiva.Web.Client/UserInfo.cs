@@ -4,8 +4,8 @@ namespace Recruiva.Web.Client
     // expose more information about the authenticated user to the client.
     public class UserInfo
     {
-        public string Email { get; set; }
+        public string Email { get; set; } = string.Empty;
 
-        public string UserId { get; set; }
+        public string UserId { get; set; } = string.Empty;
     }
 }

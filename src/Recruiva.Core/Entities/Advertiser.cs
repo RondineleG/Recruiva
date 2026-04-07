@@ -12,7 +12,7 @@ public class Advertiser : BaseEntity
 
     public Address? Address { get; set; }
 
-    public Id AddressId { get; set; }
+    public Id AddressId { get; set; } = Id.Empty;
 
     public string? CompanyDescription { get; set; }
 

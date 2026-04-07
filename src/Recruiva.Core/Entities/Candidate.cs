@@ -8,9 +8,9 @@ namespace Recruiva.Core.Entities;
 
 public class Candidate : BaseEntity
 {
-    public Address Address { get; set; }
+    public Address? Address { get; set; }
 
-    public Id AddressId { get; set; }
+    public Id AddressId { get; set; } = Id.Empty;
 
     public virtual ICollection<Application> Applications { get; set; } = [];
 

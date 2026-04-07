@@ -13,12 +13,12 @@ public class Application : BaseEntity
     public virtual Candidate? Candidate { get; set; }
 
     [Required]
-    public Id CandidateId { get; set; }
+    public Id CandidateId { get; set; } = Id.Empty;
 
     public virtual Job? Job { get; set; }
 
     [Required]
-    public Id JobId { get; set; }
+    public Id JobId { get; set; } = Id.Empty;
 
     public string? Notes { get; set; }
 

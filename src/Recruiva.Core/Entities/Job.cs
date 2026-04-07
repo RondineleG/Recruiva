@@ -11,7 +11,7 @@ public class Job : BaseEntity
     public virtual Advertiser? Advertiser { get; set; }
 
     [Required]
-    public Id AdvertiserId { get; set; }
+    public Id AdvertiserId { get; set; } = Id.Empty;
 
     public virtual ICollection<Application> Applications { get; set; } = [];
 

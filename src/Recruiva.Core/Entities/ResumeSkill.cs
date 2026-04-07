@@ -9,7 +9,7 @@ public class ResumeSkill : BaseEntity
 
     public virtual Resume? Resume { get; set; }
 
-    public Id ResumeId { get; set; }
+    public Id ResumeId { get; set; } = Id.Empty;
 
     public string Skill { get; set; } = string.Empty;
 

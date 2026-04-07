@@ -13,12 +13,12 @@ namespace Recruiva.Core.DTOs.Response
         }
 
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-        public string AccessToken { get; private set; }
+        public string AccessToken { get; private set; } = string.Empty;
 
         public List<string> Erros { get; private set; }
 
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-        public string RefreshToken { get; private set; }
+        public string RefreshToken { get; private set; } = string.Empty;
 
         public bool Sucesso => Erros.Count == 0;
 
