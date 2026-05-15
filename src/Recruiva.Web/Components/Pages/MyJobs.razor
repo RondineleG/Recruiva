@@ -2,7 +2,9 @@
 @using Recruiva.Core.DTOs.Response
 @using Recruiva.Core.Enums
 @using Recruiva.Core.UseCases.Jobs
+@using Recruiva.Web.Services
 @inject SearchJobsUseCase SearchJobsUseCase
+@inject CurrentUserHelper CurrentUserHelper
 @inject NavigationManager Navigation
 
 <PageTitle>Minhas Vagas - Recruiva</PageTitle>
@@ -160,11 +162,14 @@
 
     protected override async Task OnInitializedAsync()
     {
-        // TODO: Filtrar por advertiserId do usuário logado
+        // Obter advertiserId do usuário logado
+        var advertiserId = CurrentUserHelper.GetAdvertiserId();
+
         var request = new ListJobsRequest
         {
             Page = 1,
-            Size = 100
+            Size = 100,
+            AdvertiserId = advertiserId
         };
 
         var result = await SearchJobsUseCase.ExecuteAsync(request);
@@ -172,7 +177,7 @@
         {
             jobs = result.Data?.Jobs;
         }
-        
+
         isLoading = false;
     }
 

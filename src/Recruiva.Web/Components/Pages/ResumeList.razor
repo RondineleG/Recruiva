@@ -1,6 +1,9 @@
 @page "/resumes"
 @page "/resumes/create"
+@using Recruiva.Core.DTOs.Response
+@using Recruiva.Core.UseCases.Resumes
 @using Recruiva.Web.Services
+@inject ListResumesByCandidateUseCase ListResumesByCandidateUseCase
 @inject ICurrentUserHelper CurrentUserHelper
 
 <PageTitle>Meus Currículos - Recruiva</PageTitle>
@@ -12,6 +15,14 @@
             <i class="bi bi-plus-circle"></i> Novo Currículo
         </button>
     </div>
+
+    @if (!string.IsNullOrEmpty(errorMessage))
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="bi bi-exclamation-triangle"></i> @errorMessage
+            <button type="button" class="btn-close" @onclick="() => errorMessage = null"></button>
+        </div>
+    }
 
     @if (isLoading)
     {
@@ -69,14 +80,31 @@
 @code {
     private List<ResumeResponse>? resumes;
     private bool isLoading = true;
+    private string? errorMessage;
 
     protected override async Task OnInitializedAsync()
     {
+        errorMessage = null;
+
         // Obter CandidateId do usuário logado
         var candidateId = CurrentUserHelper.GetCandidateId();
+        if (candidateId.HasValue)
+        {
+            var result = await ListResumesByCandidateUseCase.ExecuteAsync(candidateId.Value);
+            if (result.Status == EResultStatus.Success)
+            {
+                resumes = result.Data?.ToList();
+            }
+            else
+            {
+                errorMessage = result.Message;
+            }
+        }
+        else
+        {
+            errorMessage = "Usuário não autenticado como candidato.";
+        }
 
-        // TODO: Implementar listagem real
-        resumes = new List<ResumeResponse>();
         isLoading = false;
     }
 

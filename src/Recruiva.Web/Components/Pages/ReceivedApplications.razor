@@ -1,9 +1,11 @@
 @page "/received-applications"
 @page "/jobs/{jobId:guid}/applications"
+@using Recruiva.Core.DTOs.Request
 @using Recruiva.Core.DTOs.Response
 @using Recruiva.Core.Enums
 @using Recruiva.Core.UseCases.Applications
 @inject ListApplicationsByJobUseCase ListApplicationsByJobUseCase
+@inject UpdateApplicationStatusUseCase UpdateApplicationStatusUseCase
 @inject NavigationManager Navigation
 
 <PageTitle>Candidaturas Recebidas - Recruiva</PageTitle>
@@ -15,6 +17,22 @@
             &larr; Minhas Vagas
         </button>
     </div>
+
+    @if (!string.IsNullOrEmpty(successMessage))
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="bi bi-check-circle"></i> @successMessage
+            <button type="button" class="btn-close" @onclick="() => successMessage = null"></button>
+        </div>
+    }
+
+    @if (!string.IsNullOrEmpty(errorMessage))
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="bi bi-exclamation-triangle"></i> @errorMessage
+            <button type="button" class="btn-close" @onclick="() => errorMessage = null"></button>
+        </div>
+    }
 
     @if (isLoading)
     {
@@ -95,15 +113,24 @@
 
     private IEnumerable<ApplicationResponse>? applications;
     private bool isLoading = true;
+    private string? errorMessage;
+    private string? successMessage;
 
     protected override async Task OnInitializedAsync()
     {
+        errorMessage = null;
+        successMessage = null;
+
         if (JobId.HasValue)
         {
             var result = await ListApplicationsByJobUseCase.ExecuteAsync(JobId.Value);
             if (result.Status == EResultStatus.Success)
             {
                 applications = result.Data;
+            }
+            else
+            {
+                errorMessage = result.Message;
             }
         }
 
@@ -112,8 +139,26 @@
 
     private async Task UpdateStatus(Guid applicationId, EApplicationStatus newStatus)
     {
-        // TODO: Implementar atualização de status
-        await OnInitializedAsync();
+        errorMessage = null;
+        successMessage = null;
+
+        var request = new UpdateApplicationStatusRequest
+        {
+            ApplicationId = applicationId,
+            NewStatus = newStatus
+        };
+
+        var result = await UpdateApplicationStatusUseCase.ExecuteAsync(request);
+
+        if (result.Status == EResultStatus.Success)
+        {
+            successMessage = $"Status atualizado para {newStatus} com sucesso!";
+            await OnInitializedAsync();
+        }
+        else
+        {
+            errorMessage = result.Message;
+        }
     }
 
     private void NavigateToMyJobs()

@@ -15,14 +15,45 @@ using Recruiva.Core.UseCases.Notifications;
 using Recruiva.Core.UseCases.Storage;
 using Recruiva.Core.UseCases.Subscriptions;
 using Recruiva.Core.Validations;
+using Recruiva.Web.Middleware;
 using Recruiva.Web.Repositories;
 using Recruiva.Web.Services;
+using Serilog;
 
-var builder = WebApplication.CreateBuilder(args);
+try
+{
+    Log.Information("Iniciando aplicação Recruiva");
+
+    var builder = WebApplication.CreateBuilder(args);
+
+    // Configurar Serilog
+    Log.Logger = new LoggerConfiguration()
+        .ReadFrom.Configuration(builder.Configuration)
+        .Enrich.FromLogContext()
+        .Enrich.WithProperty("Application", "Recruiva")
+        .CreateLogger();
+
+    // Usar Serilog
+    builder.Host.UseSerilog();
 
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents()
     .AddInteractiveWebAssemblyComponents();
+
+// Adicionar Swagger
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo
+    {
+        Title = "Recruiva API",
+        Version = "v1",
+        Description = "API para plataforma de recrutamento Recruiva"
+    });
+});
+
+// Adicionar Health Checks
+builder.Services.AddHealthChecks();
 
 builder.Services.AddCascadingAuthenticationState();
 builder.Services.AddScoped<IdentityUserAccessor>();
@@ -163,6 +194,11 @@ if (app.Environment.IsDevelopment())
 {
     app.UseWebAssemblyDebugging();
     app.UseMigrationsEndPoint();
+    app.UseSwagger();
+    app.UseSwaggerUI(c =>
+    {
+        c.SwaggerEndpoint("/swagger/v1/swagger.json", "Recruiva API v1");
+    });
 }
 else
 {
@@ -171,6 +207,8 @@ else
 }
 
 app.UseHttpsRedirection();
+app.UseRateLimit(100); // 100 requests per second
+app.UseSecurityHeaders();
 app.UseStaticFiles();
 app.UseAntiforgery();
 
@@ -181,6 +219,9 @@ app.MapRazorComponents<App>()
 
 app.MapAdditionalIdentityEndpoints();
 
+// Health Check endpoint
+app.MapHealthChecks("/health");
+
 // Seed Data em desenvolvimento
 if (app.Environment.IsDevelopment())
 {
@@ -189,4 +230,14 @@ if (app.Environment.IsDevelopment())
     await SeedData.InitializeAsync(context);
 }
 
+Log.Information("Aplicação Recruiva iniciada com sucesso");
 app.Run();
+}
+catch (Exception ex)
+{
+    Log.Fatal(ex, "Aplicação Recruiva falhou ao iniciar");
+}
+finally
+{
+    Log.CloseAndFlush();
+}

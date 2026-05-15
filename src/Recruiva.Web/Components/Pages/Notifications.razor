@@ -2,8 +2,10 @@
 @using Recruiva.Core.DTOs.Response;
 @using Recruiva.Core.Enums;
 @using Recruiva.Core.UseCases.Notifications;
+@using Recruiva.Web.Services;
 @inject ListNotificationsByUserUseCase ListNotificationsUseCase;
 @inject MarkNotificationAsReadUseCase MarkNotificationAsReadUseCase;
+@inject CurrentUserHelper CurrentUserHelper;
 @inject NavigationManager Navigation;
 
 <PageTitle>Central de Notificações - Recruiva</PageTitle>
@@ -131,8 +133,26 @@
     private async Task LoadNotifications()
     {
         isLoading = true;
-        // TODO: Obter recipientId do usuário autenticado
-        var recipientId = "default";
+
+        // Obter recipientId do usuário autenticado
+        var userType = CurrentUserHelper.GetUserType();
+        string recipientId;
+
+        if (userType == "candidate")
+        {
+            var candidateId = CurrentUserHelper.GetCandidateId();
+            recipientId = candidateId?.ToString() ?? "default";
+        }
+        else if (userType == "advertiser")
+        {
+            var advertiserId = CurrentUserHelper.GetAdvertiserId();
+            recipientId = advertiserId?.ToString() ?? "default";
+        }
+        else
+        {
+            recipientId = "default";
+        }
+
         var result = await ListNotificationsUseCase.ExecuteAsync(recipientId);
         if (result.Status == EResultStatus.Success)
         {

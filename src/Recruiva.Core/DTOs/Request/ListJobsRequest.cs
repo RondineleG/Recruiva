@@ -13,4 +13,5 @@ public class ListJobsRequest
     public string? Category { get; set; }
     public string? SortBy { get; set; } = "CreatedAt";
     public bool SortDescending { get; set; } = true;
+    public Guid? AdvertiserId { get; set; }
 }

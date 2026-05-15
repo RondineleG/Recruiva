@@ -1,5 +1,9 @@
 @page "/resumes/new"
+@using Recruiva.Core.DTOs.Request
+@using Recruiva.Core.Enums
+@using Recruiva.Core.UseCases.Resumes
 @using Recruiva.Web.Services
+@inject CreateResumeUseCase CreateResumeUseCase
 @inject ICurrentUserHelper CurrentUserHelper
 
 <PageTitle>Criar Currículo - Recruiva</PageTitle>
@@ -119,10 +123,17 @@
         isSubmitting = true;
         errorMessage = string.Empty;
 
-        // TODO: Implementar criação real
-        await Task.Delay(100);
-        successMessage = true;
-        
+        var result = await CreateResumeUseCase.ExecuteAsync(model);
+
+        if (result.Status == EResultStatus.Success)
+        {
+            successMessage = true;
+        }
+        else
+        {
+            errorMessage = result.Message;
+        }
+
         isSubmitting = false;
     }
 

@@ -9,6 +9,14 @@
 <PageTitle>Detalhes do Currículo - Recruiva</PageTitle>
 
 <div class="container mt-4">
+    @if (!string.IsNullOrEmpty(errorMessage))
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="bi bi-exclamation-triangle"></i> @errorMessage
+            <button type="button" class="btn-close" @onclick="() => errorMessage = null"></button>
+        </div>
+    }
+
     @if (isLoading)
     {
         <div class="text-center py-5">
@@ -283,20 +291,25 @@
     private ResumeResponse? resume;
     private bool isLoading = true;
     private bool showDeleteConfirm = false;
+    private string? errorMessage;
 
     protected override async Task OnInitializedAsync()
     {
+        errorMessage = null;
         var result = await GetResumeByIdUseCase.ExecuteAsync(ResumeId);
         if (result.Status == EResultStatus.Success)
         {
             resume = result.Data;
+        }
+        else
+        {
+            errorMessage = result.Message;
         }
         isLoading = false;
     }
 
     private void EditResume()
     {
-        // TODO: Navegar para página de edição quando criada
         Navigation.NavigateTo($"/resumes/{ResumeId}/edit");
     }
 
@@ -313,6 +326,8 @@
     private async Task DeleteResumeConfirmed()
     {
         showDeleteConfirm = false;
+        errorMessage = null;
+
         var result = await DeleteResumeUseCase.ExecuteAsync(ResumeId);
         if (result.Status == EResultStatus.Success)
         {
@@ -320,8 +335,7 @@
         }
         else
         {
-            // TODO: Mostrar mensagem de erro
-            Console.WriteLine($"Erro ao excluir currículo: {result.Message}");
+            errorMessage = $"Erro ao excluir currículo: {result.Message}";
         }
     }
 

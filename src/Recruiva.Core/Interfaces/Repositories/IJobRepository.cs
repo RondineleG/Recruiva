@@ -1,3 +1,4 @@
+using Recruiva.Core.DTOs.Response;
 using Recruiva.Core.Entities;
 using Recruiva.Core.Interfaces.Repositories.Base;
 using Recruiva.Core.Requests;
@@ -14,6 +15,9 @@ public interface IJobRepository : IBaseRepository<Job>
         decimal? salaryMin = null,
         decimal? salaryMax = null,
         string? category = null,
+        Guid? advertiserId = null,
         int page = 1,
         int size = 10);
+
+    Task<PagedResponse<Job>> GetAllPagedAsync(int page, int size);
 }

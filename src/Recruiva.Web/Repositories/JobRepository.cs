@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 
+using Recruiva.Core.DTOs.Response;
 using Recruiva.Core.Entities;
 using Recruiva.Core.Interfaces.Repositories;
 using Recruiva.Core.Interfaces.Repositories.Base;
@@ -51,6 +52,28 @@ public class JobRepository : IJobRepository
         return RequestResult<IEnumerable<Job>>.Success(jobs);
     }
 
+    public async Task<PagedResponse<Job>> GetAllPagedAsync(int page, int size)
+    {
+        var query = _context.Jobs
+            .Include(j => j.Advertiser)
+            .Where(j => !j.IsDeleted && j.Status == EJobStatus.Active);
+
+        var totalCount = await query.CountAsync();
+        var jobs = await query
+            .OrderByDescending(j => j.CreatedAt)
+            .Skip((page - 1) * size)
+            .Take(size)
+            .ToListAsync();
+
+        return new PagedResponse<Job>
+        {
+            Data = jobs,
+            TotalCount = totalCount,
+            Page = page,
+            Size = size
+        };
+    }
+
     public async Task<RequestResult<Job>> GetByIdAsync(Id id)
     {
         var job = await _context.Jobs
@@ -78,6 +101,7 @@ public class JobRepository : IJobRepository
         decimal? salaryMin = null,
         decimal? salaryMax = null,
         string? category = null,
+        Guid? advertiserId = null,
         int page = 1,
         int size = 10)
     {
@@ -86,6 +110,12 @@ public class JobRepository : IJobRepository
             .Include(j => j.Location)
             .Include(j => j.Salary)
             .Where(j => !j.IsDeleted && j.Status == EJobStatus.Active);
+
+        // Filtro por advertiserId (para MyJobs)
+        if (advertiserId.HasValue)
+        {
+            query = query.Where(j => j.AdvertiserId.Value == advertiserId.Value);
+        }
 
         // Filtro por busca textual (aplicado no WHERE do SQL)
         if (!string.IsNullOrWhiteSpace(searchTerm))

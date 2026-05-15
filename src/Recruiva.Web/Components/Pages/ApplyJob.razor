@@ -2,8 +2,10 @@
 @using Recruiva.Core.DTOs.Request
 @using Recruiva.Core.Enums
 @using Recruiva.Core.UseCases.Applications
+@using Recruiva.Core.UseCases.Jobs
 @using Recruiva.Web.Services
 @inject CreateApplicationUseCase CreateApplicationUseCase
+@inject GetJobByIdUseCase GetJobByIdUseCase
 @inject ICurrentUserHelper CurrentUserHelper
 @inject NavigationManager Navigation
 
@@ -89,8 +91,17 @@
 
     protected override async Task OnInitializedAsync()
     {
-        // TODO: Obter título da vaga
-        jobTitle = $"Vaga {JobId.ToString().Substring(0, 8)}";
+        // Obter título da vaga
+        var jobResult = await GetJobByIdUseCase.ExecuteAsync(JobId);
+        if (jobResult.Status == EResultStatus.Success)
+        {
+            jobTitle = jobResult.Data?.Title ?? $"Vaga {JobId.ToString().Substring(0, 8)}";
+        }
+        else
+        {
+            jobTitle = $"Vaga {JobId.ToString().Substring(0, 8)}";
+            errorMessage = "Vaga não encontrada.";
+        }
 
         // Obter CandidateId do usuário logado
         var candidateId = CurrentUserHelper.GetCandidateId();

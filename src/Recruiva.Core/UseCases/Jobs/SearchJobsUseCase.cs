@@ -27,6 +27,7 @@ public class SearchJobsUseCase : IUseCase<ListJobsRequest, ListJobsResponse>
             salaryMin: request.SalaryMin,
             salaryMax: request.SalaryMax,
             category: request.Category,
+            advertiserId: request.AdvertiserId,
             page: request.Page,
             size: request.Size);
 
