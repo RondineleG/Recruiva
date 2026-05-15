@@ -6,6 +6,7 @@ using Recruiva.Core.Interfaces.Repositories.Base;
 using Recruiva.Core.Interfaces.Storage;
 using Recruiva.Core.Interfaces.UseCases;
 using Recruiva.Core.Interfaces.Validations;
+using Recruiva.Core.Messaging;
 using Recruiva.Core.UseCases.Jobs;
 using Recruiva.Core.UseCases.Applications;
 using Recruiva.Core.UseCases.Candidates;
@@ -89,6 +90,21 @@ builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
 // Registrar EmailSender (SendGrid com fallback para NoOp em desenvolvimento)
 builder.Services.AddScoped<Recruiva.Core.Interfaces.Services.IEmailSender, Recruiva.Web.Services.SendGridEmailSender>();
+
+// Configurar RabbitMQ
+var rabbitMQConfig = new RabbitMQConfiguration(
+    HostName: builder.Configuration["RabbitMQ:HostName"] ?? "localhost",
+    Port: int.Parse(builder.Configuration["RabbitMQ:Port"] ?? "5672"),
+    UserName: builder.Configuration["RabbitMQ:UserName"] ?? "guest",
+    Password: builder.Configuration["RabbitMQ:Password"] ?? "guest",
+    VirtualHost: builder.Configuration["RabbitMQ:VirtualHost"] ?? "/",
+    RequestedHeartbeat: int.Parse(builder.Configuration["RabbitMQ:RequestedHeartbeat"] ?? "30"),
+    AutomaticRecoveryEnabled: bool.Parse(builder.Configuration["RabbitMQ:AutomaticRecoveryEnabled"] ?? "true"),
+    NetworkRecoveryInterval: int.Parse(builder.Configuration["RabbitMQ:NetworkRecoveryInterval"] ?? "5000")
+);
+
+builder.Services.AddSingleton(rabbitMQConfig);
+builder.Services.AddSingleton<IRabbitMQBus, RabbitMQBus>();
 
 // Registrar Repositórios
 builder.Services.AddScoped<IJobRepository, JobRepository>();

@@ -22,6 +22,27 @@ services:
       retries: 10
       start_period: 40s
 
+  # RabbitMQ para mensageria
+  rabbitmq:
+    image: rabbitmq:3.13-management
+    container_name: recruiva-rabbitmq
+    environment:
+      - RABBITMQ_DEFAULT_USER=${RABBITMQ_USER:-guest}
+      - RABBITMQ_DEFAULT_PASS=${RABBITMQ_PASSWORD:-guest}
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    networks:
+      - recruiva-network
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
   # Aplicação Recruiva
   app:
     build:
@@ -35,6 +56,11 @@ services:
       - SendGrid__ApiKey=${SENDGRID_API_KEY:-}
       - SendGrid__FromEmail=noreply@recruiva.com
       - SendGrid__FromName=Recruiva
+      - RabbitMQ__HostName=rabbitmq
+      - RabbitMQ__Port=5672
+      - RabbitMQ__UserName=${RABBITMQ_USER:-guest}
+      - RabbitMQ__Password=${RABBITMQ_PASSWORD:-guest}
+      - RabbitMQ__VirtualHost=/
     ports:
       - "8080:80"
     volumes:
@@ -42,12 +68,16 @@ services:
     depends_on:
       sqlserver:
         condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
     networks:
       - recruiva-network
     restart: unless-stopped
 
 volumes:
   sqlserver_data:
+    driver: local
+  rabbitmq_data:
     driver: local
   app_uploads:
     driver: local
