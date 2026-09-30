@@ -10,11 +10,11 @@
 @inject IdentityRedirectManager RedirectManager
 @inject ILogger<DeletePersonalData> Logger
 
-<PageTitle>Delete Personal Data</PageTitle>
+<PageTitle>Excluir dados pessoais</PageTitle>
 
 <StatusMessage Message="@message" />
 
-<h3>Delete Personal Data</h3>
+<h3>Excluir dados pessoais</h3>
 
 <div class="alert alert-warning" role="alert">
     <p>
@@ -29,8 +29,8 @@
         @if (requirePassword)
         {
             <div class="form-floating mb-3">
-                <InputText type="password" @bind-Value="Input.Password" class="form-control" autocomplete="current-password" aria-required="true" placeholder="Please enter your password." />
-                <label for="password" class="form-label">Password</label>
+                <InputText type="password" @bind-Value="Input.Password" class="form-control" autocomplete="current-password" aria-required="true" placeholder=" " />
+                <label for="password" class="form-label">Senha</label>
                 <ValidationMessage For="() => Input.Password" class="text-danger" />
             </div>
         }

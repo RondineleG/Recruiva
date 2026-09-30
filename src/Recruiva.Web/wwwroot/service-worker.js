@@ -1,14 +1,19 @@
 // Recruiva Service Worker - PWA Support
 // Network First Strategy with basic offline caching
 
-const CACHE_NAME = 'recruiva-v1';
-const RUNTIME_CACHE = 'recruiva-runtime-v1';
+const CACHE_NAME = 'recruiva-v6-design-system';
+const RUNTIME_CACHE = 'recruiva-runtime-v6-design-system';
 
 // Assets to cache on install
 const PRECACHE_ASSETS = [
     '/',
     '/app.css',
+    '/ui.css',
     '/manifest.json',
+    '/favicon-16x16.png',
+    '/favicon-32x32.png',
+    '/icon-192.png',
+    '/icon-512.png',
     '/_framework/blazor.web.js'
 ];
 
@@ -49,6 +54,12 @@ self.addEventListener('fetch', (event) => {
 
     // Skip Blazor SignalR connections
     if (event.request.url.includes('/_blazor')) {
+        return;
+    }
+
+    // Never cache document responses: a transient router response must not
+    // become the page users see after a later deployment.
+    if (event.request.mode === 'navigate') {
         return;
     }
 
