@@ -1,7 +1,7 @@
 # 🚀 Recruiva
 
 ![Build Status](https://img.shields.io/badge/build-passing-brightgreen)
-![.NET](https://img.shields.io/badge/.NET-9.0-blue)
+![.NET](https://img.shields.io/badge/.NET-10.0-blue)
 ![License](https://img.shields.io/badge/license-MIT-green)
 ![Blazor](https://img.shields.io/badge/Blazor-WebAssembly%20%7C%20Server-purple)
 ![Security](https://img.shields.io/badge/security-critical%20fixes-green)
@@ -9,7 +9,7 @@
 
 > **Plataforma moderna de recrutamento e seleção para conectar talentos a oportunidades.**
 
-Recruiva é uma aplicação web completa para gestão de vagas, candidaturas e candidatos, construída com **.NET 9.0** e **Blazor WebAssembly/Server**. Oferece uma experiência intuitiva para anunciantes publicarem vagas e para candidatos se candidatarem de forma eficiente.
+Recruiva é uma aplicação web completa para gestão de vagas, candidaturas e candidatos, construída com **.NET 10.0** e **Blazor WebAssembly/Server**. Oferece uma experiência intuitiva para anunciantes publicarem vagas e para candidatos se candidatarem de forma eficiente.
 
 ---
 
@@ -116,10 +116,10 @@ export SendGrid__ApiKey="sua-api-key"
 
 | Camada | Tecnologia |
 |--------|------------|
-| **Framework** | .NET 9.0 (ASP.NET Core) |
+| **Framework** | .NET 10.0 (ASP.NET Core) |
 | **Frontend** | Blazor WebAssembly + Server (Interactive Render Modes) |
 | **UI** | Bootstrap 5, Bootstrap Icons |
-| **ORM** | Entity Framework Core 9.0 |
+| **ORM** | Entity Framework Core 10.0 |
 | **Database** | SQL Server / LocalDB |
 | **Auth** | ASP.NET Core Identity + JWT |
 | **Email** | SendGrid API |
@@ -173,7 +173,7 @@ Recruiva/
 ## 🚀 Como Executar
 
 ### Pré-requisitos
-- [.NET 9.0 SDK](https://dotnet.microsoft.com/download/dotnet/9.0)
+- [.NET 10.0 SDK](https://dotnet.microsoft.com/download/dotnet/10.0)
 - [SQL Server](https://www.microsoft.com/sql-server/sql-server-downloads) ou [LocalDB](https://docs.microsoft.com/sql/database-engine/configure-windows/sql-express-localdb)
 - (Opcional) [Docker](https://www.docker.com/products/docker-desktop)
 

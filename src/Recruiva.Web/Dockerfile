@@ -1,7 +1,7 @@
 # ============================================================
 # Stage 1: Build
 # ============================================================
-FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
+FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 WORKDIR /src
 
 # Copiar arquivos de projeto primeiro (cache de camadas Docker)
@@ -22,14 +22,14 @@ COPY ["src/Recruiva.Web/", "Recruiva.Web/"]
 
 # Publish diretamente (inclui build)
 WORKDIR "/src/Recruiva.Web"
-RUN mkdir -p bin/Release/net9.0/pt-br /app/publish/pt-br
+RUN mkdir -p bin/Release/net10.0/pt-br /app/publish/pt-br
 RUN dotnet publish "Recruiva.Web.csproj" -c Release -o /app/publish \
     /p:UseAppHost=false
 
 # ============================================================
 # Stage 2: Runtime
 # ============================================================
-FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS runtime
+FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS runtime
 WORKDIR /app
 
 # Criar diretório para uploads

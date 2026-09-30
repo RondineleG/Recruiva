@@ -7,7 +7,7 @@ on:
     branches: [ main, develop ]
 
 env:
-  DOTNET_VERSION: '9.0.x'
+  DOTNET_VERSION: '10.0.x'
   AZURE_WEBAPP_NAME: 'recruiva-webapp'
 
 jobs:
@@ -29,9 +29,8 @@ jobs:
     - name: Build project
       run: dotnet build --configuration Release --no-restore
       
-    - name: Run tests (if any)
-      run: dotnet test --configuration Release --no-build --verbosity normal --collect:"XPlat Code Coverage" --settings coverlet.runsettings
-      continue-on-error: true
+    - name: Run tests
+      run: dotnet test --configuration Release --no-build --verbosity normal --collect:"XPlat Code Coverage" --settings tests/coverlet.runsettings
       
     - name: Generate code coverage report
       run: |
@@ -72,7 +71,7 @@ jobs:
         
     - name: Check for secrets
       run: |
-        if git log --all --full-history -S "password" --source --all; then
+        if [ -n "$(git log --all --full-history -S "password" --oneline)" ]; then
           echo "Potential secrets found in git history"
           exit 1
         fi
