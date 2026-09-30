@@ -25,7 +25,7 @@ public class TenantConfigRepository : IBaseRepository<TenantConfig>
 
     public async Task<RequestResult<TenantConfig>> DeleteAsync(Id id)
     {
-        var tenantConfig = await _context.TenantConfigs.FindAsync(id.Value);
+        var tenantConfig = await _context.TenantConfigs.FindAsync(id);
         if (tenantConfig == null)
             return RequestResult<TenantConfig>.EntityNotFound("TenantConfig", id.Value, "Configuração de tenant não encontrada.");
 

@@ -25,7 +25,7 @@ public class CandidateRepository : IBaseRepository<Candidate>
 
     public async Task<RequestResult<Candidate>> DeleteAsync(Id id)
     {
-        var candidate = await _context.Candidates.FindAsync(id.Value);
+        var candidate = await _context.Candidates.FindAsync(id);
         if (candidate == null)
             return RequestResult<Candidate>.EntityNotFound("Candidate", id.Value, "Candidato não encontrado.");
 

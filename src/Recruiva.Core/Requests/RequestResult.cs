@@ -60,7 +60,7 @@ public class RequestResult : IRequestValidations, IRequestError, IRequestEntityW
 
     public static RequestResult WithError(string message)
     {
-        return new RequestResult { Status = EResultStatus.HasError, RequestError = new RequestError(message) };
+        return new RequestResult { Status = EResultStatus.HasError, Message = message, RequestError = new RequestError(message) };
     }
 
     public static RequestResult WithError(Exception exception)
@@ -70,17 +70,18 @@ public class RequestResult : IRequestValidations, IRequestError, IRequestEntityW
 
     public static RequestResult WithError(List<string> generalErrors)
     {
-        return new RequestResult { Status = EResultStatus.HasError, _generalErrors = generalErrors };
+        return new RequestResult { Status = EResultStatus.HasError, Message = string.Join("; ", generalErrors), _generalErrors = generalErrors };
     }
 
     public static RequestResult WithError(Dictionary<string, List<string>> entityErrors)
     {
-        return new RequestResult { Status = EResultStatus.EntityHasError, _entityErrors = entityErrors };
+        var message = string.Join("; ", entityErrors.SelectMany(error => error.Value.Select(value => $"{error.Key}: {value}")));
+        return new RequestResult { Status = EResultStatus.EntityHasError, Message = message, _entityErrors = entityErrors };
     }
 
     public static RequestResult WithError(RequestError error)
     {
-        return new RequestResult { Status = EResultStatus.HasError, RequestError = error };
+        return new RequestResult { Status = EResultStatus.HasError, Message = error.Description, RequestError = error };
     }
 
     public static RequestResult WithNoContent()
@@ -232,7 +233,7 @@ public class RequestResult<T> : RequestResult, IRequestCustomResult<T>
 
     public new static RequestResult<T> WithError(string message)
     {
-        return new RequestResult<T> { Status = EResultStatus.HasError, RequestError = new RequestError(message) };
+        return new RequestResult<T> { Status = EResultStatus.HasError, Message = message, RequestError = new RequestError(message) };
     }
 
     public new static RequestResult<T> WithError(Exception exception)
@@ -242,17 +243,18 @@ public class RequestResult<T> : RequestResult, IRequestCustomResult<T>
 
     public new static RequestResult<T> WithError(List<string> generalErrors)
     {
-        return new RequestResult<T> { Status = EResultStatus.HasError, _generalErrors = generalErrors };
+        return new RequestResult<T> { Status = EResultStatus.HasError, Message = string.Join("; ", generalErrors), _generalErrors = generalErrors };
     }
 
     public new static RequestResult<T> WithError(Dictionary<string, List<string>> entityErrors)
     {
-        return new RequestResult<T> { Status = EResultStatus.EntityHasError, _entityErrors = entityErrors };
+        var message = string.Join("; ", entityErrors.SelectMany(error => error.Value.Select(value => $"{error.Key}: {value}")));
+        return new RequestResult<T> { Status = EResultStatus.EntityHasError, Message = message, _entityErrors = entityErrors };
     }
 
     public new static RequestResult<T> WithError(RequestError error)
     {
-        return new RequestResult<T> { Status = EResultStatus.HasError, RequestError = error };
+        return new RequestResult<T> { Status = EResultStatus.HasError, Message = error.Description, RequestError = error };
     }
 
     public new static RequestResult<T> WithNoContent()

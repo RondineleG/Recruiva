@@ -10,11 +10,11 @@ public class Candidate : BaseEntity
 {
     public Address? Address { get; set; }
 
-    public Id AddressId { get; set; } = Id.Empty;
+    public Id? AddressId { get; set; }
 
     public virtual ICollection<Application> Applications { get; set; } = [];
 
-    public DateTime DateOfBirth { get; set; }
+    public DateTime? DateOfBirth { get; set; }
 
     [Required, EmailAddress]
     public string Email { get; set; } = string.Empty;

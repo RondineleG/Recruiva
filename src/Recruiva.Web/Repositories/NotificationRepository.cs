@@ -25,7 +25,7 @@ public class NotificationRepository : IBaseRepository<Notification>
 
     public async Task<RequestResult<Notification>> DeleteAsync(Id id)
     {
-        var notification = await _context.Notifications.FindAsync(id.Value);
+        var notification = await _context.Notifications.FindAsync(id);
         if (notification == null)
             return RequestResult<Notification>.EntityNotFound("Notification", id.Value, "Notificação não encontrada.");
 

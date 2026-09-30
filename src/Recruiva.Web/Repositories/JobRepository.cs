@@ -27,7 +27,7 @@ public class JobRepository : IJobRepository
 
     public async Task<RequestResult<Job>> DeleteAsync(Id id)
     {
-        var job = await _context.Jobs.FindAsync(id.Value);
+        var job = await _context.Jobs.FindAsync(id);
         if (job == null)
             return RequestResult<Job>.EntityNotFound("Job", id.Value, "Vaga não encontrada.");
 
@@ -114,7 +114,8 @@ public class JobRepository : IJobRepository
         // Filtro por advertiserId (para MyJobs)
         if (advertiserId.HasValue)
         {
-            query = query.Where(j => j.AdvertiserId.Value == advertiserId.Value);
+            var advertiserKey = Id.Create(advertiserId.Value);
+            query = query.Where(j => j.AdvertiserId == advertiserKey);
         }
 
         // Filtro por busca textual (aplicado no WHERE do SQL)

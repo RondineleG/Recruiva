@@ -44,9 +44,9 @@ public sealed class ListAdvertisersUseCase : IUseCase<ListAdvertisersRequest, Li
         if (!string.IsNullOrWhiteSpace(request.SearchTerm))
         {
             var term = request.SearchTerm.ToLower();
-            if (!advertiser.Name.ToLower().Contains(term) &&
-                !advertiser.Email.ToLower().Contains(term) &&
-                !advertiser.TaxId.ToLower().Contains(term))
+            if (!advertiser.Name.Contains(term, StringComparison.OrdinalIgnoreCase) &&
+                !advertiser.Email.Contains(term, StringComparison.OrdinalIgnoreCase) &&
+                !(advertiser.TaxId?.Contains(term, StringComparison.OrdinalIgnoreCase) ?? false))
             {
                 return false;
             }

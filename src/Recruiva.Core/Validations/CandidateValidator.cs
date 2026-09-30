@@ -34,14 +34,10 @@ public class CandidateValidator : IEntityValidator<Candidate>
             result.AddError("Email em formato inválido.", "Email");
 
         // Validar data de nascimento (maior de 14 anos)
-        if (entity.DateOfBirth == default)
+        if (!entity.DateOfBirth.HasValue)
             result.AddError("Data de nascimento é obrigatória.", "DateOfBirth");
-        else
-        {
-            var age = CalculateAge(entity.DateOfBirth);
-            if (age < 14)
-                result.AddError("Candidato deve ter pelo menos 14 anos.", "DateOfBirth");
-        }
+        else if (CalculateAge(entity.DateOfBirth.Value) < 14)
+            result.AddError("Candidato deve ter pelo menos 14 anos.", "DateOfBirth");
 
         // Validar telefone se informado (max 25 chars)
         if (!string.IsNullOrEmpty(entity.Phone) && entity.Phone.Length > 25)

@@ -6,7 +6,6 @@ using Recruiva.Core.Interfaces.Repositories.Base;
 using Recruiva.Core.Interfaces.Storage;
 using Recruiva.Core.Interfaces.UseCases;
 using Recruiva.Core.Interfaces.Validations;
-using Recruiva.Core.Messaging;
 using Recruiva.Core.UseCases.Jobs;
 using Recruiva.Core.UseCases.Applications;
 using Recruiva.Core.UseCases.Candidates;
@@ -84,27 +83,16 @@ builder.Services.AddIdentityCore<ApplicationUser>(options =>
     options.Password.RequiredLength = 6;
 })
 .AddRoles<IdentityRole<Guid>>()
-.AddEntityFrameworkStores<ApplicationDbContext>();
+.AddEntityFrameworkStores<ApplicationDbContext>()
+.AddSignInManager()
+.AddDefaultTokenProviders()
+.AddClaimsPrincipalFactory<ApplicationUserClaimsPrincipalFactory>();
 
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
 // Registrar EmailSender (SendGrid com fallback para NoOp em desenvolvimento)
 builder.Services.AddScoped<Recruiva.Core.Interfaces.Services.IEmailSender, Recruiva.Web.Services.SendGridEmailSender>();
-
-// Configurar RabbitMQ
-var rabbitMQConfig = new RabbitMQConfiguration(
-    HostName: builder.Configuration["RabbitMQ:HostName"] ?? "localhost",
-    Port: int.Parse(builder.Configuration["RabbitMQ:Port"] ?? "5672"),
-    UserName: builder.Configuration["RabbitMQ:UserName"] ?? "guest",
-    Password: builder.Configuration["RabbitMQ:Password"] ?? "guest",
-    VirtualHost: builder.Configuration["RabbitMQ:VirtualHost"] ?? "/",
-    RequestedHeartbeat: int.Parse(builder.Configuration["RabbitMQ:RequestedHeartbeat"] ?? "30"),
-    AutomaticRecoveryEnabled: bool.Parse(builder.Configuration["RabbitMQ:AutomaticRecoveryEnabled"] ?? "true"),
-    NetworkRecoveryInterval: int.Parse(builder.Configuration["RabbitMQ:NetworkRecoveryInterval"] ?? "5000")
-);
-
-builder.Services.AddSingleton(rabbitMQConfig);
-builder.Services.AddSingleton<IRabbitMQBus, RabbitMQBus>();
+builder.Services.AddScoped<Microsoft.AspNetCore.Identity.IEmailSender<ApplicationUser>, IdentityEmailSender>();
 
 // Registrar Repositórios
 builder.Services.AddScoped<IJobRepository, JobRepository>();
@@ -193,7 +181,9 @@ builder.Services.AddScoped<UploadFileUseCase>();
 
 // Registrar CurrentUserHelper
 builder.Services.AddHttpContextAccessor();
-builder.Services.AddScoped<ICurrentUserHelper, CurrentUserHelper>();
+builder.Services.AddScoped<CurrentUserHelper>();
+builder.Services.AddScoped<ICurrentUserHelper>(services =>
+    services.GetRequiredService<CurrentUserHelper>());
 
 // Registrar UseCase de Analytics
 builder.Services.AddScoped<Recruiva.Web.UseCases.Analytics.GetDashboardAnalyticsUseCase>();
@@ -223,11 +213,17 @@ else
 }
 
 app.UseHttpsRedirection();
+app.UseRequestLocalization(new RequestLocalizationOptions()
+    .SetDefaultCulture("pt-BR")
+    .AddSupportedCultures("pt-BR")
+    .AddSupportedUICultures("pt-BR"));
 app.UseRateLimit(100); // 100 requests per second
 app.UseSecurityHeaders();
+app.UseStatusCodePagesWithReExecute("/404");
 app.UseStaticFiles();
 app.UseAntiforgery();
 
+app.MapStaticAssets();
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode()
     .AddInteractiveWebAssemblyRenderMode()
@@ -244,6 +240,8 @@ if (app.Environment.IsDevelopment())
     using var scope = app.Services.CreateScope();
     var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
     await SeedData.InitializeAsync(context);
+    var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
+    await DevelopmentIdentitySeedData.InitializeAsync(userManager);
 }
 
 Log.Information("Aplicação Recruiva iniciada com sucesso");

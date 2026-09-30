@@ -25,7 +25,7 @@ public class ResumeRepository : IBaseRepository<Resume>
 
     public async Task<RequestResult<Resume>> DeleteAsync(Id id)
     {
-        var resume = await _context.Resumes.FindAsync(id.Value);
+        var resume = await _context.Resumes.FindAsync(id);
         if (resume == null)
             return RequestResult<Resume>.EntityNotFound("Resume", id.Value, "Currículo não encontrado.");
 

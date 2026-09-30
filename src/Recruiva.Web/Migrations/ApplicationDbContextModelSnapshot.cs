@@ -17,7 +17,7 @@ namespace Recruiva.Web.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "9.0.7")
+                .HasAnnotation("ProductVersion", "10.0.12")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -167,7 +167,7 @@ namespace Recruiva.Web.Migrations
                     b.ToTable("UserTokens", "Identity");
                 });
 
-            modelBuilder.Entity("Recruiva.Web.Entities.Address", b =>
+            modelBuilder.Entity("Recruiva.Core.Entities.Address", b =>
                 {
                     b.Property<Guid>("Id")
                         .HasMaxLength(36)
@@ -250,7 +250,7 @@ namespace Recruiva.Web.Migrations
                     b.ToTable("Addresses", (string)null);
                 });
 
-            modelBuilder.Entity("Recruiva.Web.Entities.Advertiser", b =>
+            modelBuilder.Entity("Recruiva.Core.Entities.Advertiser", b =>
                 {
                     b.Property<Guid>("Id")
                         .HasMaxLength(36)
@@ -259,7 +259,7 @@ namespace Recruiva.Web.Migrations
                     b.Property<string>("ActivePlan")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid>("AddressId")
+                    b.Property<Guid?>("AddressId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("CompanyDescription")
@@ -309,7 +309,6 @@ namespace Recruiva.Web.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("Phone")
-                        .IsRequired()
                         .HasMaxLength(25)
                         .HasColumnType("nvarchar(25)");
 
@@ -319,7 +318,6 @@ namespace Recruiva.Web.Migrations
                         .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("TaxId")
-                        .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
@@ -342,7 +340,8 @@ namespace Recruiva.Web.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("AddressId")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasFilter("[AddressId] IS NOT NULL");
 
                     b.HasIndex("Email")
                         .IsUnique()
@@ -353,7 +352,8 @@ namespace Recruiva.Web.Migrations
 
                     b.HasIndex("TaxId")
                         .IsUnique()
-                        .HasDatabaseName("IX_Advertisers_TaxId");
+                        .HasDatabaseName("IX_Advertisers_TaxId")
+                        .HasFilter("[TaxId] IS NOT NULL");
 
                     b.HasIndex("TenantId", "Id")
                         .IsUnique();
@@ -361,7 +361,7 @@ namespace Recruiva.Web.Migrations
                     b.ToTable("Advertisers", (string)null);
                 });
 
-            modelBuilder.Entity("Recruiva.Web.Entities.Application", b =>
+            modelBuilder.Entity("Recruiva.Core.Entities.Application", b =>
                 {
                     b.Property<Guid>("Id")
                         .HasMaxLength(36)
@@ -451,7 +451,7 @@ namespace Recruiva.Web.Migrations
                     b.ToTable("Applications", (string)null);
                 });
 
-            modelBuilder.Entity("Recruiva.Web.Entities.ApplicationStatusHistory", b =>
+            modelBuilder.Entity("Recruiva.Core.Entities.ApplicationStatusHistory", b =>
                 {
                     b.Property<Guid>("Id")
                         .HasMaxLength(36)
@@ -523,13 +523,13 @@ namespace Recruiva.Web.Migrations
                     b.ToTable("ApplicationStatusHistory", (string)null);
                 });
 
-            modelBuilder.Entity("Recruiva.Web.Entities.Candidate", b =>
+            modelBuilder.Entity("Recruiva.Core.Entities.Candidate", b =>
                 {
                     b.Property<Guid>("Id")
                         .HasMaxLength(36)
                         .HasColumnType("UNIQUEIDENTIFIER");
 
-                    b.Property<Guid>("AddressId")
+                    b.Property<Guid?>("AddressId")
                         .HasColumnType("UNIQUEIDENTIFIER");
 
                     b.Property<DateTime>("CreatedAt")
@@ -540,7 +540,7 @@ namespace Recruiva.Web.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
-                    b.Property<DateTime>("DateOfBirth")
+                    b.Property<DateTime?>("DateOfBirth")
                         .HasColumnType("date");
 
                     b.Property<DateTime?>("DeletedAt")
@@ -600,7 +600,8 @@ namespace Recruiva.Web.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("AddressId")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasFilter("[AddressId] IS NOT NULL");
 
                     b.HasIndex("Email")
                         .IsUnique()
@@ -621,7 +622,7 @@ namespace Recruiva.Web.Migrations
                     b.ToTable("Candidates", (string)null);
                 });
 
-            modelBuilder.Entity("Recruiva.Web.Entities.Job", b =>
+            modelBuilder.Entity("Recruiva.Core.Entities.Job", b =>
                 {
                     b.Property<Guid>("Id")
                         .HasMaxLength(36)
@@ -629,6 +630,10 @@ namespace Recruiva.Web.Migrations
 
                     b.Property<Guid>("AdvertiserId")
                         .HasColumnType("UNIQUEIDENTIFIER");
+
+                    b.Property<string>("ApplicationInstructions")
+                        .HasMaxLength(2000)
+                        .HasColumnType("nvarchar(2000)");
 
                     b.Property<string>("Benefits")
                         .HasMaxLength(2000)
@@ -666,6 +671,15 @@ namespace Recruiva.Web.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bit")
                         .HasDefaultValue(false);
+
+                    b.Property<int>("NumberOfOpenings")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(1);
+
+                    b.Property<string>("Observations")
+                        .HasMaxLength(2000)
+                        .HasColumnType("nvarchar(2000)");
 
                     b.Property<string>("Requirements")
                         .HasMaxLength(2000)
@@ -722,7 +736,7 @@ namespace Recruiva.Web.Migrations
                     b.ToTable("Jobs", (string)null);
                 });
 
-            modelBuilder.Entity("Recruiva.Web.Entities.Notification", b =>
+            modelBuilder.Entity("Recruiva.Core.Entities.Notification", b =>
                 {
                     b.Property<Guid>("Id")
                         .HasMaxLength(36)
@@ -803,7 +817,7 @@ namespace Recruiva.Web.Migrations
                     b.ToTable("Notifications", (string)null);
                 });
 
-            modelBuilder.Entity("Recruiva.Web.Entities.Resume", b =>
+            modelBuilder.Entity("Recruiva.Core.Entities.Resume", b =>
                 {
                     b.Property<Guid>("Id")
                         .HasMaxLength(36)
@@ -874,7 +888,7 @@ namespace Recruiva.Web.Migrations
                     b.ToTable("Resumes", (string)null);
                 });
 
-            modelBuilder.Entity("Recruiva.Web.Entities.ResumeSkill", b =>
+            modelBuilder.Entity("Recruiva.Core.Entities.ResumeSkill", b =>
                 {
                     b.Property<Guid>("Id")
                         .HasMaxLength(36)
@@ -947,7 +961,183 @@ namespace Recruiva.Web.Migrations
                     b.ToTable("ResumeSkills", (string)null);
                 });
 
-            modelBuilder.Entity("Recruiva.Web.Entities.TenantConfig", b =>
+            modelBuilder.Entity("Recruiva.Core.Entities.Subscription", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasMaxLength(36)
+                        .HasColumnType("UNIQUEIDENTIFIER");
+
+                    b.Property<Guid>("AdvertiserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("CancellationReason")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("DeletedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<DateTime?>("EndDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
+
+                    b.Property<string>("PaymentId")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<Guid>("PlanId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("StartDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("TenantId")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UpdatedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AdvertiserId")
+                        .HasDatabaseName("IX_Subscriptions_AdvertiserId");
+
+                    b.HasIndex("PlanId")
+                        .HasDatabaseName("IX_Subscriptions_PlanId");
+
+                    b.HasIndex("Status")
+                        .HasDatabaseName("IX_Subscriptions_Status");
+
+                    b.HasIndex("AdvertiserId", "Status")
+                        .HasDatabaseName("IX_Subscriptions_AdvertiserId_Status");
+
+                    b.HasIndex("TenantId", "Id")
+                        .IsUnique();
+
+                    b.ToTable("Subscriptions", (string)null);
+                });
+
+            modelBuilder.Entity("Recruiva.Core.Entities.SubscriptionPlan", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasMaxLength(36)
+                        .HasColumnType("UNIQUEIDENTIFIER");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("DeletedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<bool>("HasAnalytics")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("HasBoost")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("HasHighlight")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsActive")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(true);
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
+
+                    b.Property<int>("MaxJobs")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(0);
+
+                    b.Property<int>("MaxResumes")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<decimal>("Price")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("decimal(18,2)")
+                        .HasDefaultValue(0m);
+
+                    b.Property<string>("TenantId")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UpdatedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("IsActive")
+                        .HasDatabaseName("IX_SubscriptionPlans_IsActive");
+
+                    b.HasIndex("Name")
+                        .HasDatabaseName("IX_SubscriptionPlans_Name");
+
+                    b.HasIndex("TenantId", "Id")
+                        .IsUnique();
+
+                    b.ToTable("SubscriptionPlans", (string)null);
+                });
+
+            modelBuilder.Entity("Recruiva.Core.Entities.TenantConfig", b =>
                 {
                     b.Property<Guid>("Id")
                         .HasMaxLength(36)
@@ -1183,26 +1373,25 @@ namespace Recruiva.Web.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Recruiva.Web.Entities.Advertiser", b =>
+            modelBuilder.Entity("Recruiva.Core.Entities.Advertiser", b =>
                 {
-                    b.HasOne("Recruiva.Web.Entities.Address", "Address")
+                    b.HasOne("Recruiva.Core.Entities.Address", "Address")
                         .WithOne()
-                        .HasForeignKey("Recruiva.Web.Entities.Advertiser", "AddressId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .HasForeignKey("Recruiva.Core.Entities.Advertiser", "AddressId")
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("Address");
                 });
 
-            modelBuilder.Entity("Recruiva.Web.Entities.Application", b =>
+            modelBuilder.Entity("Recruiva.Core.Entities.Application", b =>
                 {
-                    b.HasOne("Recruiva.Web.Entities.Candidate", "Candidate")
+                    b.HasOne("Recruiva.Core.Entities.Candidate", "Candidate")
                         .WithMany("Applications")
                         .HasForeignKey("CandidateId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Recruiva.Web.Entities.Job", "Job")
+                    b.HasOne("Recruiva.Core.Entities.Job", "Job")
                         .WithMany("Applications")
                         .HasForeignKey("JobId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -1213,9 +1402,9 @@ namespace Recruiva.Web.Migrations
                     b.Navigation("Job");
                 });
 
-            modelBuilder.Entity("Recruiva.Web.Entities.ApplicationStatusHistory", b =>
+            modelBuilder.Entity("Recruiva.Core.Entities.ApplicationStatusHistory", b =>
                 {
-                    b.HasOne("Recruiva.Web.Entities.Application", "Application")
+                    b.HasOne("Recruiva.Core.Entities.Application", "Application")
                         .WithMany("StatusHistory")
                         .HasForeignKey("ApplicationId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -1224,26 +1413,25 @@ namespace Recruiva.Web.Migrations
                     b.Navigation("Application");
                 });
 
-            modelBuilder.Entity("Recruiva.Web.Entities.Candidate", b =>
+            modelBuilder.Entity("Recruiva.Core.Entities.Candidate", b =>
                 {
-                    b.HasOne("Recruiva.Web.Entities.Address", "Address")
+                    b.HasOne("Recruiva.Core.Entities.Address", "Address")
                         .WithOne()
-                        .HasForeignKey("Recruiva.Web.Entities.Candidate", "AddressId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .HasForeignKey("Recruiva.Core.Entities.Candidate", "AddressId")
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("Address");
                 });
 
-            modelBuilder.Entity("Recruiva.Web.Entities.Job", b =>
+            modelBuilder.Entity("Recruiva.Core.Entities.Job", b =>
                 {
-                    b.HasOne("Recruiva.Web.Entities.Advertiser", "Advertiser")
+                    b.HasOne("Recruiva.Core.Entities.Advertiser", "Advertiser")
                         .WithMany("Jobs")
                         .HasForeignKey("AdvertiserId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.OwnsOne("Recruiva.Web.Entities.JobBoost", "Boost", b1 =>
+                    b.OwnsOne("Recruiva.Core.Entities.JobBoost", "Boost", b1 =>
                         {
                             b1.Property<Guid>("JobId")
                                 .HasColumnType("UNIQUEIDENTIFIER");
@@ -1269,13 +1457,13 @@ namespace Recruiva.Web.Migrations
 
                             b1.HasKey("JobId");
 
-                            b1.ToTable("Jobs", (string)null);
+                            b1.ToTable("Jobs");
 
                             b1.WithOwner()
                                 .HasForeignKey("JobId");
                         });
 
-                    b.OwnsOne("Recruiva.Web.Entities.JobCounters", "Counters", b1 =>
+                    b.OwnsOne("Recruiva.Core.Entities.JobCounters", "Counters", b1 =>
                         {
                             b1.Property<Guid>("JobId")
                                 .HasColumnType("UNIQUEIDENTIFIER");
@@ -1306,13 +1494,13 @@ namespace Recruiva.Web.Migrations
 
                             b1.HasKey("JobId");
 
-                            b1.ToTable("Jobs", (string)null);
+                            b1.ToTable("Jobs");
 
                             b1.WithOwner()
                                 .HasForeignKey("JobId");
                         });
 
-                    b.OwnsOne("Recruiva.Web.Entities.JobHighlight", "Highlight", b1 =>
+                    b.OwnsOne("Recruiva.Core.Entities.JobHighlight", "Highlight", b1 =>
                         {
                             b1.Property<Guid>("JobId")
                                 .HasColumnType("UNIQUEIDENTIFIER");
@@ -1333,13 +1521,13 @@ namespace Recruiva.Web.Migrations
 
                             b1.HasKey("JobId");
 
-                            b1.ToTable("Jobs", (string)null);
+                            b1.ToTable("Jobs");
 
                             b1.WithOwner()
                                 .HasForeignKey("JobId");
                         });
 
-                    b.OwnsOne("Recruiva.Web.Entities.JobLocation", "Location", b1 =>
+                    b.OwnsOne("Recruiva.Core.Entities.JobLocation", "Location", b1 =>
                         {
                             b1.Property<Guid>("JobId")
                                 .HasColumnType("UNIQUEIDENTIFIER");
@@ -1385,13 +1573,13 @@ namespace Recruiva.Web.Migrations
 
                             b1.HasKey("JobId");
 
-                            b1.ToTable("Jobs", (string)null);
+                            b1.ToTable("Jobs");
 
                             b1.WithOwner()
                                 .HasForeignKey("JobId");
                         });
 
-                    b.OwnsOne("Recruiva.Web.Entities.ModerationInfo", "Moderation", b1 =>
+                    b.OwnsOne("Recruiva.Core.Entities.ModerationInfo", "Moderation", b1 =>
                         {
                             b1.Property<Guid>("JobId")
                                 .HasColumnType("UNIQUEIDENTIFIER");
@@ -1420,13 +1608,13 @@ namespace Recruiva.Web.Migrations
 
                             b1.HasKey("JobId");
 
-                            b1.ToTable("Jobs", (string)null);
+                            b1.ToTable("Jobs");
 
                             b1.WithOwner()
                                 .HasForeignKey("JobId");
                         });
 
-                    b.OwnsOne("Recruiva.Web.Entities.SalaryRange", "Salary", b1 =>
+                    b.OwnsOne("Recruiva.Core.Entities.SalaryRange", "Salary", b1 =>
                         {
                             b1.Property<Guid>("JobId")
                                 .HasColumnType("UNIQUEIDENTIFIER");
@@ -1455,7 +1643,7 @@ namespace Recruiva.Web.Migrations
 
                             b1.HasKey("JobId");
 
-                            b1.ToTable("Jobs", (string)null);
+                            b1.ToTable("Jobs");
 
                             b1.WithOwner()
                                 .HasForeignKey("JobId");
@@ -1477,15 +1665,92 @@ namespace Recruiva.Web.Migrations
                     b.Navigation("Salary");
                 });
 
-            modelBuilder.Entity("Recruiva.Web.Entities.Resume", b =>
+            modelBuilder.Entity("Recruiva.Core.Entities.Resume", b =>
                 {
-                    b.HasOne("Recruiva.Web.Entities.Candidate", "Candidate")
+                    b.HasOne("Recruiva.Core.Entities.Candidate", "Candidate")
                         .WithMany("Resumes")
                         .HasForeignKey("CandidateId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.OwnsMany("Recruiva.Web.Enums.Education", "EducationHistory", b1 =>
+                    b.OwnsMany("Recruiva.Core.Entities.Experience", "ExperienceHistory", b1 =>
+                        {
+                            b1.Property<int>("Id")
+                                .ValueGeneratedOnAdd()
+                                .HasColumnType("int");
+
+                            SqlServerPropertyBuilderExtensions.UseIdentityColumn(b1.Property<int>("Id"));
+
+                            b1.Property<string>("Company")
+                                .IsRequired()
+                                .HasMaxLength(150)
+                                .HasColumnType("nvarchar(150)");
+
+                            b1.Property<string>("Description")
+                                .HasMaxLength(2000)
+                                .HasColumnType("nvarchar(2000)");
+
+                            b1.Property<DateTime?>("EndDate")
+                                .HasColumnType("datetime2");
+
+                            b1.Property<bool>("IsCurrent")
+                                .ValueGeneratedOnAdd()
+                                .HasColumnType("bit")
+                                .HasDefaultValue(false);
+
+                            b1.Property<string>("Position")
+                                .IsRequired()
+                                .HasMaxLength(150)
+                                .HasColumnType("nvarchar(150)");
+
+                            b1.Property<Guid>("ResumeId")
+                                .HasColumnType("UNIQUEIDENTIFIER");
+
+                            b1.Property<DateTime>("StartDate")
+                                .HasColumnType("datetime2");
+
+                            b1.HasKey("Id");
+
+                            b1.HasIndex("ResumeId");
+
+                            b1.ToTable("ExperienceHistory", (string)null);
+
+                            b1.WithOwner()
+                                .HasForeignKey("ResumeId");
+                        });
+
+                    b.OwnsMany("Recruiva.Core.Entities.Language", "Languages", b1 =>
+                        {
+                            b1.Property<int>("Id")
+                                .ValueGeneratedOnAdd()
+                                .HasColumnType("int");
+
+                            SqlServerPropertyBuilderExtensions.UseIdentityColumn(b1.Property<int>("Id"));
+
+                            b1.Property<string>("Level")
+                                .IsRequired()
+                                .HasMaxLength(50)
+                                .HasColumnType("nvarchar(50)");
+
+                            b1.Property<string>("Name")
+                                .IsRequired()
+                                .HasMaxLength(50)
+                                .HasColumnType("nvarchar(50)");
+
+                            b1.Property<Guid>("ResumeId")
+                                .HasColumnType("UNIQUEIDENTIFIER");
+
+                            b1.HasKey("Id");
+
+                            b1.HasIndex("ResumeId");
+
+                            b1.ToTable("Languages", (string)null);
+
+                            b1.WithOwner()
+                                .HasForeignKey("ResumeId");
+                        });
+
+                    b.OwnsMany("Recruiva.Core.Enums.Education", "EducationHistory", b1 =>
                         {
                             b1.Property<int>("Id")
                                 .ValueGeneratedOnAdd()
@@ -1532,83 +1797,6 @@ namespace Recruiva.Web.Migrations
                                 .HasForeignKey("ResumeId");
                         });
 
-                    b.OwnsMany("Recruiva.Web.Entities.Experience", "ExperienceHistory", b1 =>
-                        {
-                            b1.Property<int>("Id")
-                                .ValueGeneratedOnAdd()
-                                .HasColumnType("int");
-
-                            SqlServerPropertyBuilderExtensions.UseIdentityColumn(b1.Property<int>("Id"));
-
-                            b1.Property<string>("Company")
-                                .IsRequired()
-                                .HasMaxLength(150)
-                                .HasColumnType("nvarchar(150)");
-
-                            b1.Property<string>("Description")
-                                .HasMaxLength(2000)
-                                .HasColumnType("nvarchar(2000)");
-
-                            b1.Property<DateTime?>("EndDate")
-                                .HasColumnType("datetime2");
-
-                            b1.Property<bool>("IsCurrent")
-                                .ValueGeneratedOnAdd()
-                                .HasColumnType("bit")
-                                .HasDefaultValue(false);
-
-                            b1.Property<string>("Position")
-                                .IsRequired()
-                                .HasMaxLength(150)
-                                .HasColumnType("nvarchar(150)");
-
-                            b1.Property<Guid>("ResumeId")
-                                .HasColumnType("UNIQUEIDENTIFIER");
-
-                            b1.Property<DateTime>("StartDate")
-                                .HasColumnType("datetime2");
-
-                            b1.HasKey("Id");
-
-                            b1.HasIndex("ResumeId");
-
-                            b1.ToTable("ExperienceHistory", (string)null);
-
-                            b1.WithOwner()
-                                .HasForeignKey("ResumeId");
-                        });
-
-                    b.OwnsMany("Recruiva.Web.Entities.Language", "Languages", b1 =>
-                        {
-                            b1.Property<int>("Id")
-                                .ValueGeneratedOnAdd()
-                                .HasColumnType("int");
-
-                            SqlServerPropertyBuilderExtensions.UseIdentityColumn(b1.Property<int>("Id"));
-
-                            b1.Property<string>("Level")
-                                .IsRequired()
-                                .HasMaxLength(50)
-                                .HasColumnType("nvarchar(50)");
-
-                            b1.Property<string>("Name")
-                                .IsRequired()
-                                .HasMaxLength(50)
-                                .HasColumnType("nvarchar(50)");
-
-                            b1.Property<Guid>("ResumeId")
-                                .HasColumnType("UNIQUEIDENTIFIER");
-
-                            b1.HasKey("Id");
-
-                            b1.HasIndex("ResumeId");
-
-                            b1.ToTable("Languages", (string)null);
-
-                            b1.WithOwner()
-                                .HasForeignKey("ResumeId");
-                        });
-
                     b.Navigation("Candidate");
 
                     b.Navigation("EducationHistory");
@@ -1618,9 +1806,9 @@ namespace Recruiva.Web.Migrations
                     b.Navigation("Languages");
                 });
 
-            modelBuilder.Entity("Recruiva.Web.Entities.ResumeSkill", b =>
+            modelBuilder.Entity("Recruiva.Core.Entities.ResumeSkill", b =>
                 {
-                    b.HasOne("Recruiva.Web.Entities.Resume", "Resume")
+                    b.HasOne("Recruiva.Core.Entities.Resume", "Resume")
                         .WithMany("Skills")
                         .HasForeignKey("ResumeId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -1629,29 +1817,48 @@ namespace Recruiva.Web.Migrations
                     b.Navigation("Resume");
                 });
 
-            modelBuilder.Entity("Recruiva.Web.Entities.Advertiser", b =>
+            modelBuilder.Entity("Recruiva.Core.Entities.Subscription", b =>
+                {
+                    b.HasOne("Recruiva.Core.Entities.Advertiser", "Advertiser")
+                        .WithMany()
+                        .HasForeignKey("AdvertiserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Recruiva.Core.Entities.SubscriptionPlan", "Plan")
+                        .WithMany()
+                        .HasForeignKey("PlanId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Advertiser");
+
+                    b.Navigation("Plan");
+                });
+
+            modelBuilder.Entity("Recruiva.Core.Entities.Advertiser", b =>
                 {
                     b.Navigation("Jobs");
                 });
 
-            modelBuilder.Entity("Recruiva.Web.Entities.Application", b =>
+            modelBuilder.Entity("Recruiva.Core.Entities.Application", b =>
                 {
                     b.Navigation("StatusHistory");
                 });
 
-            modelBuilder.Entity("Recruiva.Web.Entities.Candidate", b =>
+            modelBuilder.Entity("Recruiva.Core.Entities.Candidate", b =>
                 {
                     b.Navigation("Applications");
 
                     b.Navigation("Resumes");
                 });
 
-            modelBuilder.Entity("Recruiva.Web.Entities.Job", b =>
+            modelBuilder.Entity("Recruiva.Core.Entities.Job", b =>
                 {
                     b.Navigation("Applications");
                 });
 
-            modelBuilder.Entity("Recruiva.Web.Entities.Resume", b =>
+            modelBuilder.Entity("Recruiva.Core.Entities.Resume", b =>
                 {
                     b.Navigation("Skills");
                 });

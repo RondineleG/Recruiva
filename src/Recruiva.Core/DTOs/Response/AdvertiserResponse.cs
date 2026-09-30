@@ -5,8 +5,8 @@ public class AdvertiserResponse
     public Guid Id { get; set; }
     public string Name { get; set; } = string.Empty;
     public string Email { get; set; } = string.Empty;
-    public string Phone { get; set; } = string.Empty;
-    public string TaxId { get; set; } = string.Empty;
+    public string? Phone { get; set; }
+    public string? TaxId { get; set; }
     public string PersonType { get; set; } = string.Empty;
     public string? CompanyDescription { get; set; }
     public string? Website { get; set; }

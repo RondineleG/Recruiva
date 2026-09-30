@@ -25,6 +25,7 @@ public class CreateAdvertiserUseCase : IUseCase<CreateAdvertiserRequest, Adverti
             Id = Id.Create(Guid.NewGuid()),
             Name = request.Name,
             Email = request.Email,
+            AddressId = request.AddressId.HasValue ? Id.Create(request.AddressId.Value) : null,
             Phone = request.Phone,
             TaxId = request.TaxId,
             PersonType = request.PersonType,

@@ -8,6 +8,9 @@ public class UpdateJobRequest
     public string? Requirements { get; set; }
     public string? Responsibilities { get; set; }
     public string? Benefits { get; set; }
+    public string? ApplicationInstructions { get; set; }
+    public int NumberOfOpenings { get; set; } = 1;
+    public string? Observations { get; set; }
     public string? Category { get; set; }
     public string? Tags { get; set; }
     public DateTime ExpirationDate { get; set; }

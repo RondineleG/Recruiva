@@ -39,6 +39,15 @@ public class JobConfiguration : IEntityTypeConfiguration<Job>
         builder.Property(j => j.Benefits)
             .HasMaxLength(2000);
 
+        builder.Property(j => j.ApplicationInstructions)
+            .HasMaxLength(2000);
+
+        builder.Property(j => j.NumberOfOpenings)
+            .HasDefaultValue(1);
+
+        builder.Property(j => j.Observations)
+            .HasMaxLength(2000);
+
         builder.Property(j => j.Category)
             .HasMaxLength(100);
 

@@ -124,7 +124,7 @@ public static class SeedData
             Status = EAdvertiserStatus.Active,
             IsEmailVerified = true,
             CompanyDescription = "Empresa especializada em soluções de tecnologia",
-            LogoUrl = "https://via.placeholder.com/150",
+            LogoUrl = null,
             Website = "https://techsolutions.com",
             ActivePlan = "Free"
         };
@@ -142,7 +142,7 @@ public static class SeedData
             Status = EAdvertiserStatus.Active,
             IsEmailVerified = true,
             CompanyDescription = "Agência de marketing digital",
-            LogoUrl = "https://via.placeholder.com/150",
+            LogoUrl = null,
             Website = "https://marketingdigital.com",
             ActivePlan = "Free"
         };

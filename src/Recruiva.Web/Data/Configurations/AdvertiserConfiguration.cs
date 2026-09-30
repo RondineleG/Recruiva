@@ -21,10 +21,6 @@ public class AdvertiserConfiguration : IEntityTypeConfiguration<Advertiser>
             .HasColumnType("uniqueidentifier");
 
         builder.Property(a => a.AddressId)
-            .HasConversion(
-                id => id.Value,
-                value => Id.Create(value)
-            )
             .HasColumnType("uniqueidentifier");
 
         builder.Property(a => a.Status)
@@ -40,11 +36,9 @@ public class AdvertiserConfiguration : IEntityTypeConfiguration<Advertiser>
             .HasMaxLength(100);
 
         builder.Property(a => a.Phone)
-            .IsRequired()
             .HasMaxLength(25);
 
         builder.Property(a => a.TaxId)
-            .IsRequired()
             .HasMaxLength(50);
 
         builder.HasIndex(a => a.Email)
@@ -53,6 +47,7 @@ public class AdvertiserConfiguration : IEntityTypeConfiguration<Advertiser>
 
         builder.HasIndex(a => a.TaxId)
             .IsUnique()
+            .HasFilter("[TaxId] IS NOT NULL")
             .HasDatabaseName("IX_Advertisers_TaxId");
 
         builder.HasIndex(a => a.Status)

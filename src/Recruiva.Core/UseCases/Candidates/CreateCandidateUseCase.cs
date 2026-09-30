@@ -25,6 +25,7 @@ public class CreateCandidateUseCase : IUseCase<CreateCandidateRequest, Candidate
             Id = Id.Create(Guid.NewGuid()),
             Name = request.Name,
             Email = request.Email,
+            AddressId = request.AddressId.HasValue ? Id.Create(request.AddressId.Value) : null,
             Phone = request.Phone,
             DateOfBirth = request.DateOfBirth,
             LinkedIn = request.LinkedIn,

@@ -25,6 +25,15 @@ public class JobValidator : IEntityValidator<Job>
         if (entity.ExpirationDate <= DateTime.UtcNow)
             result.AddError("Data de expiração deve ser futura.", "ExpirationDate");
 
+        if (entity.NumberOfOpenings < 1)
+            result.AddError("Informe ao menos uma vaga disponível.", "NumberOfOpenings");
+
+        if (!string.IsNullOrEmpty(entity.Observations) && entity.Observations.Length > 2000)
+            result.AddError("Observações devem ter no máximo 2000 caracteres.", "Observations");
+
+        if (!string.IsNullOrEmpty(entity.ApplicationInstructions) && entity.ApplicationInstructions.Length > 2000)
+            result.AddError("As instruções para candidatura devem ter no máximo 2000 caracteres.", "ApplicationInstructions");
+
         if (entity.Salary != null && entity.Salary.Min.HasValue && entity.Salary.Max.HasValue && entity.Salary.Min > entity.Salary.Max)
             result.AddError("Salário mínimo deve ser menor ou igual ao salário máximo.", "Salary");
 

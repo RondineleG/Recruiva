@@ -34,6 +34,9 @@ public class UpdateJobUseCase : IUseCase<UpdateJobRequest, JobResponse>
         existingJob.Requirements = request.Requirements;
         existingJob.Responsibilities = request.Responsibilities;
         existingJob.Benefits = request.Benefits;
+        existingJob.ApplicationInstructions = request.ApplicationInstructions;
+        existingJob.NumberOfOpenings = request.NumberOfOpenings;
+        existingJob.Observations = request.Observations;
         existingJob.Category = request.Category;
         existingJob.Tags = request.Tags;
         existingJob.ExpirationDate = request.ExpirationDate;
@@ -84,6 +87,9 @@ public class UpdateJobUseCase : IUseCase<UpdateJobRequest, JobResponse>
             Requirements = job.Requirements,
             Responsibilities = job.Responsibilities,
             Benefits = job.Benefits,
+            ApplicationInstructions = job.ApplicationInstructions,
+            NumberOfOpenings = job.NumberOfOpenings,
+            Observations = job.Observations,
             Category = job.Category,
             Tags = job.Tags,
             ExpirationDate = job.ExpirationDate,

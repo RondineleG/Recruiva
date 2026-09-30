@@ -26,7 +26,7 @@ public class SubscriptionPlanRepository : IBaseRepository<SubscriptionPlan>
 
     public async Task<RequestResult<SubscriptionPlan>> DeleteAsync(Id id)
     {
-        var plan = await _context.SubscriptionPlans.FindAsync(id.Value);
+        var plan = await _context.SubscriptionPlans.FindAsync(id);
         if (plan == null)
             return RequestResult<SubscriptionPlan>.EntityNotFound("SubscriptionPlan", id.Value, "Plano não encontrado.");
 

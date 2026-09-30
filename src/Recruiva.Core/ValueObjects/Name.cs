@@ -2,7 +2,7 @@ using Recruiva.Core.Converters;
 using Recruiva.Core.Exceptions;
 using Recruiva.Core.Validations;
 using Recruiva.Core.ValueObjects.Base;
-using Recruiva.Web.Resources.Core.ValueObjects;
+using Recruiva.Core.Resources.Core.ValueObjects;
 
 using System.Globalization;
 using System.Text.Json.Serialization;

@@ -18,14 +18,30 @@ public class ApplicationRepository : IBaseRepository<Application>
 
     public async Task<RequestResult<Application>> CreateAsync(Application entity)
     {
-        _context.Applications.Add(entity);
-        await _context.SaveChangesAsync();
-        return RequestResult<Application>.Success(entity);
+        var alreadyApplied = await _context.Applications
+            .AsNoTracking()
+            .AnyAsync(application => !application.IsDeleted &&
+                application.CandidateId == entity.CandidateId &&
+                application.JobId == entity.JobId);
+        if (alreadyApplied)
+            return RequestResult<Application>.WithError("Você já se candidatou a esta vaga.");
+
+        try
+        {
+            _context.Applications.Add(entity);
+            await _context.SaveChangesAsync();
+            return RequestResult<Application>.Success(entity);
+        }
+        catch (DbUpdateException)
+        {
+            _context.Entry(entity).State = EntityState.Detached;
+            return RequestResult<Application>.WithError("Não foi possível concluir sua candidatura. Você pode já ter se candidatado a esta vaga.");
+        }
     }
 
     public async Task<RequestResult<Application>> DeleteAsync(Id id)
     {
-        var application = await _context.Applications.FindAsync(id.Value);
+        var application = await _context.Applications.FindAsync(id);
         if (application == null)
             return RequestResult<Application>.EntityNotFound("Application", id.Value, "Candidatura não encontrada.");
 

@@ -29,6 +29,7 @@ public sealed class UpdateAdvertiserUseCase : IUseCase<UpdateAdvertiserRequest, 
 
         advertiser.Name = request.Name;
         advertiser.Phone = request.Phone;
+        advertiser.TaxId = request.TaxId;
         advertiser.CompanyDescription = request.CompanyDescription;
         advertiser.Website = request.Website;
         advertiser.LogoUrl = request.LogoUrl;

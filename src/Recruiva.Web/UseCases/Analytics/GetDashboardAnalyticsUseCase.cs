@@ -4,6 +4,7 @@ using Recruiva.Core.DTOs.Response;
 using Recruiva.Core.Entities;
 using Recruiva.Core.Enums;
 using Recruiva.Core.Requests;
+using Recruiva.Core.ValueObjects;
 
 namespace Recruiva.Web.UseCases.Analytics;
 
@@ -18,21 +19,32 @@ public class GetDashboardAnalyticsUseCase
 
     public async Task<RequestResult<DashboardAnalyticsResponse>> ExecuteAsync(Guid? advertiserId = null)
     {
+        if (!advertiserId.HasValue)
+            return RequestResult<DashboardAnalyticsResponse>.WithError("O painel de recrutamento exige um perfil de anunciante.");
+
         var response = new DashboardAnalyticsResponse();
-
-        // Total de candidatos
-        response.TotalCandidates = await _context.Candidates
-            .CountAsync(c => !c.IsDeleted);
-
-        // Total de anunciantes
-        response.TotalAdvertisers = await _context.Advertisers
-            .CountAsync(a => !a.IsDeleted);
+        var advertiserKey = Id.Create(advertiserId.Value);
 
         // Total de vagas e vagas ativas
         var allJobs = await _context.Jobs
+            .AsNoTracking()
             .Include(j => j.Advertiser)
-            .Where(j => !j.IsDeleted)
+            .Where(j => !j.IsDeleted && j.AdvertiserId == advertiserKey)
             .ToListAsync();
+        var jobIds = allJobs.Select(j => j.Id).ToList();
+
+        // Total de candidatos
+        response.TotalCandidates = await _context.Applications
+            .AsNoTracking()
+            .Where(a => !a.IsDeleted && jobIds.Contains(a.JobId))
+            .Select(a => a.CandidateId)
+            .Distinct()
+            .CountAsync();
+
+        // Total de anunciantes
+        response.TotalAdvertisers = await _context.Advertisers
+            .AsNoTracking()
+            .CountAsync(a => a.Id == advertiserKey && !a.IsDeleted);
 
         response.TotalJobs = allJobs.Count;
         response.ActiveJobs = allJobs.Count(j => j.Status == EJobStatus.Active);
@@ -44,9 +56,10 @@ public class GetDashboardAnalyticsUseCase
 
         // Total de candidaturas
         var allApplications = await _context.Applications
+            .AsNoTracking()
             .Include(a => a.Candidate)
             .Include(a => a.Job)
-            .Where(a => !a.IsDeleted)
+            .Where(a => !a.IsDeleted && jobIds.Contains(a.JobId))
             .ToListAsync();
 
         response.TotalApplications = allApplications.Count;
@@ -103,6 +116,9 @@ public class GetDashboardAnalyticsUseCase
             Requirements = job.Requirements,
             Responsibilities = job.Responsibilities,
             Benefits = job.Benefits,
+            ApplicationInstructions = job.ApplicationInstructions,
+            NumberOfOpenings = job.NumberOfOpenings,
+            Observations = job.Observations,
             Category = job.Category,
             Tags = job.Tags,
             ExpirationDate = job.ExpirationDate,

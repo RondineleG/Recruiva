@@ -26,7 +26,7 @@ public class SubscriptionRepository : IBaseRepository<Subscription>
 
     public async Task<RequestResult<Subscription>> DeleteAsync(Id id)
     {
-        var subscription = await _context.Subscriptions.FindAsync(id.Value);
+        var subscription = await _context.Subscriptions.FindAsync(id);
         if (subscription == null)
             return RequestResult<Subscription>.EntityNotFound("Subscription", id.Value, "Assinatura não encontrada.");
 

@@ -25,7 +25,7 @@ public class AdvertiserRepository : IBaseRepository<Advertiser>
 
     public async Task<RequestResult<Advertiser>> DeleteAsync(Id id)
     {
-        var advertiser = await _context.Advertisers.FindAsync(id.Value);
+        var advertiser = await _context.Advertisers.FindAsync(id);
         if (advertiser == null)
             return RequestResult<Advertiser>.EntityNotFound("Advertiser", id.Value, "Anunciante não encontrado.");
 

@@ -12,7 +12,7 @@ public class IdValueComparer : ValueComparer<Id>
     public IdValueComparer() : base(
         (l, r) => (l == null && r == null) || (l != null && r != null && l.Value == r.Value),
         id => id != null ? id.Value.GetHashCode() : 0,
-        id => id != null ? Id.Create(id.Value) : null!)
+        id => id!)
     {
     }
 }

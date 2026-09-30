@@ -12,7 +12,7 @@ public class Advertiser : BaseEntity
 
     public Address? Address { get; set; }
 
-    public Id AddressId { get; set; } = Id.Empty;
+    public Id? AddressId { get; set; }
 
     public string? CompanyDescription { get; set; }
 
@@ -33,13 +33,11 @@ public class Advertiser : BaseEntity
     [Required]
     public EPersonType PersonType { get; set; }
 
-    [Required]
-    public string Phone { get; set; } = string.Empty;
+    public string? Phone { get; set; }
 
     public EAdvertiserStatus Status { get; set; } = EAdvertiserStatus.Incomplete;
 
-    [Required]
-    public string TaxId { get; set; } = string.Empty;
+    public string? TaxId { get; set; }
 
     public string? Website { get; set; }
 }

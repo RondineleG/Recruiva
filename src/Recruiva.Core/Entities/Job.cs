@@ -15,6 +15,8 @@ public class Job : BaseEntity
 
     public virtual ICollection<Application> Applications { get; set; } = [];
 
+    public string? ApplicationInstructions { get; set; }
+
     public string? Benefits { get; set; }
 
     public JobBoost? Boost { get; set; }
@@ -33,6 +35,10 @@ public class Job : BaseEntity
     public JobLocation? Location { get; set; }
 
     public ModerationInfo? Moderation { get; set; }
+
+    public int NumberOfOpenings { get; set; } = 1;
+
+    public string? Observations { get; set; }
 
     public string? Requirements { get; set; }
 

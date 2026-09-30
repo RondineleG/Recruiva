@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Recruiva.Web.Resources.Core.Entities {
+namespace Recruiva.Core.Resources.Core.Entities {
     using System;
     
     
@@ -39,7 +39,7 @@ namespace Recruiva.Web.Resources.Core.Entities {
         public static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Recruiva.Web.Resources.Core.Entities.UserResources", typeof(UserResources).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Recruiva.Core.Resources.Core.Entities.UserResources", typeof(UserResources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
