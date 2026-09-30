@@ -1,4 +1,5 @@
 @page "/resumes/new"
+@rendermode InteractiveServer
 @using Recruiva.Core.DTOs.Request
 @using Recruiva.Core.Enums
 @using Recruiva.Core.UseCases.Resumes
@@ -8,15 +9,17 @@
 
 <PageTitle>Criar Currículo - Recruiva</PageTitle>
 
-<div class="container mt-4">
+<div class="container mt-4 page-form-shell resume-create-page">
+    <header class="page-heading">
+        <div class="page-heading__copy">
+            <span class="page-kicker">MINHA CARREIRA</span>
+            <h1>Criar currículo</h1>
+            <p>Comece com um resumo claro. Você pode completar as outras seções depois.</p>
+        </div>
+        <button class="btn btn-secondary" @onclick="Cancel">Cancelar</button>
+    </header>
     <div class="row">
         <div class="col-lg-8 mx-auto">
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <h1>📝 Criar Novo Currículo</h1>
-                <button class="btn btn-secondary" @onclick="Cancel">
-                    ← Cancelar
-                </button>
-            </div>
 
             @if (!string.IsNullOrEmpty(errorMessage))
             {
@@ -37,7 +40,7 @@
             }
             else
             {
-                <div class="card">
+                <div class="card page-form-card">
                     <div class="card-body">
                         <EditForm Model="model" OnValidSubmit="SubmitForm">
                             <DataAnnotationsValidator />
@@ -46,22 +49,22 @@
                             <h5 class="mb-3"><i class="bi bi-info-circle"></i> Informações Básicas</h5>
                             
                             <div class="mb-3">
-                                <label class="form-label">Título do Currículo *</label>
-                                <InputText class="form-control" @bind-Value="model.Title" 
+                                <label class="form-label" for="model.Title">Título do Currículo *</label>
+                                <InputText class="form-control" @bind-Value="model.Title" id="model.Title"
                                     placeholder="Ex: Desenvolvedor Full Stack Pleno" />
                                 <div class="form-text">Um título claro ajuda os recrutadores a entenderem seu perfil</div>
                             </div>
 
                             <div class="mb-3">
-                                <label class="form-label">Resumo Profissional</label>
-                                <InputTextArea class="form-control" @bind-Value="model.Summary" rows="4" 
+                                <label class="form-label" for="model.Summary">Resumo Profissional</label>
+                                <InputTextArea class="form-control" @bind-Value="model.Summary" id="model.Summary" rows="4"
                                     placeholder="Escreva um breve resumo sobre sua experiência e objetivos profissionais..." />
                                 <div class="form-text">Máximo 2000 caracteres</div>
                             </div>
 
                             <div class="mb-3 form-check">
-                                <InputCheckbox class="form-check-input" @bind-Value="model.IsActive" />
-                                <label class="form-check-label">
+                                <InputCheckbox class="form-check-input" @bind-Value="model.IsActive" id="model.IsActive" />
+                                <label class="form-check-label" for="model.IsActive">
                                     <strong>Definir como currículo ativo</strong>
                                     <br />
                                     <small class="text-muted">Este currículo será usado automaticamente nas candidaturas</small>
@@ -72,18 +75,18 @@
 
                             <!-- Próximas Seções -->
                             <div class="alert alert-info">
-                                <h5><i class="bi bi-info-circle"></i> Seções Adicionais</h5>
+                                <h5><i class="bi bi-info-circle"></i> Você poderá complementar depois</h5>
                                 <p class="mb-2">Após criar o currículo básico, você poderá adicionar:</p>
                                 <ul class="mb-0">
-                                    <li><strong>🎓 Formação Acadêmica</strong> - Sua educação e cursos</li>
-                                    <li><strong>💼 Experiência Profissional</strong> - Trabalhos anteriores</li>
-                                    <li><strong>🌍 Idiomas</strong> - Línguas que você domina</li>
-                                    <li><strong>⚙️ Habilidades</strong> - Suas competências técnicas</li>
+                                    <li><strong>Formação acadêmica</strong> — sua educação e cursos</li>
+                                    <li><strong>Experiência profissional</strong> — trabalhos anteriores</li>
+                                    <li><strong>Idiomas</strong> — línguas que você domina</li>
+                                    <li><strong>Habilidades</strong> — suas competências técnicas</li>
                                 </ul>
                             </div>
 
                             <div class="d-grid gap-2">
-                                <button type="submit" class="btn btn-success btn-lg" disabled="isSubmitting">
+                                <button type="submit" class="btn btn-success btn-lg" disabled="@isSubmitting" data-testid="resume-create-submit">
                                     @if (isSubmitting)
                                     {
                                         <span class="spinner-border spinner-border-sm me-2" role="status"></span>

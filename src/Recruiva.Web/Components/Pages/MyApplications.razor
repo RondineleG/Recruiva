@@ -1,22 +1,22 @@
 @page "/my-applications"
-@using Recruiva.Core.Enums
+@rendermode InteractiveServer
 
-<PageTitle>Minhas Candidaturas - Recruiva</PageTitle>
+<PageTitle>Minhas candidaturas - Recruiva</PageTitle>
 
-<div class="container mt-4">
-    <h1>📋 Minhas Candidaturas</h1>
-    
-    <div class="alert alert-info">
-        <i class="bi bi-info-circle"></i> 
-        Funcionalidade em desenvolvimento. Em breve você poderá acompanhar todas as suas candidaturas aqui.
-    </div>
+<div class="container my-applications-page">
+    <header class="page-heading">
+        <div class="page-heading__copy">
+            <span class="page-kicker">MINHA CARREIRA</span>
+            <h1>Minhas candidaturas</h1>
+            <p>Acompanhe as oportunidades para as quais você já se candidatou.</p>
+        </div>
+    </header>
 
-    <div class="text-center mt-5">
-        <i class="bi bi-send display-1 text-muted"></i>
-        <h3 class="mt-3">Nenhuma candidatura ainda</h3>
-        <p class="text-muted">Candidate-se a vagas para vê-las aqui!</p>
-        <a href="/jobs" class="btn btn-primary">
-            <i class="bi bi-search"></i> Buscar Vagas
-        </a>
-    </div>
+    <section class="empty-state" aria-labelledby="applications-empty-title">
+        <span class="empty-state__icon" aria-hidden="true">↗</span>
+        <span class="page-kicker">SUA PRÓXIMA OPORTUNIDADE</span>
+        <h2 id="applications-empty-title">Sua jornada começa com uma candidatura</h2>
+        <p>Quando você se candidatar, poderá acompanhar aqui as atualizações de cada processo seletivo.</p>
+        <a href="/jobs" class="btn btn-primary">Explorar vagas <span aria-hidden="true">↗</span></a>
+    </section>
 </div>

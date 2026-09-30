@@ -1,15 +1,22 @@
 @page "/profile/candidate"
+@rendermode InteractiveServer
+@using System.ComponentModel.DataAnnotations
 @attribute [Microsoft.AspNetCore.Authorization.Authorize]
 @inject Recruiva.Core.UseCases.Candidates.UpdateCandidateUseCase UpdateCandidateUseCase
 @inject Recruiva.Core.Interfaces.Repositories.Base.IBaseRepository<Recruiva.Core.Entities.Candidate> CandidateRepository
 @inject Recruiva.Web.Services.ICurrentUserHelper CurrentUserHelper
 @inject Microsoft.AspNetCore.Components.NavigationManager Navigation
-@inject Microsoft.AspNetCore.Components.Forms.EditContext EditContext
 
 <PageTitle>Meu Perfil - Recruiva</PageTitle>
 
-<div class="container mt-4">
-    <h1>👤 Meu Perfil de Candidato</h1>
+<div class="container mt-4 profile-layout candidate-profile-page">
+    <header class="page-heading">
+        <div class="page-heading__copy">
+            <span class="page-kicker">MINHA CARREIRA</span>
+            <h1>Meu perfil</h1>
+            <p>Mantenha suas informações profissionais atualizadas para se candidatar com confiança.</p>
+        </div>
+    </header>
 
     @if (_isLoading)
     {
@@ -23,24 +30,24 @@
     {
         <div class="row mt-4">
             <div class="col-md-8">
-                <div class="card">
+                <div class="card profile-form-card">
                     <div class="card-header">
                         <h5 class="mb-0">Dados Pessoais</h5>
                     </div>
                     <div class="card-body">
                         @if (!string.IsNullOrEmpty(_successMessage))
                         {
-                            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                            <div class="alert alert-success" role="alert">
                                 @_successMessage
-                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                <button type="button" class="btn-close" @onclick="() => _successMessage = null" aria-label="Fechar"></button>
                             </div>
                         }
 
                         @if (!string.IsNullOrEmpty(_errorMessage))
                         {
-                            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            <div class="alert alert-danger" role="alert">
                                 @_errorMessage
-                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                <button type="button" class="btn-close" @onclick="() => _errorMessage = null" aria-label="Fechar"></button>
                             </div>
                         }
 
@@ -48,31 +55,31 @@
                             <DataAnnotationsValidator />
 
                             <div class="mb-3">
-                                <label class="form-label">Nome Completo *</label>
-                                <InputText @bind-Value="_editModel.Name" class="form-control" />
+                                <label class="form-label" for="candidate-name">Nome Completo *</label>
+                                <InputText @bind-Value="_editModel.Name" class="form-control" id="candidate-name" data-testid="candidate-profile-name" />
                                 <ValidationMessage For="@(() => _editModel.Name)" />
                             </div>
 
                             <div class="mb-3">
-                                <label class="form-label">Email</label>
-                                <InputText @bind-Value="_editModel.Email" class="form-control" disabled />
+                                <label class="form-label" for="candidate-email">Email</label>
+                                <InputText @bind-Value="_editModel.Email" class="form-control" id="candidate-email" disabled />
                                 <small class="text-muted">Email não pode ser alterado</small>
                             </div>
 
                             <div class="mb-3">
-                                <label class="form-label">Telefone</label>
-                                <InputText @bind-Value="_editModel.Phone" class="form-control" />
+                                <label class="form-label" for="candidate-phone">Telefone</label>
+                                <InputText @bind-Value="_editModel.Phone" class="form-control" id="candidate-phone" placeholder="(00) 00000-0000" />
                             </div>
 
                             <div class="mb-3">
-                                <label class="form-label">Data de Nascimento *</label>
-                                <InputDate @bind-Value="_editModel.DateOfBirth" class="form-control" />
+                                <label class="form-label" for="candidate-dob">Data de Nascimento *</label>
+                                <InputDate @bind-Value="_editModel.DateOfBirth" class="form-control" id="candidate-dob" max="@DateTime.Today.AddYears(-14).ToString("yyyy-MM-dd")" />
                                 <ValidationMessage For="@(() => _editModel.DateOfBirth)" />
                             </div>
 
                             <div class="mb-3">
-                                <label class="form-label">LinkedIn</label>
-                                <InputText @bind-Value="_editModel.LinkedIn" class="form-control" placeholder="https://linkedin.com/in/seu-perfil" />
+                                <label class="form-label" for="candidate-linkedin">LinkedIn</label>
+                                <InputText @bind-Value="_editModel.LinkedIn" class="form-control" id="candidate-linkedin" placeholder="https://linkedin.com/in/seu-perfil" />
                             </div>
 
                             <div class="d-flex gap-2">
@@ -83,7 +90,7 @@
                                     }
                                     Salvar Alterações
                                 </button>
-                                <button type="button" class="btn btn-outline-secondary" @onclick="CancelEdit">Cancelar</button>
+                                <button type="button" class="btn btn-outline-secondary" @onclick="CancelEdit" disabled="@_isSaving">Cancelar</button>
                             </div>
                         </EditForm>
                     </div>
@@ -246,10 +253,12 @@
     private class EditModel
     {
         public Guid Id { get; set; }
+        [Required(ErrorMessage = "Informe seu nome completo.")]
         public string Name { get; set; } = string.Empty;
         public string Email { get; set; } = string.Empty;
         public string? Phone { get; set; }
-        public DateTime DateOfBirth { get; set; }
+        [Required(ErrorMessage = "Informe sua data de nascimento.")]
+        public DateTime? DateOfBirth { get; set; }
         public string? LinkedIn { get; set; }
         public Guid? AddressId { get; set; }
     }

@@ -1,5 +1,6 @@
 @page "/resumes"
 @page "/resumes/create"
+@rendermode InteractiveServer
 @using Recruiva.Core.DTOs.Response
 @using Recruiva.Core.UseCases.Resumes
 @using Recruiva.Web.Services
@@ -8,13 +9,15 @@
 
 <PageTitle>Meus Currículos - Recruiva</PageTitle>
 
-<div class="container mt-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1>📄 Meus Currículos</h1>
-        <button class="btn btn-primary" @onclick="CreateResume">
-            <i class="bi bi-plus-circle"></i> Novo Currículo
-        </button>
-    </div>
+<div class="container mt-4 resumes-page">
+    <header class="page-heading">
+        <div class="page-heading__copy">
+            <span class="page-kicker">MINHA CARREIRA</span>
+            <h1>Meus currículos</h1>
+            <p>Mantenha seu perfil profissional atualizado para cada oportunidade.</p>
+        </div>
+        <button class="btn btn-primary" @onclick="CreateResume">Novo currículo <span aria-hidden="true">↗</span></button>
+    </header>
 
     @if (!string.IsNullOrEmpty(errorMessage))
     {

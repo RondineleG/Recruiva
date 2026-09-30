@@ -1,4 +1,5 @@
 @page "/notifications"
+@rendermode InteractiveServer
 @using Recruiva.Core.DTOs.Response;
 @using Recruiva.Core.Enums;
 @using Recruiva.Core.UseCases.Notifications;
@@ -10,57 +11,51 @@
 
 <PageTitle>Central de Notificações - Recruiva</PageTitle>
 
-<div class="container-fluid mt-4">
-    <!-- Header -->
-    <div class="row mb-4">
-        <div class="col">
-            <h1>🔔 Central de Notificações</h1>
-            <p class="text-muted">Gerencie suas notificações e fique por dentro das novidades</p>
+<div class="container mt-4 notifications-page">
+    <header class="page-heading">
+        <div class="page-heading__copy">
+            <span class="page-kicker">ATUALIZAÇÕES</span>
+            <h1>Notificações</h1>
+            <p>Acompanhe as atualizações das suas vagas e candidaturas.</p>
         </div>
-    </div>
+    </header>
 
-    <!-- Resumo -->
-    <div class="row mb-4">
+    <section class="row g-3 mb-4 notification-metrics" aria-label="Resumo das notificações">
         <div class="col-md-4">
-            <div class="card bg-primary text-white">
+            <article class="card notification-metric">
                 <div class="card-body">
-                    <h3><i class="bi bi-bell"></i> @totalNotifications</h3>
-                    <p class="mb-0">Total de Notificações</p>
+                    <span class="notification-metric__label">Total</span>
+                    <strong class="notification-metric__value">@totalNotifications</strong>
                 </div>
-            </div>
+            </article>
         </div>
         <div class="col-md-4">
-            <div class="card bg-warning text-white">
+            <article class="card notification-metric">
                 <div class="card-body">
-                    <h3><i class="bi bi-envelope"></i> @unreadCount</h3>
-                    <p class="mb-0">Não Lidas</p>
+                    <span class="notification-metric__label">Não lidas</span>
+                    <strong class="notification-metric__value">@unreadCount</strong>
                 </div>
-            </div>
+            </article>
         </div>
         <div class="col-md-4">
-            <div class="card bg-success text-white">
+            <article class="card notification-metric">
                 <div class="card-body">
-                    <h3><i class="bi bi-envelope-open"></i> @readCount</h3>
-                    <p class="mb-0">Lidas</p>
+                    <span class="notification-metric__label">Lidas</span>
+                    <strong class="notification-metric__value">@readCount</strong>
                 </div>
-            </div>
+            </article>
         </div>
-    </div>
+    </section>
 
-    <!-- Ações -->
-    <div class="row mb-3">
-        <div class="col d-flex justify-content-between align-items-center">
-            <h4>📋 Notificações</h4>
-            <div>
-                <button class="btn btn-outline-primary me-2" @onclick="MarkAllAsRead" disabled="@(unreadCount == 0)">
-                    <i class="bi bi-check-all"></i> Marcar todas como lidas
-                </button>
-                <button class="btn btn-outline-secondary" @onclick="LoadNotifications">
-                    <i class="bi bi-arrow-clockwise"></i> Atualizar
-                </button>
-            </div>
+    <section class="notifications-toolbar">
+        <h2>Atualizações recentes</h2>
+        <div class="notifications-toolbar__actions">
+            <button class="btn btn-outline-primary" @onclick="MarkAllAsRead" disabled="@(unreadCount == 0)">
+                Marcar todas como lidas
+            </button>
+            <button class="btn btn-secondary" @onclick="LoadNotifications">Atualizar</button>
         </div>
-    </div>
+    </section>
 
     <!-- Lista de Notificações -->
     @if (isLoading)
@@ -185,12 +180,12 @@
 
     private string GetNotificationIcon(ENotificationType type) => type switch
     {
-        ENotificationType.System => "⚙️",
-        ENotificationType.NewJob => "💼",
-        ENotificationType.ApplicationStatus => "📄",
-        ENotificationType.JobExpired => "⚠️",
-        ENotificationType.Promotional => "🎉",
-        _ => "🔔"
+        ENotificationType.System => "◇",
+        ENotificationType.NewJob => "▣",
+        ENotificationType.ApplicationStatus => "↗",
+        ENotificationType.JobExpired => "!",
+        ENotificationType.Promotional => "✦",
+        _ => "◌"
     };
 
     private string FormatDate(DateTime date)

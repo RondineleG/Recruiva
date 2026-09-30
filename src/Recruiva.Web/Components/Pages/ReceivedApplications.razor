@@ -1,5 +1,6 @@
 @page "/received-applications"
 @page "/jobs/{jobId:guid}/applications"
+@rendermode InteractiveServer
 @using Recruiva.Core.DTOs.Request
 @using Recruiva.Core.DTOs.Response
 @using Recruiva.Core.Enums
@@ -10,13 +11,15 @@
 
 <PageTitle>Candidaturas Recebidas - Recruiva</PageTitle>
 
-<div class="container mt-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1>&#x1F4EC; Candidaturas Recebidas</h1>
-        <button class="btn btn-secondary" @onclick="NavigateToMyJobs">
-            &larr; Minhas Vagas
-        </button>
-    </div>
+<div class="container mt-4 received-applications-page">
+    <header class="page-heading">
+        <div class="page-heading__copy">
+            <span class="page-kicker">ÁREA DA EMPRESA</span>
+            <h1>Candidaturas recebidas</h1>
+            <p>Revise os perfis e escolha os próximos passos do processo.</p>
+        </div>
+        <button class="btn btn-secondary" @onclick="NavigateToMyJobs">Voltar às vagas</button>
+    </header>
 
     @if (!string.IsNullOrEmpty(successMessage))
     {
@@ -43,9 +46,10 @@
     }
     else if (applications != null && applications.Any())
     {
-        <div class="card">
-            <div class="card-body">
-                <table class="table table-hover">
+        <div class="card received-applications-card">
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover">
                     <thead>
                         <tr>
                             <th>Candidato</th>
@@ -96,6 +100,7 @@
                         }
                     </tbody>
                 </table>
+                </div>
             </div>
         </div>
     }

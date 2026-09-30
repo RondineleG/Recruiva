@@ -1,4 +1,5 @@
 @page "/advertiser/upload-logo"
+@rendermode InteractiveServer
 @using Recruiva.Core.DTOs.Request
 @using Recruiva.Core.Interfaces.Storage
 @inject IStorageProvider StorageProvider
@@ -7,15 +8,17 @@
 
 <PageTitle>Upload de Logo - Recruiva</PageTitle>
 
-<div class="container mt-4">
+<div class="container mt-4 page-form-shell upload-page">
+    <header class="page-heading">
+        <div class="page-heading__copy">
+            <span class="page-kicker">IDENTIDADE DA EMPRESA</span>
+            <h1>Atualizar logo da empresa</h1>
+            <p>Escolha uma imagem nítida que represente sua organização.</p>
+        </div>
+        <button class="btn btn-secondary" @onclick="Cancel">Voltar</button>
+    </header>
     <div class="row">
         <div class="col-lg-6 mx-auto">
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <h1>🏢 Upload de Logo da Empresa</h1>
-                <button class="btn btn-secondary" @onclick="Cancel">
-                    ← Voltar
-                </button>
-            </div>
 
             @if (!string.IsNullOrEmpty(errorMessage))
             {
@@ -49,8 +52,8 @@
             <div class="card">
                 <div class="card-body">
                     <div class="mb-3">
-                        <label class="form-label">Selecione o arquivo de logo</label>
-                        <InputFile class="form-control" OnChange="OnFileSelected" accept="image/jpeg,image/png,image/gif,image/webp" />
+                        <label class="form-label" for="logo-file">Selecione o arquivo de logo</label>
+                        <InputFile class="form-control" id="logo-file" OnChange="OnFileSelected" accept="image/jpeg,image/png,image/gif,image/webp" />
                         <div class="form-text">
                             Formatos aceitos: JPEG, PNG, GIF, WebP | Tamanho máximo: 5MB
                         </div>
@@ -78,7 +81,7 @@
 
                     <div class="d-grid gap-2">
                         <button type="button" class="btn btn-success btn-lg" @onclick="UploadLogoAsync" disabled="@(!isFileSelected || isUploading)">
-                            @(isUploading ? "Enviando..." : "📤 Upload Logo")
+                            @(isUploading ? "Enviando..." : "Enviar logo")
                         </button>
                     </div>
                 </div>

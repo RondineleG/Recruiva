@@ -1,4 +1,5 @@
 @page "/resumes/upload"
+@rendermode InteractiveServer
 @using Recruiva.Core.DTOs.Request
 @using Recruiva.Core.Interfaces.Storage
 @inject IStorageProvider StorageProvider
@@ -7,15 +8,17 @@
 
 <PageTitle>Upload de Currículo - Recruiva</PageTitle>
 
-<div class="container mt-4">
+<div class="container mt-4 page-form-shell upload-page">
+    <header class="page-heading">
+        <div class="page-heading__copy">
+            <span class="page-kicker">MINHA CARREIRA</span>
+            <h1>Enviar currículo em PDF</h1>
+            <p>Adicione um currículo para agilizar suas próximas candidaturas.</p>
+        </div>
+        <button class="btn btn-secondary" @onclick="Cancel">Voltar</button>
+    </header>
     <div class="row">
         <div class="col-lg-6 mx-auto">
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <h1>📄 Upload de Currículo (PDF)</h1>
-                <button class="btn btn-secondary" @onclick="Cancel">
-                    ← Voltar
-                </button>
-            </div>
 
             @if (!string.IsNullOrEmpty(errorMessage))
             {
@@ -74,7 +77,7 @@
 
                     <div class="d-grid gap-2">
                         <button type="button" class="btn btn-success btn-lg" @onclick="UploadResumeAsync" disabled="@(!isFileSelected || isUploading)">
-                            @(isUploading ? "Enviando..." : "📤 Upload Currículo")
+                            @(isUploading ? "Enviando..." : "Enviar currículo")
                         </button>
                     </div>
                 </div>

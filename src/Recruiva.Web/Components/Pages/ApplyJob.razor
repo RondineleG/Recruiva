@@ -1,4 +1,6 @@
 @page "/apply/{jobId:guid}"
+@rendermode InteractiveServer
+@attribute [Microsoft.AspNetCore.Authorization.Authorize]
 @using Recruiva.Core.DTOs.Request
 @using Recruiva.Core.Enums
 @using Recruiva.Core.UseCases.Applications
@@ -11,69 +13,81 @@
 
 <PageTitle>Candidatar-se - Recruiva</PageTitle>
 
-<div class="container mt-4">
+<div class="container mt-4 application-page">
+    <header class="page-heading">
+        <div class="page-heading__copy">
+            <span class="page-kicker">CANDIDATURA</span>
+            <h1>Candidatar-se à vaga</h1>
+            <p>Revise os detalhes e envie seu perfil para a empresa.</p>
+        </div>
+        <button class="btn btn-secondary" @onclick="Cancel">Voltar à oportunidade</button>
+    </header>
     <div class="row">
         <div class="col-lg-8 mx-auto">
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <h1>📝 Candidatar-se à Vaga</h1>
-                <button class="btn btn-secondary" @onclick="Cancel">
-                    ← Cancelar
-                </button>
-            </div>
 
-            @if (!string.IsNullOrEmpty(errorMessage))
+            @if (!isCandidate)
             {
-                <div class="alert alert-danger">
-                    <i class="bi bi-exclamation-triangle"></i> @errorMessage
-                </div>
-            }
-
-            @if (successMessage)
-            {
-                <div class="alert alert-success">
-                    <i class="bi bi-check-circle"></i> Candidatura realizada com sucesso!
-                    <br />
-                    <button class="btn btn-primary mt-2" @onclick="ViewApplications">
-                        Ver Minhas Candidaturas
-                    </button>
+                <div class="alert alert-info" role="status">
+                    Esta etapa é exclusiva para candidatos. Entre com uma conta de candidato para enviar sua candidatura.
+                    <a href="/dashboard">Voltar ao início</a>
                 </div>
             }
             else
             {
-                <div class="card">
-                    <div class="card-body">
-                        <p class="text-muted">
-                            Você está se candidatando à vaga <strong>@jobTitle</strong>.
-                            <br />
-                            Preencha as informações abaixo (opcional):
-                        </p>
-
-                        <EditForm Model="model" OnValidSubmit="SubmitForm">
-                            <DataAnnotationsValidator />
-
-                            <div class="mb-3">
-                                <label class="form-label">Observações (opcional)</label>
-                                <InputTextArea class="form-control" @bind-Value="model.Notes" rows="4" 
-                                    placeholder="Escreva uma breve mensagem ou destaque suas qualificações..." />
-                            </div>
-
-                            <div class="alert alert-info">
-                                <i class="bi bi-info-circle"></i> 
-                                Seu currículo ativo será enviado automaticamente.
-                            </div>
-
-                            <div class="d-grid gap-2">
-                                <button type="submit" class="btn btn-success btn-lg" disabled="isSubmitting">
-                                    @if (isSubmitting)
-                                    {
-                                        <span class="spinner-border spinner-border-sm me-2" role="status"></span>
-                                    }
-                                    <i class="bi bi-send"></i> Enviar Candidatura
-                                </button>
-                            </div>
-                        </EditForm>
+                @if (!string.IsNullOrEmpty(errorMessage))
+                {
+                    <div class="alert alert-danger" data-testid="application-feedback">
+                        <i class="bi bi-exclamation-triangle"></i> @errorMessage
                     </div>
-                </div>
+                }
+
+                @if (successMessage)
+                {
+                    <div class="alert alert-success" data-testid="application-feedback">
+                        <i class="bi bi-check-circle"></i> Candidatura realizada com sucesso!
+                        <br />
+                        <button class="btn btn-primary mt-2" @onclick="ViewApplications">
+                            Ver minhas candidaturas
+                        </button>
+                    </div>
+                }
+                else
+                {
+                    <div class="card">
+                        <div class="card-body">
+                            <p class="text-muted">
+                                Você está se candidatando à vaga <strong>@jobTitle</strong>.
+                                <br />
+                                Preencha as informações abaixo (opcional):
+                            </p>
+
+                            <EditForm Model="model" OnValidSubmit="SubmitForm">
+                                <DataAnnotationsValidator />
+
+                                <div class="mb-3">
+                                    <label class="form-label" for="application-notes">Observações (opcional)</label>
+                                    <InputTextArea id="application-notes" class="form-control" @bind-Value="model.Notes" rows="4" data-testid="application-notes"
+                                        placeholder="Escreva uma breve mensagem ou destaque suas qualificações..." />
+                                </div>
+
+                                <div class="alert alert-info">
+                                    <i class="bi bi-info-circle"></i>
+                                    Seu currículo ativo será enviado automaticamente.
+                                </div>
+
+                                <div class="d-grid gap-2">
+                                    <button type="submit" class="btn btn-success btn-lg" disabled="@isSubmitting" data-testid="application-submit">
+                                        @if (isSubmitting)
+                                        {
+                                            <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+                                        }
+                                        <i class="bi bi-send"></i> Enviar candidatura
+                                    </button>
+                                </div>
+                            </EditForm>
+                        </div>
+                    </div>
+                }
             }
         </div>
     </div>
@@ -87,6 +101,7 @@
     private string errorMessage = string.Empty;
     private bool successMessage = false;
     private bool isSubmitting = false;
+    private bool isCandidate;
     private string jobTitle = "carregando...";
 
     protected override async Task OnInitializedAsync()
@@ -105,6 +120,7 @@
 
         // Obter CandidateId do usuário logado
         var candidateId = CurrentUserHelper.GetCandidateId();
+        isCandidate = candidateId.HasValue;
         if (candidateId.HasValue)
         {
             model.CandidateId = candidateId.Value;
@@ -133,7 +149,7 @@
 
     private void Cancel()
     {
-        Navigation.NavigateTo($"/jobs/{JobId}");
+        Navigation.NavigateTo($"/jobs?jobId={JobId}");
     }
 
     private void ViewApplications()

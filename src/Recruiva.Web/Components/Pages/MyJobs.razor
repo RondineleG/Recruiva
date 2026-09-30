@@ -1,4 +1,5 @@
 @page "/my-jobs"
+@rendermode InteractiveServer
 @using Recruiva.Core.DTOs.Response
 @using Recruiva.Core.Enums
 @using Recruiva.Core.UseCases.Jobs
@@ -9,13 +10,17 @@
 
 <PageTitle>Minhas Vagas - Recruiva</PageTitle>
 
-<div class="container mt-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1>💼 Minhas Vagas</h1>
+<div class="container mt-4 my-jobs-page">
+    <header class="page-heading">
+        <div class="page-heading__copy">
+            <span class="page-kicker">ÁREA DA EMPRESA</span>
+            <h1>Minhas vagas</h1>
+            <p>Gerencie publicações, acompanhe o interesse e avance com os candidatos.</p>
+        </div>
         <button class="btn btn-primary" @onclick="@(() => Navigation.NavigateTo("/jobs/create", forceLoad: true))">
-            <i class="bi bi-plus-circle"></i> Nova Vaga
+            Nova vaga <span aria-hidden="true">↗</span>
         </button>
-    </div>
+    </header>
 
     @if (isLoading)
     {
@@ -26,46 +31,26 @@
     }
     else if (jobs?.Any() == true)
     {
-        <!-- Resumo -->
-        <div class="row mb-4">
+        <section class="row g-3 mb-4 dashboard-metrics" aria-label="Resumo das vagas">
             <div class="col-md-3">
-                <div class="card bg-primary text-white">
-                    <div class="card-body text-center">
-                        <h3>@jobs.Count()</h3>
-                        <p class="mb-0">Total de Vagas</p>
-                    </div>
-                </div>
+                <article class="card dashboard-metric"><div class="card-body"><span class="dashboard-metric__icon" aria-hidden="true">▣</span><span class="dashboard-metric__label">Total de vagas</span><strong class="dashboard-metric__value">@jobs.Count()</strong></div></article>
             </div>
             <div class="col-md-3">
-                <div class="card bg-success text-white">
-                    <div class="card-body text-center">
-                        <h3>@jobs.Count(j => j.Status == "Active")</h3>
-                        <p class="mb-0">Ativas</p>
-                    </div>
-                </div>
+                <article class="card dashboard-metric"><div class="card-body"><span class="dashboard-metric__icon" aria-hidden="true">✓</span><span class="dashboard-metric__label">Vagas ativas</span><strong class="dashboard-metric__value">@jobs.Count(j => j.Status == "Active")</strong></div></article>
             </div>
             <div class="col-md-3">
-                <div class="card bg-warning text-white">
-                    <div class="card-body text-center">
-                        <h3>@jobs.Sum(j => j.Views)</h3>
-                        <p class="mb-0">Visualizações</p>
-                    </div>
-                </div>
+                <article class="card dashboard-metric"><div class="card-body"><span class="dashboard-metric__icon" aria-hidden="true">◉</span><span class="dashboard-metric__label">Visualizações</span><strong class="dashboard-metric__value">@jobs.Sum(j => j.Views)</strong></div></article>
             </div>
             <div class="col-md-3">
-                <div class="card bg-info text-white">
-                    <div class="card-body text-center">
-                        <h3>@jobs.Sum(j => j.Applications)</h3>
-                        <p class="mb-0">Candidaturas</p>
-                    </div>
-                </div>
+                <article class="card dashboard-metric"><div class="card-body"><span class="dashboard-metric__icon" aria-hidden="true">↗</span><span class="dashboard-metric__label">Candidaturas</span><strong class="dashboard-metric__value">@jobs.Sum(j => j.Applications)</strong></div></article>
             </div>
-        </div>
+        </section>
 
         <!-- Tabela de Vagas -->
-        <div class="card">
-            <div class="card-body">
-                <table class="table table-hover">
+        <div class="card jobs-management-card">
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover">
                     <thead>
                         <tr>
                             <th>Título</th>
@@ -79,7 +64,7 @@
                     <tbody>
                         @foreach (var job in jobs)
                         {
-                            <tr>
+                            <tr data-testid="my-job-row">
                                 <td>
                                     <strong>@job.Title</strong>
                                     @if (!string.IsNullOrEmpty(job.Category))
@@ -140,6 +125,7 @@
                         }
                     </tbody>
                 </table>
+                </div>
             </div>
         </div>
     }

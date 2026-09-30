@@ -1,8 +1,11 @@
 @page "/jobs/{jobId:guid}"
+@rendermode InteractiveServer
 @using Recruiva.Core.DTOs.Response
 @using Recruiva.Core.Enums
 @using Recruiva.Core.UseCases.Jobs
+@using Recruiva.Web.Services
 @inject GetJobByIdUseCase GetJobByIdUseCase
+@inject ICurrentUserHelper CurrentUserHelper
 @inject NavigationManager Navigation
 
 <PageTitle>@(job?.Title ?? "Detalhes da Vaga") - Recruiva</PageTitle>
@@ -25,7 +28,7 @@
     }
 </HeadContent>
 
-<div class="container mt-4">
+<div class="container job-detail-page">
     @if (isLoading)
     {
         <div class="text-center py-5">
@@ -47,23 +50,23 @@
     else
     {
         <!-- Breadcrumb -->
-        <nav aria-label="breadcrumb" class="mb-4">
+            <nav aria-label="breadcrumb" class="mb-4 job-detail-breadcrumb">
             <ol class="breadcrumb">
                 <li class="breadcrumb-item"><a href="/jobs">Vagas</a></li>
                 <li class="breadcrumb-item active">@job.Title</li>
             </ol>
         </nav>
 
-        <div class="row">
+        <div class="row job-detail-layout">
             <!-- Detalhes da Vaga -->
-            <div class="col-lg-8">
-                <div class="card mb-4">
+            <div class="col-lg-8 job-detail-main">
+                <div class="card mb-4 job-detail-card">
                     <div class="card-body">
                         <div class="d-flex justify-content-between align-items-start mb-3">
-                            <h1 class="card-title">@job.Title</h1>
+                            <h1 class="card-title" data-testid="job-detail-title">@job.Title</h1>
                             @if (job.IsRemote)
                             {
-                                <span class="badge bg-success fs-6">🏠 Remoto</span>
+                                <span class="badge bg-success fs-6">Remoto</span>
                             }
                         </div>
 
@@ -88,7 +91,7 @@
                                 <div class="col-md-6 mb-2">
                                     <strong><i class="bi bi-currency-exchange"></i> Salário:</strong><br />
                                     <span class="text-success">
-                                        R$ @job.SalaryMin.Value.ToString("N2") - R$ @job.SalaryMax.Value.ToString("N2") @job.SalaryCurrency
+                                        @GetCurrencySymbol(job.SalaryCurrency) @job.SalaryMin.Value.ToString("N2") - @GetCurrencySymbol(job.SalaryCurrency) @job.SalaryMax.Value.ToString("N2")
                                     </span>
                                 </div>
                             }
@@ -96,6 +99,11 @@
                             <div class="col-md-6 mb-2">
                                 <strong><i class="bi bi-tag"></i> Tipo:</strong><br />
                                 @(job.Type == "OnSite" ? "Presencial" : job.Type == "Remote" ? "Remoto" : "Híbrido")
+                            </div>
+
+                            <div class="col-md-6 mb-2">
+                                <strong>Número de vagas:</strong><br />
+                                @job.NumberOfOpenings
                             </div>
 
                             @if (!string.IsNullOrEmpty(job.Category))
@@ -138,6 +146,27 @@
                             </div>
                         }
 
+                        @if (!string.IsNullOrWhiteSpace(job.Observations))
+                        {
+                            <div class="mb-4">
+                                <h4>Observações</h4>
+                                <p class="mt-2">@job.Observations</p>
+                            </div>
+                        }
+
+                        @if (!string.IsNullOrWhiteSpace(job.ApplicationInstructions))
+                        {
+                            <div class="mb-4">
+                                <h4>Como se candidatar</h4>
+                                <p class="mt-2">@job.ApplicationInstructions</p>
+                            </div>
+                        }
+
+                        <div class="alert alert-warning" role="note">
+                            Nunca pague para participar de um processo seletivo e não envie documentos, dados bancários ou fotos por canais que você não conhece.
+                        </div>
+                        <p class="job-modal__disclaimer">Vaga publicada sob responsabilidade do anunciante. A Recruiva não se responsabiliza pelo conteúdo informado.</p>
+
                         @if (!string.IsNullOrEmpty(job.Tags))
                         {
                             <div class="mb-3">
@@ -160,22 +189,32 @@
             </div>
 
             <!-- Sidebar -->
-            <div class="col-lg-4">
+            <div class="col-lg-4 job-detail-sidebar">
                 <!-- Card de Candidatura -->
-                <div class="card mb-3">
+                <div class="card mb-3 job-apply-card">
                     <div class="card-body">
                         <h5 class="card-title">Interessado nesta vaga?</h5>
                         <p class="card-text">Candidate-se agora e demonstre seu interesse!</p>
-                        <button class="btn btn-success w-100 btn-lg" @onclick="ApplyToJob">
-                            <i class="bi bi-send"></i> Candidatar-se
-                        </button>
+                        @if (isCandidate)
+                        {
+                            <a class="btn btn-success w-100 btn-lg" href="@($"/apply/{JobId}")"><i class="bi bi-send"></i> Candidatar-se</a>
+                        }
+                        else if (!isAuthenticated)
+                        {
+                            <a class="btn btn-outline-primary w-100 mb-2" href="/Account/Register?AccountType=candidate">Criar conta de candidato</a>
+                            <a class="btn btn-success w-100 btn-lg" href="@($"/Account/Login?ReturnUrl=%2Fapply%2F{JobId}")">Entrar para se candidatar</a>
+                        }
+                        else
+                        {
+                            <p class="text-muted">A candidatura está disponível para perfis de candidato.</p>
+                        }
                     </div>
                 </div>
 
                 <!-- Card da Empresa -->
                 @if (!string.IsNullOrEmpty(job.AdvertiserName))
                 {
-                    <div class="card">
+                    <div class="card job-company-card">
                         <div class="card-body">
                             <h6 class="card-title">Sobre a Empresa</h6>
                             @if (!string.IsNullOrEmpty(job.AdvertiserLogoUrl))
@@ -207,9 +246,13 @@
 
     private JobResponse? job;
     private bool isLoading = true;
+    private bool isAuthenticated;
+    private bool isCandidate;
 
     protected override async Task OnInitializedAsync()
     {
+        isAuthenticated = CurrentUserHelper.IsAuthenticated();
+        isCandidate = CurrentUserHelper.GetCandidateId().HasValue;
         var result = await GetJobByIdUseCase.ExecuteAsync(JobId);
         if (result.Status == EResultStatus.Success)
         {
@@ -218,10 +261,12 @@
         isLoading = false;
     }
 
-    private void ApplyToJob()
+    private static string GetCurrencySymbol(string currency) => currency switch
     {
-        Navigation.NavigateTo($"/apply/{JobId}");
-    }
+        "USD" => "US$",
+        "EUR" => "€",
+        _ => "R$"
+    };
 
     private void NavigateBackToList()
     {

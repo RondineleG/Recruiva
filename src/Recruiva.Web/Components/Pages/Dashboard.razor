@@ -1,5 +1,7 @@
 @page "/"
 @page "/dashboard"
+@rendermode InteractiveServer
+@using Recruiva.Core.DTOs.Request
 @using Recruiva.Core.DTOs.Response
 @using Recruiva.Core.Enums
 @using Recruiva.Core.UseCases.Jobs
@@ -19,59 +21,84 @@
     <meta property="og:type" content="website" />
 </HeadContent>
 
-<div class="container-fluid mt-4">
-    <!-- Header -->
-    <div class="row mb-4">
-        <div class="col">
-            <h1>&#x1F4CA; Dashboard</h1>
-            <p class="text-muted">Bem-vindo ao Recruiva - Sua plataforma de recrutamento</p>
-        </div>
-    </div>
+<div class="container-fluid mt-4 dashboard-page">
+    @if (isAnonymous)
+    {
+        <section class="landing-hero">
+            <span class="page-kicker">RECRUIVA · TALENTOS QUE FICAM</span>
+            <h1>O trabalho certo muda tudo.</h1>
+            <p>Uma forma mais humana de encontrar oportunidades, contratar melhor e construir o próximo capítulo.</p>
+            <div class="landing-hero__actions">
+                <a class="btn btn-primary btn-lg" href="/Account/Register">Criar conta gratuita</a>
+                <a class="btn btn-outline-primary btn-lg" href="/jobs">Explorar vagas</a>
+            </div>
+            <ul class="landing-hero__proof">
+                <li><span aria-hidden="true">✓</span> Perfil em um só lugar</li>
+                <li><span aria-hidden="true">⌕</span> Busca sem complicação</li>
+                <li><span aria-hidden="true">◈</span> Ambiente seguro e gratuito</li>
+            </ul>
+        </section>
+    }
+    else
+    {
+        <header class="page-heading">
+            <div class="page-heading__copy">
+                <span class="page-kicker">@(isAdvertiser ? "SEU ESPAÇO RECRUIVA" : "SUA JORNADA")</span>
+                <h1>@(isAdvertiser ? "Visão geral" : "Continue sua jornada")</h1>
+                <p>@(isAdvertiser ? "Acompanhe suas vagas e candidaturas em um só lugar." : "Acompanhe suas candidaturas e descubra a próxima oportunidade.")</p>
+            </div>
+        </header>
+    }
 
     @if (isLoading)
     {
         <div class="text-center py-5">
             <div class="spinner-border text-primary" role="status"></div>
-            <p class="mt-2">Carregando dashboard...</p>
+            <p class="mt-2">Carregando...</p>
         </div>
     }
-    else
+    else if (isAdvertiser)
     {
-        <!-- Estatísticas -->
-        <div class="row mb-4">
-            <div class="col-md-3">
-                <div class="card bg-primary text-white">
-                    <div class="card-body">
-                        <h3><i class="bi bi-briefcase"></i> @analytics?.TotalJobs</h3>
-                        <p class="mb-0">Total de Vagas</p>
-                    </div>
+        <section class="dashboard-section" aria-label="Indicadores de recrutamento">
+            <div class="row g-3 dashboard-metrics">
+                <div class="col-md-3">
+                    <article class="card dashboard-metric">
+                        <div class="card-body">
+                            <span class="dashboard-metric__icon" aria-hidden="true">▣</span>
+                            <span class="dashboard-metric__label">Total de vagas</span>
+                            <strong class="dashboard-metric__value">@analytics?.TotalJobs</strong>
+                        </div>
+                    </article>
+                </div>
+                <div class="col-md-3">
+                    <article class="card dashboard-metric">
+                        <div class="card-body">
+                            <span class="dashboard-metric__icon" aria-hidden="true">✓</span>
+                            <span class="dashboard-metric__label">Vagas ativas</span>
+                            <strong class="dashboard-metric__value">@analytics?.ActiveJobs</strong>
+                        </div>
+                    </article>
+                </div>
+                <div class="col-md-3">
+                    <article class="card dashboard-metric">
+                        <div class="card-body">
+                            <span class="dashboard-metric__icon" aria-hidden="true">◉</span>
+                            <span class="dashboard-metric__label">Candidatos</span>
+                            <strong class="dashboard-metric__value">@analytics?.TotalCandidates</strong>
+                        </div>
+                    </article>
+                </div>
+                <div class="col-md-3">
+                    <article class="card dashboard-metric">
+                        <div class="card-body">
+                            <span class="dashboard-metric__icon" aria-hidden="true">↗</span>
+                            <span class="dashboard-metric__label">Candidaturas</span>
+                            <strong class="dashboard-metric__value">@analytics?.TotalApplications</strong>
+                        </div>
+                    </article>
                 </div>
             </div>
-            <div class="col-md-3">
-                <div class="card bg-success text-white">
-                    <div class="card-body">
-                        <h3><i class="bi bi-check-circle"></i> @analytics?.ActiveJobs</h3>
-                        <p class="mb-0">Vagas Ativas</p>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="card bg-info text-white">
-                    <div class="card-body">
-                        <h3><i class="bi bi-people"></i> @analytics?.TotalCandidates</h3>
-                        <p class="mb-0">Candidatos</p>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="card bg-warning text-white">
-                    <div class="card-body">
-                        <h3><i class="bi bi-send"></i> @analytics?.TotalApplications</h3>
-                        <p class="mb-0">Candidaturas</p>
-                    </div>
-                </div>
-            </div>
-        </div>
+        </section>
 
         <!-- Gráfico de Vagas por Status -->
         @if (analytics?.JobsByStatus != null && analytics.JobsByStatus.Any())
@@ -80,7 +107,7 @@
                 <div class="col">
                     <div class="card">
                         <div class="card-body">
-                            <h5 class="card-title">&#x1F4CA; Vagas por Status</h5>
+                            <h2 class="card-title">Vagas por situação</h2>
                             <div class="mt-3">
                                 @foreach (var status in analytics.JobsByStatus)
                                 {
@@ -97,7 +124,7 @@
 
                                     <div class="mb-2">
                                         <div class="d-flex justify-content-between">
-                                            <span>@status.Key</span>
+                                            <span>@GetStatusLabel(status.Key)</span>
                                             <span>@status.Value (@percentage%)</span>
                                         </div>
                                         <div class="progress" style="height: 20px;">
@@ -119,7 +146,7 @@
                 <div class="col">
                     <div class="card">
                         <div class="card-body">
-                            <h5 class="card-title">&#x1F4EC; Candidaturas por Status</h5>
+                            <h2 class="card-title">Candidaturas por situação</h2>
                             <div class="mt-3">
                                 @foreach (var status in analytics.ApplicationsByStatus)
                                 {
@@ -135,7 +162,7 @@
 
                                     <div class="mb-2">
                                         <div class="d-flex justify-content-between">
-                                            <span>@status.Key</span>
+                                            <span>@GetStatusLabel(status.Key)</span>
                                             <span>@status.Value (@percentage%)</span>
                                         </div>
                                         <div class="progress" style="height: 20px;">
@@ -151,67 +178,136 @@
         }
     }
 
-    <!-- Ações Rápidas -->
-    <div class="row mb-4">
-        <div class="col">
-            <h4>&#x26A1; Ações Rápidas</h4>
-        </div>
-    </div>
-    <div class="row g-3 mb-4">
-        <div class="col-md-4">
-            <div class="card h-100">
-                <div class="card-body text-center">
-                    <i class="bi bi-search display-6 text-primary"></i>
-                    <h5 class="card-title mt-3">Buscar Vagas</h5>
-                    <p class="card-text text-muted">Encontre a vaga ideal para você</p>
-                    <button class="btn btn-primary" @onclick="NavigateToJobs">
-                        Ver Vagas
-                    </button>
-                </div>
+    <section class="page-section dashboard-actions">
+        <div class="page-section__heading">
+            <div>
+                <span class="page-kicker">@(isAnonymous ? "COMECE POR AQUI" : "PRÓXIMOS PASSOS")</span>
+                <h2>Acessos rápidos</h2>
             </div>
         </div>
-        <div class="col-md-4">
-            <div class="card h-100">
-                <div class="card-body text-center">
-                    <i class="bi bi-plus-circle display-6 text-success"></i>
-                    <h5 class="card-title mt-3">Criar Vaga</h5>
-                    <p class="card-text text-muted">Publique uma nova vaga</p>
-                    <button class="btn btn-success" @onclick="NavigateToCreateJob">
-                        Nova Vaga
-                    </button>
+        @if (isAdvertiser)
+        {
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <article class="card dashboard-action-card">
+                        <div class="card-body">
+                            <span class="dashboard-action-card__icon" aria-hidden="true">▣</span>
+                            <h3>Minhas vagas</h3>
+                            <p>Revise suas publicações e acompanhe o interesse.</p>
+                            <button class="btn btn-outline-primary" @onclick="NavigateToMyJobs">Acompanhar vagas <span aria-hidden="true">→</span></button>
+                        </div>
+                    </article>
+                </div>
+                <div class="col-md-4">
+                    <article class="card dashboard-action-card dashboard-action-card--featured">
+                        <div class="card-body">
+                            <span class="dashboard-action-card__icon" aria-hidden="true">＋</span>
+                            <h3>Publique uma vaga</h3>
+                            <p>Conte o que você procura e encontre novas pessoas.</p>
+                            <button class="btn btn-primary" @onclick="NavigateToCreateJob">Criar vaga <span aria-hidden="true">↗</span></button>
+                        </div>
+                    </article>
+                </div>
+                <div class="col-md-4">
+                    <article class="card dashboard-action-card">
+                        <div class="card-body">
+                            <span class="dashboard-action-card__icon" aria-hidden="true">◎</span>
+                            <h3>Candidaturas recebidas</h3>
+                            <p>Conheça os profissionais interessados nas suas vagas.</p>
+                            <button class="btn btn-outline-primary" @onclick="NavigateToApplications">Ver candidatos <span aria-hidden="true">→</span></button>
+                        </div>
+                    </article>
                 </div>
             </div>
-        </div>
-        <div class="col-md-4">
-            <div class="card h-100">
-                <div class="card-body text-center">
-                    <i class="bi bi-file-earmark-text display-6 text-info"></i>
-                    <h5 class="card-title mt-3">Meu Currículo</h5>
-                    <p class="card-text text-muted">Gerencie seus currículos</p>
-                    <button class="btn btn-info" @onclick="NavigateToResumes">
-                        Ver Currículos
-                    </button>
+        }
+        else if (isCandidate)
+        {
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <article class="card dashboard-action-card dashboard-action-card--featured">
+                        <div class="card-body">
+                            <span class="dashboard-action-card__icon" aria-hidden="true">⌕</span>
+                            <h3>Explorar vagas</h3>
+                            <p>Encontre oportunidades que combinam com o seu momento.</p>
+                            <button class="btn btn-primary" @onclick="NavigateToJobs">Ver vagas <span aria-hidden="true">→</span></button>
+                        </div>
+                    </article>
+                </div>
+                <div class="col-md-4">
+                    <article class="card dashboard-action-card">
+                        <div class="card-body">
+                            <span class="dashboard-action-card__icon" aria-hidden="true">↗</span>
+                            <h3>Minhas candidaturas</h3>
+                            <p>Acompanhe o retorno das vagas em que você se candidatou.</p>
+                            <button class="btn btn-outline-primary" @onclick="NavigateToMyApplications">Acompanhar <span aria-hidden="true">→</span></button>
+                        </div>
+                    </article>
+                </div>
+                <div class="col-md-4">
+                    <article class="card dashboard-action-card">
+                        <div class="card-body">
+                            <span class="dashboard-action-card__icon" aria-hidden="true">▤</span>
+                            <h3>Meus currículos</h3>
+                            <p>Mantenha seu currículo pronto para se candidatar rápido.</p>
+                            <button class="btn btn-outline-primary" @onclick="NavigateToResumes">Organizar <span aria-hidden="true">→</span></button>
+                        </div>
+                    </article>
                 </div>
             </div>
-        </div>
-    </div>
+        }
+        else
+        {
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <article class="card dashboard-action-card dashboard-action-card--featured">
+                        <div class="card-body">
+                            <span class="dashboard-action-card__icon" aria-hidden="true">⌕</span>
+                            <h3>Buscar vagas</h3>
+                            <p>Veja as oportunidades abertas agora, sem precisar de conta.</p>
+                            <a class="btn btn-primary" href="/jobs">Explorar vagas <span aria-hidden="true">→</span></a>
+                        </div>
+                    </article>
+                </div>
+                <div class="col-md-4">
+                    <article class="card dashboard-action-card">
+                        <div class="card-body">
+                            <span class="dashboard-action-card__icon" aria-hidden="true">✦</span>
+                            <h3>Candidatos</h3>
+                            <p>Crie seu perfil gratuito e candidate-se em poucos passos.</p>
+                            <a class="btn btn-outline-primary" href="/Account/Register?AccountType=candidate">Criar conta de candidato <span aria-hidden="true">→</span></a>
+                        </div>
+                    </article>
+                </div>
+                <div class="col-md-4">
+                    <article class="card dashboard-action-card">
+                        <div class="card-body">
+                            <span class="dashboard-action-card__icon" aria-hidden="true">▣</span>
+                            <h3>Empresas</h3>
+                            <p>Publique vagas e receba candidaturas organizadas.</p>
+                            <a class="btn btn-outline-primary" href="/Account/Register?AccountType=advertiser">Criar conta de empresa <span aria-hidden="true">→</span></a>
+                        </div>
+                    </article>
+                </div>
+            </div>
+        }
+    </section>
 
     <!-- Vagas Recentes -->
     <div class="row">
         <div class="col">
             <div class="d-flex justify-content-between align-items-center mb-3">
-                <h4>&#x1F525; Vagas Recentes</h4>
-                <button class="btn btn-outline-primary" @onclick="NavigateToJobs">
-                    Ver Todas &rarr;
-                </button>
+                <h2>@(isAnonymous ? "Vagas em destaque" : "Vagas recentes")</h2>
+                <a class="btn btn-outline-primary" href="/jobs">
+                    Ver todas as vagas <span aria-hidden="true">→</span>
+                </a>
             </div>
         </div>
     </div>
 
-    @if (analytics?.RecentJobs != null && analytics.RecentJobs.Any())
+    @if (recentJobs.Count > 0)
     {
         <div class="row g-3">
-            @foreach (var job in analytics.RecentJobs.Take(6))
+            @foreach (var job in recentJobs.Take(6))
             {
                 <div class="col-md-6 col-lg-4">
                     <div class="card h-100">
@@ -242,9 +338,9 @@
                             }
                         </div>
                         <div class="card-footer bg-transparent">
-                            <button class="btn btn-outline-primary w-100" @onclick="() => ViewJobDetails(job.Id)">
-                                Ver Detalhes
-                            </button>
+                            <a class="btn btn-outline-primary w-100" href="@($"/jobs?jobId={job.Id}")">
+                                Ver detalhes
+                            </a>
                         </div>
                     </div>
                 </div>
@@ -261,24 +357,37 @@
 
 @code {
     private DashboardAnalyticsResponse? analytics;
+    private List<JobResponse> recentJobs = [];
     private bool isLoading = true;
+    private bool isAuthenticated;
+    private bool isAdvertiser;
+    private bool isCandidate;
+    private bool isAnonymous => !isAuthenticated;
 
     protected override async Task OnInitializedAsync()
     {
+        isAuthenticated = CurrentUserHelper.IsAuthenticated();
         var advertiserId = CurrentUserHelper.GetAdvertiserId();
+        isAdvertiser = advertiserId.HasValue;
+        isCandidate = CurrentUserHelper.GetCandidateId().HasValue;
 
-        var result = await DashboardAnalyticsUseCase.ExecuteAsync(advertiserId);
-        if (result.Status == EResultStatus.Success)
+        if (isAdvertiser)
         {
-            analytics = result.Data;
+            var analyticsResult = await DashboardAnalyticsUseCase.ExecuteAsync(advertiserId);
+            if (analyticsResult.Status == EResultStatus.Success)
+            {
+                analytics = analyticsResult.Data;
+                recentJobs = analytics?.RecentJobs ?? [];
+            }
+        }
+        else
+        {
+            var jobsResult = await SearchJobsUseCase.ExecuteAsync(new ListJobsRequest { Page = 1, Size = 6 });
+            if (jobsResult.Status == EResultStatus.Success && jobsResult.Data is not null)
+                recentJobs = jobsResult.Data.Jobs.ToList();
         }
 
         isLoading = false;
-    }
-
-    private void ViewJobDetails(Guid jobId)
-    {
-        Navigation.NavigateTo($"/jobs/{jobId}");
     }
 
     private void NavigateToJobs()
@@ -291,8 +400,36 @@
         Navigation.NavigateTo("/jobs/create");
     }
 
+    private void NavigateToMyJobs()
+    {
+        Navigation.NavigateTo("/my-jobs");
+    }
+
+    private void NavigateToApplications()
+    {
+        Navigation.NavigateTo("/received-applications");
+    }
+
+    private void NavigateToMyApplications()
+    {
+        Navigation.NavigateTo("/my-applications");
+    }
+
     private void NavigateToResumes()
     {
         Navigation.NavigateTo("/resumes");
     }
+
+    private static string GetStatusLabel(string status) => status switch
+    {
+        "Active" => "Ativas",
+        "Expired" => "Expiradas",
+        "Paused" => "Pausadas",
+        "Hidden" => "Ocultas",
+        "Rejected" => "Rejeitadas",
+        "Sent" => "Enviadas",
+        "Viewed" => "Visualizadas",
+        "Selected" => "Selecionadas",
+        _ => status
+    };
 }

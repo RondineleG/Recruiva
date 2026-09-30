@@ -1,4 +1,5 @@
 @page "/plans"
+@rendermode InteractiveServer
 @using Recruiva.Core.DTOs.Response
 @using Recruiva.Core.UseCases.Subscriptions
 @using Recruiva.Core.Interfaces.Services
@@ -10,13 +11,14 @@
 
 <PageTitle>Planos e Preços - Recruiva</PageTitle>
 
-<div class="container-fluid mt-4">
-    <div class="row mb-4">
-        <div class="col">
-            <h1>&#x1F48E; Planos e Preços</h1>
-            <p class="text-muted">Escolha o plano ideal para impulsionar suas contratações</p>
+<div class="container mt-4 plans-page">
+    <header class="page-heading">
+        <div class="page-heading__copy">
+            <span class="page-kicker">RECRUTAMENTO FLEXÍVEL</span>
+            <h1>Planos para crescer no seu ritmo</h1>
+            <p>Compare os recursos e escolha o que faz sentido para suas contratações.</p>
         </div>
-    </div>
+    </header>
 
     @if (isLoading)
     {
@@ -60,7 +62,7 @@
                     };
 
                     <div class="col-md-4">
-                        <div class="card h-100 @cardClass @(isCurrentPlan ? "border-3 shadow-lg" : "shadow-sm")">
+                        <div class="card h-100 plan-card @cardClass @(isCurrentPlan ? "plan-card--current border-3 shadow-lg" : "shadow-sm")">
                             @if (isCurrentPlan)
                             {
                                 <div class="card-header bg-primary text-white text-center">
